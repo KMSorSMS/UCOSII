@@ -1,2 +1,5 @@
 Diagnostics:
   UnusedIncludes: None
+CompileFlags:
+  Add: [-Wno-format]
+  Compiler: /opt/arm-gnu-toolchain-13.2.Rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-gcc

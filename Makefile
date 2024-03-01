@@ -99,7 +99,7 @@ AS_INCLUDES =
 C_INCLUDES =  \
 -ISource \
 -Iports \
--ICfg/ \
+-ICfg \
 
 
 # compile gcc flags
@@ -170,5 +170,9 @@ clean:
 # dependencies
 #######################################
 -include $(wildcard $(BUILD_DIR)/*.d)
+
+.PHONY: bear
+bear:
+	bear -o build/compile_commands.json make
 
 # *** EOF ***
