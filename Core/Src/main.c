@@ -78,7 +78,7 @@ void SystemClock_Config(void)
 
 }
 
-void SetSystick(){
+void SetSystick(void){
 	SysTick->CTRL &= ~(1 << 2);		//设置AHB外设时钟源为HCLK/8
 	SysTick->CTRL |= (1 << 1);		//开启中断
 	SysTick->LOAD = 0xA;			//设置重装载值为0xA,缩小10倍，这样HAL库的DELAY函数就是1微秒
@@ -86,7 +86,7 @@ void SetSystick(){
 	SysTick->CTRL |= (1 << 0);		//开启计数器
 }
 
-void initAll() {
+void initAll(void) {
 	HAL_Init();  			 		//初始化HAL库
 	SystemClock_Config();			//初始化系统时钟
 	MX_GPIO_Init();					//初始化GPIOA,用于控制LED
@@ -105,7 +105,7 @@ void initAll() {
 	HAL_NVIC_SetPriority(SysTick_IRQn, 0, 0);
 }
 
-int main() {
+int main(void) {
 	initAll();
 	while (1) {
 		HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_SET);

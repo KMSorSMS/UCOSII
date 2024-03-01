@@ -209,7 +209,7 @@ void       OS_CPU_SysTickInit     (INT32U     cnts);
 void       OS_CPU_SysTickInitFreq (INT32U     cpu_freq);
 
 void       OS_CPU_SysTickHandler  (void);
-void       OS_CPU_PendSVHandler   (void);
+void       PendSV_Handler   (void);
 
 #if (OS_CPU_ARM_FP_EN > 0u)
 void       OS_CPU_FP_Reg_Push     (OS_STK    *stkPtr);
