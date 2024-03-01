@@ -18,6 +18,9 @@ ${PROJ_PATH}/Middlewares/BSP/Src/MS5611.c
 ${PROJ_PATH}/Middlewares/BSP/Src/usart.c
 ${PROJ_PATH}/Middlewares/BSP/Src/Receiver.c
 ${PROJ_PATH}/Middlewares/BSP/Src/MotorPWM.c
+${PROJ_PATH}/Middlewares/Third_Party/Src/app_hooks.c
 ${PROJ_PATH}/Middlewares/Third_Party/Src/os_cpu_a.S
+${PROJ_PATH}/Middlewares/Third_Party/Src/os_cpu_c.c
+${PROJ_PATH}/Middlewares/Third_Party/Src/os_dbg.c
 ${PROJ_PATH}/Middlewares/Third_Party/Src/ucos_ii.c
 )

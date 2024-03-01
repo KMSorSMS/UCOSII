@@ -40,8 +40,8 @@
 	  "--query-driver=/opt/arm-gnu-toolchain-13.2.Rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-gcc",
 	],
 	"clangd.fallbackFlags": [
-	  "-Iports",
-	  "-ICfg"
+	  "-I/usr/include/",
 	],
 	"clangd.path": "/usr/bin/clangd",
+	"cSpell.enabled": false,
 }

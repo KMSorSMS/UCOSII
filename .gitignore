@@ -3,3 +3,4 @@ CubeMX/*
 !CubeMX/*.ioc
 docs/*
 docs/
+.cache/
