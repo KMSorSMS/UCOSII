@@ -14,16 +14,16 @@ set(PROJ_PATH                       ${CMAKE_CURRENT_SOURCE_DIR})
 set(CMAKE_TOOLCHAIN_FILE			gcc-arm-none-eabi)
 
 # Project Name    --- MUST EDIT ---
-project(CMake-Template)
+project(UCOSII)
 enable_language(C CXX ASM)
 
 # Linker File     --- MUST EDIT ---
-set(linker_script_SRC               ${PROJ_PATH}/Core/STM32L432KCUX_FLASH.ld)
+set(linker_script_SRC               ${PROJ_PATH}/Core/STM32F401RETx_FLASH.ld)
 set(EXECUTABLE                      ${CMAKE_PROJECT_NAME})
 
 # MCU Parameters - I am storing all created profiles. Pick one to use.
 # include(STM32G431xx_HAL_PARA)
-include(STM32L432xx_HAL_PARA)
+include(STM32F401xe_HAL_PARA)
 
 # USE .\getIncludeList.sh and .\getSourceList.sh to generate file list
 # Include List, Source List, and MCU Sepecific Setting
