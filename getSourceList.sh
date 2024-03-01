@@ -6,21 +6,21 @@ APP_PATH='Application/*'
 CORE_PATH='Core/*'
 DRIVERS_PATH='Drivers/*'
 FATFS_PATH='FATFS/*'
-MIDWARE_PATH='Middlewares/*'
+MIDWARE_PATH='Middlewares/BSP/*'
 RTOS_PATH='Middlewares/Third_Party/Src/*'
 USB_PATH='USB_Device/*'
 
-APP_SRC="$(eval find "$APP_PATH" -type f -name '*.c' -o -name '*.cpp' -o -name '*.s')"
-CORE_SRC="$(eval find "$CORE_PATH" -type f -name '*.c' -o -name '*.cpp' -o -name '*.s')"
+APP_SRC="$(eval find "$APP_PATH" -type f -name '*.c' -o -name '*.cpp' -o -name '*.s' -o -name '*.S')"
+CORE_SRC="$(eval find "$CORE_PATH" -type f -name '*.c' -o -name '*.cpp' -o -name '*.s' -o -name '*.S')"
 DRIVERS_SRC="$(eval find "$DRIVERS_PATH" -type f -name '*.c')"
 FATFS_SRC="$(eval find "$FATFS_PATH" -type f -name '*.c')"
 MIDWARE_SRC="$(eval find "$MIDWARE_PATH" -maxdepth 1 -type f -name '*.c')"
-RTOS_SRC="$(eval find "$RTOS_PATH"  -type f -name '*.c')"
+RTOS_SRC="$(eval find "$RTOS_PATH"  -type f -name '*.c' -o -name '*.s' -o -name '*.S')"
 # MIDWARE_SRC="$(eval find "$MIDWARE_PATH" -type f \( -path "*/src/*.c" -o -path "*/Src/*.c" \))"
 USB_SRC="$(eval find "$USB_PATH" -type f -name '*.c')"
 
 # Print find result
-printf "$APP_SRC\n$CORE_SRC\n$FATFS_SRC\n$USB_SRC\n$MIDWARE_SRC\n$RTOS_SRC" > cmake/SourceList.cmake
+printf "$APP_SRC\n$CORE_SRC\n$DRIVERS_SRC\n$FATFS_SRC\n$USB_SRC\n$MIDWARE_SRC\n$RTOS_SRC" > cmake/SourceList.cmake
 
 # Total Scan Method Has bug
 #ALL_SRC="$(eval find * ! -wholename 'build/*' -type f -name '*.c' -o -name '*.cpp' -o -name '*.s')"
