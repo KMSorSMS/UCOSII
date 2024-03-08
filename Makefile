@@ -37,15 +37,17 @@ BUILD_DIR = build
 # C sources C的源文件集中在Core/Src文件夹,Drivers/BSP/Src文件夹，以及部分HAL库的文件（可以单独由完整名字加入）
 # 先将Core/Src文件夹中的文件加入C_SOURCES
 # C_SOURCES = $(wildcard Source/*.c)
-C_SOURCES = $(filter-out ports/os_dbg.c , $(wildcard ports/*.c))
+# C_SOURCES = $(filter-out ports/os_dbg.c , $(wildcard ports/*.c))
+C_SOURCES = \
+
 # 将Drivers/STM32F4xx_HAL_Driver/Src文件夹中的文件加入C_SOURCES
 C_SOURCES += \
 Source/ucos_ii.c \
 
 # ASM sources 除了在当前文件夹下的startup_stm32f401xe.s文件
 ASM_SOURCES =  \
-ports/os_cpu_a.S \
-startup_stm32f401xe.s \
+# startup_stm32f401xe.s \
+# ports/os_cpu_a.S \
 
 #######################################
 # binaries
@@ -98,8 +100,8 @@ AS_INCLUDES =
 # C includes
 C_INCLUDES =  \
 -ISource \
--Iports \
 -ICfg \
+-Iports \
 
 
 # compile gcc flags
