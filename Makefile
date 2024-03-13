@@ -2,16 +2,16 @@ TARGET = learn_startup
 .PHONY: bear clean
 
 DEBUG = 1
-OPT = -Og
+OPT = -O0
 # Build path
 BUILD_DIR = build
 C_SOURCES = $(wildcard app/src/*.c)
 C_SOURCES += \
 Source/ucos_ii.c \
 
-ASM_SOURCES =  \
-  startup_stm32f401xe.s \
-# ports/os_cpu_a.S \
+ASM_SOURCES = startup_stm32f401xe.s
+ASM_SOURCES +=  \
+# ports/os_cpu_a.S 
 
 #######################################
 # binaries
@@ -35,7 +35,6 @@ AS_DEFS =
 
 # C defines
 C_DEFS =  \
--DUSE_HAL_DRIVER \
 -DSTM32F401xE
 
 
@@ -47,6 +46,7 @@ C_INCLUDES =  \
 -ISource \
 -ICfg \
 -Iports \
+-Iapp/inc \
 
 
 # compile gcc flags
@@ -85,7 +85,9 @@ all: $(BUILD_DIR)/$(TARGET).elf $(BUILD_DIR)/$(TARGET).hex $(BUILD_DIR)/$(TARGET
 OBJECTS = $(addprefix $(BUILD_DIR)/,$(notdir $(C_SOURCES:.c=.o)))
 vpath %.c $(sort $(dir $(C_SOURCES)))
 # list of ASM program objects
-OBJECTS += $(addprefix $(BUILD_DIR)/,$(notdir $($(ASM_SOURCES:.S=.o):.s=.o)))
+temp = $(ASM_SOURCES:.S=.o)
+OBJECTS += $(addprefix $(BUILD_DIR)/,$(notdir $(temp:.s=.o)))
+
 vpath %.s $(sort $(dir $(ASM_SOURCES)))
 
 $(BUILD_DIR)/%.o: %.c Makefile | $(BUILD_DIR) 
