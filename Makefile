@@ -11,6 +11,7 @@ Source/ucos_ii.c \
 
 ASM_SOURCES = startup_stm32f401xe.s
 ASM_SOURCES +=  \
+ports/os_cpu_a.S \
 # ports/os_cpu_a.S 
 
 #######################################
@@ -89,11 +90,16 @@ temp = $(ASM_SOURCES:.S=.o)
 OBJECTS += $(addprefix $(BUILD_DIR)/,$(notdir $(temp:.s=.o)))
 
 vpath %.s $(sort $(dir $(ASM_SOURCES)))
+vpath %.S $(sort $(dir $(ASM_SOURCES)))
+
 
 $(BUILD_DIR)/%.o: %.c Makefile | $(BUILD_DIR) 
 	$(CC) -c $(CFLAGS) -Wa,-a,-ad,-alms=$(BUILD_DIR)/$(notdir $(<:.c=.lst)) $< -o $@
 
 $(BUILD_DIR)/%.o: %.s Makefile | $(BUILD_DIR)
+	$(AS) -c $(ASFLAGS) $< -o $@
+
+$(BUILD_DIR)/%.o: %.S Makefile | $(BUILD_DIR)
 	$(AS) -c $(ASFLAGS) $< -o $@
 
 $(BUILD_DIR)/$(TARGET).elf: $(OBJECTS) Makefile
