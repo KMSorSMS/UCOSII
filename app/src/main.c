@@ -4,8 +4,7 @@ int main(){
     OS_CPU_SR  cpu_sr = 0u;
     #endif
     OS_ENTER_CRITICAL();
-    OS_ENTER_CRITICAL();
-    OS_EXIT_CRITICAL();
+    
     OS_EXIT_CRITICAL();
 
     return 0;

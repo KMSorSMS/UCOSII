@@ -56,13 +56,14 @@ ENTRY(Reset_Handler)
 _estack = ORIGIN(RAM) + LENGTH(RAM);    /* end of RAM */
 /* Generate a link error if heap and stack don't fit into RAM */
 _Min_Heap_Size = 0x200;      /* required amount of heap  */
-_Min_Stack_Size = 0x400; /* required amount of stack */
+_Min_Stack_Size = 0x1800; /* required amount of stack */
 
 /* Specify the memory areas */
 MEMORY
 {
 RAM (xrw)      : ORIGIN = 0x20000000, LENGTH = 96K
-FLASH (rx)      : ORIGIN = 0x8000000, LENGTH = 512K
+FLASH (rx)      : ORIGIN = 0x8000000, LENGTH = 256K
+FLASH_RW (rw)   :ORIGIN = 0x8040000, LENGTH = 256K
 }
 
 /* Define output sections */
@@ -121,14 +122,14 @@ SECTIONS
     KEEP (*(SORT(.init_array.*)))
     KEEP (*(.init_array*))
     PROVIDE_HIDDEN (__init_array_end = .);
-  } >FLASH
+  } >FLASH_RW
   .fini_array :
   {
     PROVIDE_HIDDEN (__fini_array_start = .);
     KEEP (*(SORT(.fini_array.*)))
     KEEP (*(.fini_array*))
     PROVIDE_HIDDEN (__fini_array_end = .);
-  } >FLASH
+  } >FLASH_RW
 
   /* used by the startup to initialize data */
   _sidata = LOADADDR(.data);
@@ -173,7 +174,8 @@ SECTIONS
     . = ALIGN(8);
   } >RAM
 
-  
+  /* Generate a link error if heap and stack don't fit into RAM */
+  ASSERT( . <= _estack, "Heap and stack don't fit into RAM" )
 
   /* Remove information from the standard libraries */
   /DISCARD/ :
