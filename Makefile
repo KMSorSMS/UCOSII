@@ -11,6 +11,7 @@ Source/ucos_ii.c \
 
 ASM_SOURCES = startup_stm32f401xe.s
 ASM_SOURCES +=  \
+ports/os_cpu_a.S \
 # ports/os_cpu_a.S 
 
 #######################################
@@ -89,11 +90,16 @@ temp = $(ASM_SOURCES:.S=.o)
 OBJECTS += $(addprefix $(BUILD_DIR)/,$(notdir $(temp:.s=.o)))
 
 vpath %.s $(sort $(dir $(ASM_SOURCES)))
+vpath %.S $(sort $(dir $(ASM_SOURCES)))
+
 
 $(BUILD_DIR)/%.o: %.c Makefile | $(BUILD_DIR) 
 	$(CC) -c $(CFLAGS) -Wa,-a,-ad,-alms=$(BUILD_DIR)/$(notdir $(<:.c=.lst)) $< -o $@
 
 $(BUILD_DIR)/%.o: %.s Makefile | $(BUILD_DIR)
+	$(AS) -c $(ASFLAGS) $< -o $@
+
+$(BUILD_DIR)/%.o: %.S Makefile | $(BUILD_DIR)
 	$(AS) -c $(ASFLAGS) $< -o $@
 
 $(BUILD_DIR)/$(TARGET).elf: $(OBJECTS) Makefile
@@ -122,3 +128,9 @@ clean:
 
 bear:
 	bear -o build/compile_commands.json make
+
+debug:
+	make bear -j4
+	tmux has-session -t test0 2>/dev/null && tmux kill-session -t test0 || true
+	tmux new-session -d -s test0 'openocd -f interface/stlink.cfg -f target/stm32f4x.cfg -c init -c "halt" -c "flash write_image erase build/learn_startup.bin 0x8000000" -c reset'
+	arm-none-eabi-gdb -x init.gdb
