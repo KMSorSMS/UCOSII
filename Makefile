@@ -127,10 +127,14 @@ clean:
 -include $(wildcard $(BUILD_DIR)/*.d)
 
 bear:
-	bear -o build/compile_commands.json make
+	bear -o build/compile_commands.json make -j4
 
 debug:
-	make bear -j4
+	make bear
+# 需要下载tmux
 	tmux has-session -t test0 2>/dev/null && tmux kill-session -t test0 || true
 	tmux new-session -d -s test0 'openocd -f interface/stlink.cfg -f target/stm32f4x.cfg -c init -c "halt" -c "flash write_image erase build/learn_startup.bin 0x8000000" -c reset'
+# 这里看你电脑的性能,因为gdb-server服务器要启动一会儿
+	sleep 7
 	arm-none-eabi-gdb -x init.gdb
+	
