@@ -62,8 +62,8 @@ _estack = ORIGIN(RAM) + _Min_Heap_Size + _Min_Stack_Size;    /* end of RAM */
 MEMORY
 {
 RAM (xrw)      : ORIGIN = 0x20000000, LENGTH = 96K
-FLASH (rx)      : ORIGIN = 0x8000000, LENGTH = 256K
-FLASH_RW (rw)   :ORIGIN = 0x8040000, LENGTH = 256K
+FLASH (rx)      : ORIGIN = 0x8000000, LENGTH = 512K
+/* FLASH_RW (rw)   :ORIGIN = 0x8040000, LENGTH = 256K */
 }
 
 /* Define output sections */
@@ -120,7 +120,7 @@ SECTIONS
     __exidx_end = .;
   } >FLASH
 
-  .preinit_array     :
+  /* .preinit_array     :
   {
     PROVIDE_HIDDEN (__preinit_array_start = .);
     KEEP (*(.preinit_array*))
@@ -139,7 +139,7 @@ SECTIONS
     KEEP (*(SORT(.fini_array.*)))
     KEEP (*(.fini_array*))
     PROVIDE_HIDDEN (__fini_array_end = .);
-  } >FLASH_RW
+  } >FLASH_RW */
 
   /* used by the startup to initialize data */
   _sidata = LOADADDR(.data);
