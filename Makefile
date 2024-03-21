@@ -8,6 +8,7 @@ BUILD_DIR = build
 C_SOURCES = $(wildcard app/src/*.c)
 C_SOURCES += \
 Source/ucos_ii.c \
+ports/os_cpu_c.c \
 
 ASM_SOURCES = startup_stm32f401xe.s
 ASM_SOURCES +=  \
@@ -127,6 +128,7 @@ clean:
 -include $(wildcard $(BUILD_DIR)/*.d)
 
 bear:
+	make clean
 	bear -o build/compile_commands.json make -j4
 
 debug:

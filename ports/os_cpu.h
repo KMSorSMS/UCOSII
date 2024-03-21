@@ -26,4 +26,9 @@ void       OS_CPU_SR_Restore      (OS_CPU_SR  cpu_sr);
 #define  OS_EXIT_CRITICAL()   do { OS_CPU_SR_Restore(cpu_sr);} while (0)
 #endif
 
+void OSTaskSwHook(void);
+void OSInitHookBegin(void);
+void       OSCtxSw                (void);
+void       OSIntCtxSw             (void);
+void       PendSV_Handler         (void);
 #endif
