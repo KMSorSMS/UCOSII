@@ -29,7 +29,7 @@ HEX = $(CP) -O ihex
 BIN = $(CP) -O binary -S
 
 # mcu
-MCU = -mcpu=cortex-m4 -mthumb -mfpu=fpv4-sp-d16 -mfloat-abi=hard
+MCU = -mcpu=cortex-m4 -mthumb -mfpu=fpv4-sp-d16 -mfloat-abi=soft
 
 # macros for gcc
 # AS defines

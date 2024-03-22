@@ -26,6 +26,19 @@ void       OS_CPU_SR_Restore      (OS_CPU_SR  cpu_sr);
 #define  OS_EXIT_CRITICAL()   do { OS_CPU_SR_Restore(cpu_sr);} while (0)
 #endif
 
+#define  OS_CPU_EXT  extern
+
+
+// 设置CPU的异常堆栈大小
+#ifndef  OS_CPU_EXCEPT_STK_SIZE
+#define  OS_CPU_EXCEPT_STK_SIZE      256u        /* Default exception stack size is 256 OS_STK entries */
+#endif
+// 从而进一步的设置OS的CPU异常栈
+OS_CPU_EXT  OS_STK   OS_CPU_ExceptStk[OS_CPU_EXCEPT_STK_SIZE];
+OS_CPU_EXT  OS_STK  *OS_CPU_ExceptStkBase;
+
+
+
 void OSTaskSwHook(void);
 void OSInitHookBegin(void);
 void       OSCtxSw                (void);

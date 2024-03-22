@@ -627,7 +627,13 @@ void  OSInit (void)
     OSTmr_Init();                                                /* Initialize the Timer Manager             */
 #endif
 
-    OSInitHookEnd();                                             /* Call port specific init. code            */
+#if OS_CPU_HOOKS_EN > 0u
+
+OSInitHookEnd();                                             /* Call port specific init. code            */
+
+#endif
+
+
 
 #if OS_DEBUG_EN > 0u
     OSDebugInit();

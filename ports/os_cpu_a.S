@@ -1,6 +1,8 @@
     .extern  OSTaskSwHook
+    .extern  OS_CPU_ExceptStkBase
     .extern  OS_KA_BASEPRI_Boundary
-
+    
+    .global  OSStartHighRdy                                     @ Functions declared in this file
     .global  OS_CPU_SR_Save
     .global  OS_CPU_SR_Restore  
     .global  OSIntCtxSw
@@ -151,29 +153,35 @@ OSStartHighRdy:
 
     MOVS    R0, #0                                              @ Set the PSP to 0 for initial context switch call
     MSR     PSP, R0
-
-    MOVW    R0, #:lower16:OS_CPU_ExceptStkBase                  @ Initialize the MSP to the OS_CPU_ExceptStkBase
-    MOVT    R0, #:upper16:OS_CPU_ExceptStkBase
+@ OS_CPU_ExceptStkBase是一个全局变量，用来存储异常堆栈的栈顶地址。栈向下增长
+@ 这里应该利用不了伪指令，因为这个地址是一个全局变量，不是一个常量，不过还是试一试
+    @ MOVW    R0, #:lower16:OS_CPU_ExceptStkBase                  @ Initialize the MSP to the OS_CPU_ExceptStkBase
+    @ MOVT    R0, #:upper16:OS_CPU_ExceptStkBase
+    LDR     R0, =OS_CPU_ExceptStkBase
     LDR     R1, [R0]
     MSR     MSP, R1
 
     BL      OSTaskSwHook                                        @ Call OSTaskSwHook() for FPU Push & Pop
-
+@ 把OSRunning设置为true
     LDR     R0, =OSRunning                                      @ OSRunning = TRUE
     MOVS    R1, #1
     STRB    R1, [R0]
 
-    MOVW    R0, #:lower16:OSPrioCur                             @ OSPrioCur   = OSPrioHighRdy;
-    MOVT    R0, #:upper16:OSPrioCur
-    MOVW    R1, #:lower16:OSPrioHighRdy
-    MOVT    R1, #:upper16:OSPrioHighRdy
+    @ MOVW    R0, #:lower16:OSPrioCur                             @ OSPrioCur   = OSPrioHighRdy;
+    @ MOVT    R0, #:upper16:OSPrioCur
+    LDR     R0, =OSPrioCur
+    @ MOVW    R1, #:lower16:OSPrioHighRdy
+    @ MOVT    R1, #:upper16:OSPrioHighRdy
+    LDR     R1, =OSPrioHighRdy
     LDRB    R2, [R1]
     STRB    R2, [R0]
 
-    MOVW    R0, #:lower16:OSTCBCur                              @ OSTCBCur  = OSTCBHighRdy;
-    MOVT    R0, #:upper16:OSTCBCur
-    MOVW    R1, #:lower16:OSTCBHighRdy
-    MOVT    R1, #:upper16:OSTCBHighRdy
+    @ MOVW    R0, #:lower16:OSTCBCur                              @ OSTCBCur  = OSTCBHighRdy;
+    @ MOVT    R0, #:upper16:OSTCBCur
+    LDR     R0, =OSTCBCur
+    @ MOVW    R1, #:lower16:OSTCBHighRdy
+    @ MOVT    R1, #:upper16:OSTCBHighRdy
+    LDR     R1, =OSTCBHighrdy
     LDR     R2, [R1]
     STR     R2, [R0]
 
