@@ -1,6 +1,7 @@
     .extern  OSTaskSwHook
     .extern  OS_CPU_ExceptStkBase
     .extern  OS_KA_BASEPRI_Boundary
+    .extern  OSTCBHighrdy
     
     .global  OSStartHighRdy                                     @ Functions declared in this file
     .global  OS_CPU_SR_Save
@@ -119,7 +120,6 @@ PendSV_Handler:
     CPSIE   I
     BX      LR                                                  @ Exception return will restore remaining context
 
-.end
 
 @ Note(s) : 1) This function triggers a PendSV exception (essentially, causes a context switch) to cause
 @              the first task to start.
@@ -181,7 +181,7 @@ OSStartHighRdy:
     LDR     R0, =OSTCBCur
     @ MOVW    R1, #:lower16:OSTCBHighRdy
     @ MOVT    R1, #:upper16:OSTCBHighRdy
-    LDR     R1, =OSTCBHighrdy
+    LDR     R1, =OSTCBHighRdy
     LDR     R2, [R1]
     STR     R2, [R0]
 
@@ -199,3 +199,5 @@ OSStartHighRdy:
     LDMFD    SP!, {R1, R2}                                      @ Load PC and discard xPSR
     CPSIE    I
     BX       R1
+
+.end

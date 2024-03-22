@@ -1,5 +1,6 @@
 #ifndef OS_CPU_H
 #define OS_CPU_H
+
 typedef unsigned char BOOLEAN;
 typedef unsigned char INT8U;   /* Unsigned  8 bit quantity                           */
 typedef signed char INT8S;     /* Signed    8 bit quantity                           */
@@ -14,10 +15,12 @@ typedef unsigned int OS_STK;    /* Each stack entry is 32-bit wide              
 typedef unsigned int OS_CPU_SR; /* Define size of CPU status register (PSR = 32 bits) */
 
 #define OS_CRITICAL_METHOD 3u
+
 #if OS_CRITICAL_METHOD == 3u /* See OS_CPU_A.ASM                                   */
 OS_CPU_SR OS_CPU_SR_Save(OS_CPU_SR new_basepri);
 void OS_CPU_SR_Restore(OS_CPU_SR cpu_sr);
 #endif
+
 #if OS_CRITICAL_METHOD == 3u
 /* Save current BASEPRI priority lvl for exception... */
 /* .. and set BASEPRI to CPU_CFG_KA_IPL_BOUNDARY      */
@@ -34,12 +37,17 @@ void OS_CPU_SR_Restore(OS_CPU_SR cpu_sr);
     } while (0)
 #endif
 
-#define OS_CPU_EXT extern
+#ifdef   OS_CPU_GLOBALS
+#define  OS_CPU_EXT
+#else
+#define  OS_CPU_EXT  extern
+#endif
 
 // 设置CPU的异常堆栈大小
 #ifndef OS_CPU_EXCEPT_STK_SIZE
 #define OS_CPU_EXCEPT_STK_SIZE 256u /* Default exception stack size is 256 OS_STK entries */
 #endif
+
 // 从而进一步的设置OS的CPU异常栈
 OS_CPU_EXT OS_STK OS_CPU_ExceptStk[OS_CPU_EXCEPT_STK_SIZE];
 OS_CPU_EXT OS_STK *OS_CPU_ExceptStkBase;

@@ -420,7 +420,7 @@ INT16U OSEventPendMulti(OS_EVENT **pevents_pend, OS_EVENT **pevents_rdy, void **
 #if (OS_MBOX_EN > 0u)
             case OS_EVENT_TYPE_MBOX:
                 if (pevent->OSEventPtr != (void *)0)
-                {   /* If mailbox NOT empty;                   ... */
+                { /* If mailbox NOT empty;                   ... */
                     /* ... return available message,           ... */
                     *pmsgs_rdy++ = (void *)pevent->OSEventPtr;
                     pevent->OSEventPtr = (void *)0;
@@ -439,7 +439,7 @@ INT16U OSEventPendMulti(OS_EVENT **pevents_pend, OS_EVENT **pevents_rdy, void **
             case OS_EVENT_TYPE_Q:
                 pq = (OS_Q *)pevent->OSEventPtr;
                 if (pq->OSQEntries > 0u)
-                {   /* If queue NOT empty;                     ... */
+                { /* If queue NOT empty;                     ... */
                     /* ... return available message,           ... */
                     *pmsgs_rdy++ = (void *)*pq->OSQOut++;
                     if (pq->OSQOut == pq->OSQEnd)
@@ -2095,14 +2095,16 @@ INT8U OS_TCBInit(INT8U prio, OS_STK *ptos, OS_STK *pbos, INT16U id, INT32U stk_s
             ptcb->OSTCBRegTbl[i] = 0u;
         }
 #endif
-
+#if OS_CPU_HOOKS_EN > 0u
         OSTCBInitHook(ptcb);
+#endif
 
         OS_ENTER_CRITICAL();
         OSTCBPrioTbl[prio] = ptcb;
         OS_EXIT_CRITICAL();
-
+#if OS_CPU_HOOKS_EN >0
         OSTaskCreateHook(ptcb); /* Call user defined hook                   */
+#endif
 
 #if OS_TASK_CREATE_EXT_EN > 0u
 #if defined(OS_TLS_TBL_SIZE) && (OS_TLS_TBL_SIZE > 0u)

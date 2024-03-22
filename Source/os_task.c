@@ -552,7 +552,9 @@ INT8U OSTaskDel(INT8U prio)
     { /* Remove context switch lock                  */
         OSLockNesting--;
     }
+#if OS_CPU_HOOKS_EN > 0u
     OSTaskDelHook(ptcb); /* Call user defined hook                      */
+#endif
 
 #if OS_TASK_CREATE_EXT_EN > 0u
 #if defined(OS_TLS_TBL_SIZE) && (OS_TLS_TBL_SIZE > 0u)
@@ -1389,7 +1391,9 @@ void OSTaskRegSet(INT8U prio, INT8U id, INT32U value, INT8U *perr)
 
 void OS_TaskReturn(void)
 {
+#if OS_CPU_HOOKS_EN > 0
     OSTaskReturnHook(OSTCBCur); /* Call hook to let user decide on what to do        */
+#endif
 
 #if OS_TASK_DEL_EN > 0u
     (void)OSTaskDel(OS_PRIO_SELF); /* Delete task if it accidentally returns!           */

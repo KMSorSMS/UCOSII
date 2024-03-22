@@ -1,6 +1,9 @@
+#define   OS_CPU_GLOBALS
+
 #include <ucos_ii.h>
 
 INT32U OS_KA_BASEPRI_Boundary; /* Base Priority boundary.                              */
+
 
 void OSTaskSwHook(void)
 {
