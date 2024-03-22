@@ -14,7 +14,6 @@
 *********************************************************************************************************
 */
 
-
 /*
 *********************************************************************************************************
 *
@@ -25,12 +24,12 @@
 *********************************************************************************************************
 */
 
-#ifndef  OS_SEM_C
-#define  OS_SEM_C
+#ifndef OS_SEM_C
+#define OS_SEM_C
 
-#define  MICRIUM_SOURCE
+#define MICRIUM_SOURCE
 
-#ifndef  OS_MASTER_FILE
+#ifndef OS_MASTER_FILE
 #include <ucos_ii.h>
 #endif
 
@@ -54,33 +53,33 @@
 */
 
 #if OS_SEM_ACCEPT_EN > 0u
-INT16U  OSSemAccept (OS_EVENT *pevent)
+INT16U OSSemAccept(OS_EVENT *pevent)
 {
-    INT16U     cnt;
-#if OS_CRITICAL_METHOD == 3u                          /* Allocate storage for CPU status register      */
-    OS_CPU_SR  cpu_sr = 0u;
+    INT16U cnt;
+#if OS_CRITICAL_METHOD == 3u /* Allocate storage for CPU status register      */
+    OS_CPU_SR cpu_sr = 0u;
 #endif
 
-
-
 #if OS_ARG_CHK_EN > 0u
-    if (pevent == (OS_EVENT *)0) {                    /* Validate 'pevent'                             */
+    if (pevent == (OS_EVENT *)0)
+    { /* Validate 'pevent'                             */
         return (0u);
     }
 #endif
-    if (pevent->OSEventType != OS_EVENT_TYPE_SEM) {   /* Validate event block type                     */
+    if (pevent->OSEventType != OS_EVENT_TYPE_SEM)
+    { /* Validate event block type                     */
         return (0u);
     }
     OS_ENTER_CRITICAL();
     cnt = pevent->OSEventCnt;
-    if (cnt > 0u) {                                   /* See if resource is available                  */
-        pevent->OSEventCnt--;                         /* Yes, decrement semaphore and notify caller    */
+    if (cnt > 0u)
+    {                         /* See if resource is available                  */
+        pevent->OSEventCnt--; /* Yes, decrement semaphore and notify caller    */
     }
     OS_EXIT_CRITICAL();
-    return (cnt);                                     /* Return semaphore count                        */
+    return (cnt); /* Return semaphore count                        */
 }
 #endif
-
 
 /*
 *********************************************************************************************************
@@ -99,44 +98,46 @@ INT16U  OSSemAccept (OS_EVENT *pevent)
 *********************************************************************************************************
 */
 
-OS_EVENT  *OSSemCreate (INT16U cnt)
+OS_EVENT *OSSemCreate(INT16U cnt)
 {
-    OS_EVENT  *pevent;
-#if OS_CRITICAL_METHOD == 3u                               /* Allocate storage for CPU status register */
-    OS_CPU_SR  cpu_sr = 0u;
+    OS_EVENT *pevent;
+#if OS_CRITICAL_METHOD == 3u /* Allocate storage for CPU status register */
+    OS_CPU_SR cpu_sr = 0u;
 #endif
 
-
 #ifdef OS_SAFETY_CRITICAL_IEC61508
-    if (OSSafetyCriticalStartFlag == OS_TRUE) {
+    if (OSSafetyCriticalStartFlag == OS_TRUE)
+    {
         OS_SAFETY_CRITICAL_EXCEPTION();
         return ((OS_EVENT *)0);
     }
 #endif
 
-    if (OSIntNesting > 0u) {                               /* See if called from ISR ...               */
-        return ((OS_EVENT *)0);                            /* ... can't CREATE from an ISR             */
+    if (OSIntNesting > 0u)
+    {                           /* See if called from ISR ...               */
+        return ((OS_EVENT *)0); /* ... can't CREATE from an ISR             */
     }
     OS_ENTER_CRITICAL();
-    pevent = OSEventFreeList;                              /* Get next free event control block        */
-    if (OSEventFreeList != (OS_EVENT *)0) {                /* See if pool of free ECB pool was empty   */
+    pevent = OSEventFreeList; /* Get next free event control block        */
+    if (OSEventFreeList != (OS_EVENT *)0)
+    { /* See if pool of free ECB pool was empty   */
         OSEventFreeList = (OS_EVENT *)OSEventFreeList->OSEventPtr;
     }
     OS_EXIT_CRITICAL();
-    if (pevent != (OS_EVENT *)0) {                         /* Get an event control block               */
-        pevent->OSEventType    = OS_EVENT_TYPE_SEM;
-        pevent->OSEventCnt     = cnt;                      /* Set semaphore value                      */
-        pevent->OSEventPtr     = (void *)0;                /* Unlink from ECB free list                */
+    if (pevent != (OS_EVENT *)0)
+    { /* Get an event control block               */
+        pevent->OSEventType = OS_EVENT_TYPE_SEM;
+        pevent->OSEventCnt = cnt;       /* Set semaphore value                      */
+        pevent->OSEventPtr = (void *)0; /* Unlink from ECB free list                */
 #if OS_EVENT_NAME_EN > 0u
-        pevent->OSEventName    = (INT8U *)(void *)"?";
+        pevent->OSEventName = (INT8U *)(void *)"?";
 #endif
-        OS_EventWaitListInit(pevent);                      /* Initialize to 'nobody waiting' on sem.   */
+        OS_EventWaitListInit(pevent); /* Initialize to 'nobody waiting' on sem.   */
 
         OS_TRACE_SEM_CREATE(pevent, pevent->OSEventName);
     }
     return (pevent);
 }
-
 
 /*
 *********************************************************************************************************
@@ -182,26 +183,25 @@ OS_EVENT  *OSSemCreate (INT16U cnt)
 */
 
 #if OS_SEM_DEL_EN > 0u
-OS_EVENT  *OSSemDel (OS_EVENT  *pevent,
-                     INT8U      opt,
-                     INT8U     *perr)
+OS_EVENT *OSSemDel(OS_EVENT *pevent, INT8U opt, INT8U *perr)
 {
-    BOOLEAN    tasks_waiting;
-    OS_EVENT  *pevent_return;
-#if OS_CRITICAL_METHOD == 3u                               /* Allocate storage for CPU status register */
-    OS_CPU_SR  cpu_sr = 0u;
+    BOOLEAN tasks_waiting;
+    OS_EVENT *pevent_return;
+#if OS_CRITICAL_METHOD == 3u /* Allocate storage for CPU status register */
+    OS_CPU_SR cpu_sr = 0u;
 #endif
 
-
 #ifdef OS_SAFETY_CRITICAL
-    if (perr == (INT8U *)0) {
+    if (perr == (INT8U *)0)
+    {
         OS_SAFETY_CRITICAL_EXCEPTION();
         return ((OS_EVENT *)0);
     }
 #endif
 
 #ifdef OS_SAFETY_CRITICAL_IEC61508
-    if (OSSafetyCriticalStartFlag == OS_TRUE) {
+    if (OSSafetyCriticalStartFlag == OS_TRUE)
+    {
         OS_SAFETY_CRITICAL_EXCEPTION();
         *perr = OS_ERR_ILLEGAL_DEL_RUN_TIME;
         return ((OS_EVENT *)0);
@@ -209,7 +209,8 @@ OS_EVENT  *OSSemDel (OS_EVENT  *pevent,
 #endif
 
 #if OS_ARG_CHK_EN > 0u
-    if (pevent == (OS_EVENT *)0) {                         /* Validate 'pevent'                        */
+    if (pevent == (OS_EVENT *)0)
+    { /* Validate 'pevent'                        */
         *perr = OS_ERR_PEVENT_NULL;
         return (pevent);
     }
@@ -217,66 +218,77 @@ OS_EVENT  *OSSemDel (OS_EVENT  *pevent,
 
     OS_TRACE_SEM_DEL_ENTER(pevent, opt);
 
-    if (pevent->OSEventType != OS_EVENT_TYPE_SEM) {        /* Validate event block type                */
+    if (pevent->OSEventType != OS_EVENT_TYPE_SEM)
+    { /* Validate event block type                */
         *perr = OS_ERR_EVENT_TYPE;
         OS_TRACE_SEM_DEL_EXIT(*perr);
         return (pevent);
     }
-    if (OSIntNesting > 0u) {                               /* See if called from ISR ...               */
-        *perr = OS_ERR_DEL_ISR;                            /* ... can't DELETE from an ISR             */
+    if (OSIntNesting > 0u)
+    {                           /* See if called from ISR ...               */
+        *perr = OS_ERR_DEL_ISR; /* ... can't DELETE from an ISR             */
         OS_TRACE_SEM_DEL_EXIT(*perr);
         return (pevent);
     }
     OS_ENTER_CRITICAL();
-    if (pevent->OSEventGrp != 0u) {                        /* See if any tasks waiting on semaphore    */
-        tasks_waiting = OS_TRUE;                           /* Yes                                      */
-    } else {
-        tasks_waiting = OS_FALSE;                          /* No                                       */
+    if (pevent->OSEventGrp != 0u)
+    {                            /* See if any tasks waiting on semaphore    */
+        tasks_waiting = OS_TRUE; /* Yes                                      */
     }
-    switch (opt) {
-        case OS_DEL_NO_PEND:                               /* Delete semaphore only if no task waiting */
-             if (tasks_waiting == OS_FALSE) {
+    else
+    {
+        tasks_waiting = OS_FALSE; /* No                                       */
+    }
+    switch (opt)
+    {
+        case OS_DEL_NO_PEND: /* Delete semaphore only if no task waiting */
+            if (tasks_waiting == OS_FALSE)
+            {
 #if OS_EVENT_NAME_EN > 0u
-                 pevent->OSEventName    = (INT8U *)(void *)"?";
+                pevent->OSEventName = (INT8U *)(void *)"?";
 #endif
-                 pevent->OSEventType    = OS_EVENT_TYPE_UNUSED;
-                 pevent->OSEventPtr     = OSEventFreeList; /* Return Event Control Block to free list  */
-                 pevent->OSEventCnt     = 0u;
-                 OSEventFreeList        = pevent;          /* Get next free event control block        */
-                 OS_EXIT_CRITICAL();
-                 *perr                  = OS_ERR_NONE;
-                 pevent_return          = (OS_EVENT *)0;   /* Semaphore has been deleted               */
-             } else {
-                 OS_EXIT_CRITICAL();
-                 *perr                  = OS_ERR_TASK_WAITING;
-                 pevent_return          = pevent;
-             }
-             break;
+                pevent->OSEventType = OS_EVENT_TYPE_UNUSED;
+                pevent->OSEventPtr = OSEventFreeList; /* Return Event Control Block to free list  */
+                pevent->OSEventCnt = 0u;
+                OSEventFreeList = pevent; /* Get next free event control block        */
+                OS_EXIT_CRITICAL();
+                *perr = OS_ERR_NONE;
+                pevent_return = (OS_EVENT *)0; /* Semaphore has been deleted               */
+            }
+            else
+            {
+                OS_EXIT_CRITICAL();
+                *perr = OS_ERR_TASK_WAITING;
+                pevent_return = pevent;
+            }
+            break;
 
-        case OS_DEL_ALWAYS:                                /* Always delete the semaphore              */
-             while (pevent->OSEventGrp != 0u) {            /* Ready ALL tasks waiting for semaphore    */
-                 (void)OS_EventTaskRdy(pevent, (void *)0, OS_STAT_SEM, OS_STAT_PEND_ABORT);
-             }
+        case OS_DEL_ALWAYS: /* Always delete the semaphore              */
+            while (pevent->OSEventGrp != 0u)
+            { /* Ready ALL tasks waiting for semaphore    */
+                (void)OS_EventTaskRdy(pevent, (void *)0, OS_STAT_SEM, OS_STAT_PEND_ABORT);
+            }
 #if OS_EVENT_NAME_EN > 0u
-             pevent->OSEventName    = (INT8U *)(void *)"?";
+            pevent->OSEventName = (INT8U *)(void *)"?";
 #endif
-             pevent->OSEventType    = OS_EVENT_TYPE_UNUSED;
-             pevent->OSEventPtr     = OSEventFreeList;     /* Return Event Control Block to free list  */
-             pevent->OSEventCnt     = 0u;
-             OSEventFreeList        = pevent;              /* Get next free event control block        */
-             OS_EXIT_CRITICAL();
-             if (tasks_waiting == OS_TRUE) {               /* Reschedule only if task(s) were waiting  */
-                 OS_Sched();                               /* Find highest priority task ready to run  */
-             }
-             *perr                  = OS_ERR_NONE;
-             pevent_return          = (OS_EVENT *)0;       /* Semaphore has been deleted               */
-             break;
+            pevent->OSEventType = OS_EVENT_TYPE_UNUSED;
+            pevent->OSEventPtr = OSEventFreeList; /* Return Event Control Block to free list  */
+            pevent->OSEventCnt = 0u;
+            OSEventFreeList = pevent; /* Get next free event control block        */
+            OS_EXIT_CRITICAL();
+            if (tasks_waiting == OS_TRUE)
+            {               /* Reschedule only if task(s) were waiting  */
+                OS_Sched(); /* Find highest priority task ready to run  */
+            }
+            *perr = OS_ERR_NONE;
+            pevent_return = (OS_EVENT *)0; /* Semaphore has been deleted               */
+            break;
 
         default:
-             OS_EXIT_CRITICAL();
-             *perr                  = OS_ERR_INVALID_OPT;
-             pevent_return          = pevent;
-             break;
+            OS_EXIT_CRITICAL();
+            *perr = OS_ERR_INVALID_OPT;
+            pevent_return = pevent;
+            break;
     }
 
     OS_TRACE_SEM_DEL_EXIT(*perr);
@@ -284,7 +296,6 @@ OS_EVENT  *OSSemDel (OS_EVENT  *pevent,
     return (pevent_return);
 }
 #endif
-
 
 /*
 *********************************************************************************************************
@@ -318,24 +329,23 @@ OS_EVENT  *OSSemDel (OS_EVENT  *pevent,
 *********************************************************************************************************
 */
 
-void  OSSemPend (OS_EVENT  *pevent,
-                 INT32U     timeout,
-                 INT8U     *perr)
+void OSSemPend(OS_EVENT *pevent, INT32U timeout, INT8U *perr)
 {
-#if OS_CRITICAL_METHOD == 3u                          /* Allocate storage for CPU status register      */
-    OS_CPU_SR  cpu_sr = 0u;
+#if OS_CRITICAL_METHOD == 3u /* Allocate storage for CPU status register      */
+    OS_CPU_SR cpu_sr = 0u;
 #endif
 
-
 #ifdef OS_SAFETY_CRITICAL
-    if (perr == (INT8U *)0) {
+    if (perr == (INT8U *)0)
+    {
         OS_SAFETY_CRITICAL_EXCEPTION();
         return;
     }
 #endif
 
 #if OS_ARG_CHK_EN > 0u
-    if (pevent == (OS_EVENT *)0) {                    /* Validate 'pevent'                             */
+    if (pevent == (OS_EVENT *)0)
+    { /* Validate 'pevent'                             */
         *perr = OS_ERR_PEVENT_NULL;
         return;
     }
@@ -343,64 +353,66 @@ void  OSSemPend (OS_EVENT  *pevent,
 
     OS_TRACE_SEM_PEND_ENTER(pevent, timeout);
 
-    if (pevent->OSEventType != OS_EVENT_TYPE_SEM) {   /* Validate event block type                     */
+    if (pevent->OSEventType != OS_EVENT_TYPE_SEM)
+    { /* Validate event block type                     */
         *perr = OS_ERR_EVENT_TYPE;
         OS_TRACE_SEM_PEND_EXIT(*perr);
         return;
     }
-    if (OSIntNesting > 0u) {                          /* See if called from ISR ...                    */
-        *perr = OS_ERR_PEND_ISR;                      /* ... can't PEND from an ISR                    */
+    if (OSIntNesting > 0u)
+    {                            /* See if called from ISR ...                    */
+        *perr = OS_ERR_PEND_ISR; /* ... can't PEND from an ISR                    */
         OS_TRACE_SEM_PEND_EXIT(*perr);
         return;
     }
-    if (OSLockNesting > 0u) {                         /* See if called with scheduler locked ...       */
-        *perr = OS_ERR_PEND_LOCKED;                   /* ... can't PEND when locked                    */
+    if (OSLockNesting > 0u)
+    {                               /* See if called with scheduler locked ...       */
+        *perr = OS_ERR_PEND_LOCKED; /* ... can't PEND when locked                    */
         OS_TRACE_SEM_PEND_EXIT(*perr);
         return;
     }
     OS_ENTER_CRITICAL();
-    if (pevent->OSEventCnt > 0u) {                    /* If sem. is positive, resource available ...   */
-        pevent->OSEventCnt--;                         /* ... decrement semaphore only if positive.     */
+    if (pevent->OSEventCnt > 0u)
+    {                         /* If sem. is positive, resource available ...   */
+        pevent->OSEventCnt--; /* ... decrement semaphore only if positive.     */
         OS_EXIT_CRITICAL();
         *perr = OS_ERR_NONE;
         OS_TRACE_SEM_PEND_EXIT(*perr);
         return;
     }
-                                                      /* Otherwise, must wait until event occurs       */
-    OSTCBCur->OSTCBStat     |= OS_STAT_SEM;           /* Resource not available, pend on semaphore     */
-    OSTCBCur->OSTCBStatPend  = OS_STAT_PEND_OK;
-    OSTCBCur->OSTCBDly       = timeout;               /* Store pend timeout in TCB                     */
-    OS_EventTaskWait(pevent);                         /* Suspend task until event or timeout occurs    */
+    /* Otherwise, must wait until event occurs       */
+    OSTCBCur->OSTCBStat |= OS_STAT_SEM; /* Resource not available, pend on semaphore     */
+    OSTCBCur->OSTCBStatPend = OS_STAT_PEND_OK;
+    OSTCBCur->OSTCBDly = timeout; /* Store pend timeout in TCB                     */
+    OS_EventTaskWait(pevent);     /* Suspend task until event or timeout occurs    */
     OS_EXIT_CRITICAL();
-    OS_Sched();                                       /* Find next highest priority task ready         */
+    OS_Sched(); /* Find next highest priority task ready         */
     OS_ENTER_CRITICAL();
-    switch (OSTCBCur->OSTCBStatPend) {                /* See if we timed-out or aborted                */
-        case OS_STAT_PEND_OK:
-             *perr = OS_ERR_NONE;
-             break;
+    switch (OSTCBCur->OSTCBStatPend)
+    { /* See if we timed-out or aborted                */
+        case OS_STAT_PEND_OK: *perr = OS_ERR_NONE; break;
 
         case OS_STAT_PEND_ABORT:
-             *perr = OS_ERR_PEND_ABORT;               /* Indicate that we aborted                      */
-             break;
+            *perr = OS_ERR_PEND_ABORT; /* Indicate that we aborted                      */
+            break;
 
         case OS_STAT_PEND_TO:
         default:
-             OS_EventTaskRemove(OSTCBCur, pevent);
-             *perr = OS_ERR_TIMEOUT;                  /* Indicate that we didn't get event within TO   */
-             break;
+            OS_EventTaskRemove(OSTCBCur, pevent);
+            *perr = OS_ERR_TIMEOUT; /* Indicate that we didn't get event within TO   */
+            break;
     }
-    OSTCBCur->OSTCBStat          =  OS_STAT_RDY;      /* Set   task  status to ready                   */
-    OSTCBCur->OSTCBStatPend      =  OS_STAT_PEND_OK;  /* Clear pend  status                            */
-    OSTCBCur->OSTCBEventPtr      = (OS_EVENT  *)0;    /* Clear event pointers                          */
+    OSTCBCur->OSTCBStat = OS_STAT_RDY;         /* Set   task  status to ready                   */
+    OSTCBCur->OSTCBStatPend = OS_STAT_PEND_OK; /* Clear pend  status                            */
+    OSTCBCur->OSTCBEventPtr = (OS_EVENT *)0;   /* Clear event pointers                          */
 #if (OS_EVENT_MULTI_EN > 0u)
     OSTCBCur->OSTCBEventMultiPtr = (OS_EVENT **)0;
-    OSTCBCur->OSTCBEventMultiRdy = (OS_EVENT  *)0;
+    OSTCBCur->OSTCBEventMultiRdy = (OS_EVENT *)0;
 #endif
     OS_EXIT_CRITICAL();
 
     OS_TRACE_SEM_PEND_EXIT(*perr);
 }
-
 
 /*
 *********************************************************************************************************
@@ -436,61 +448,63 @@ void  OSSemPend (OS_EVENT  *pevent,
 */
 
 #if OS_SEM_PEND_ABORT_EN > 0u
-INT8U  OSSemPendAbort (OS_EVENT  *pevent,
-                       INT8U      opt,
-                       INT8U     *perr)
+INT8U OSSemPendAbort(OS_EVENT *pevent, INT8U opt, INT8U *perr)
 {
-    INT8U      nbr_tasks;
-#if OS_CRITICAL_METHOD == 3u                          /* Allocate storage for CPU status register      */
-    OS_CPU_SR  cpu_sr = 0u;
+    INT8U nbr_tasks;
+#if OS_CRITICAL_METHOD == 3u /* Allocate storage for CPU status register      */
+    OS_CPU_SR cpu_sr = 0u;
 #endif
 
-
 #ifdef OS_SAFETY_CRITICAL
-    if (perr == (INT8U *)0) {
+    if (perr == (INT8U *)0)
+    {
         OS_SAFETY_CRITICAL_EXCEPTION();
         return (0u);
     }
 #endif
 
 #if OS_ARG_CHK_EN > 0u
-    if (pevent == (OS_EVENT *)0) {                    /* Validate 'pevent'                             */
+    if (pevent == (OS_EVENT *)0)
+    { /* Validate 'pevent'                             */
         *perr = OS_ERR_PEVENT_NULL;
         return (0u);
     }
 #endif
-    if (pevent->OSEventType != OS_EVENT_TYPE_SEM) {   /* Validate event block type                     */
+    if (pevent->OSEventType != OS_EVENT_TYPE_SEM)
+    { /* Validate event block type                     */
         *perr = OS_ERR_EVENT_TYPE;
         return (0u);
     }
     OS_ENTER_CRITICAL();
-    if (pevent->OSEventGrp != 0u) {                   /* See if any task waiting on semaphore?         */
+    if (pevent->OSEventGrp != 0u)
+    { /* See if any task waiting on semaphore?         */
         nbr_tasks = 0u;
-        switch (opt) {
-            case OS_PEND_OPT_BROADCAST:               /* Do we need to abort ALL waiting tasks?        */
-                 while (pevent->OSEventGrp != 0u) {   /* Yes, ready ALL tasks waiting on semaphore     */
-                     (void)OS_EventTaskRdy(pevent, (void *)0, OS_STAT_SEM, OS_STAT_PEND_ABORT);
-                     nbr_tasks++;
-                 }
-                 break;
+        switch (opt)
+        {
+            case OS_PEND_OPT_BROADCAST: /* Do we need to abort ALL waiting tasks?        */
+                while (pevent->OSEventGrp != 0u)
+                { /* Yes, ready ALL tasks waiting on semaphore     */
+                    (void)OS_EventTaskRdy(pevent, (void *)0, OS_STAT_SEM, OS_STAT_PEND_ABORT);
+                    nbr_tasks++;
+                }
+                break;
 
             case OS_PEND_OPT_NONE:
-            default:                                  /* No,  ready HPT       waiting on semaphore     */
-                 (void)OS_EventTaskRdy(pevent, (void *)0, OS_STAT_SEM, OS_STAT_PEND_ABORT);
-                 nbr_tasks++;
-                 break;
+            default: /* No,  ready HPT       waiting on semaphore     */
+                (void)OS_EventTaskRdy(pevent, (void *)0, OS_STAT_SEM, OS_STAT_PEND_ABORT);
+                nbr_tasks++;
+                break;
         }
         OS_EXIT_CRITICAL();
-        OS_Sched();                                   /* Find HPT ready to run                         */
+        OS_Sched(); /* Find HPT ready to run                         */
         *perr = OS_ERR_PEND_ABORT;
         return (nbr_tasks);
     }
     OS_EXIT_CRITICAL();
     *perr = OS_ERR_NONE;
-    return (0u);                                      /* No tasks waiting on semaphore                 */
+    return (0u); /* No tasks waiting on semaphore                 */
 }
 #endif
-
 
 /*
 *********************************************************************************************************
@@ -510,46 +524,48 @@ INT8U  OSSemPendAbort (OS_EVENT  *pevent,
 *********************************************************************************************************
 */
 
-INT8U  OSSemPost (OS_EVENT *pevent)
+INT8U OSSemPost(OS_EVENT *pevent)
 {
-#if OS_CRITICAL_METHOD == 3u                          /* Allocate storage for CPU status register      */
-    OS_CPU_SR  cpu_sr = 0u;
+#if OS_CRITICAL_METHOD == 3u /* Allocate storage for CPU status register      */
+    OS_CPU_SR cpu_sr = 0u;
 #endif
 
-
 #if OS_ARG_CHK_EN > 0u
-    if (pevent == (OS_EVENT *)0) {                    /* Validate 'pevent'                             */
+    if (pevent == (OS_EVENT *)0)
+    { /* Validate 'pevent'                             */
         return (OS_ERR_PEVENT_NULL);
     }
 #endif
 
     OS_TRACE_SEM_POST_ENTER(pevent);
 
-    if (pevent->OSEventType != OS_EVENT_TYPE_SEM) {   /* Validate event block type                     */
+    if (pevent->OSEventType != OS_EVENT_TYPE_SEM)
+    { /* Validate event block type                     */
         OS_TRACE_SEM_POST_EXIT(OS_ERR_EVENT_TYPE);
         return (OS_ERR_EVENT_TYPE);
     }
     OS_ENTER_CRITICAL();
-    if (pevent->OSEventGrp != 0u) {                   /* See if any task waiting for semaphore         */
-                                                      /* Ready HPT waiting on event                    */
+    if (pevent->OSEventGrp != 0u)
+    {   /* See if any task waiting for semaphore         */
+        /* Ready HPT waiting on event                    */
         (void)OS_EventTaskRdy(pevent, (void *)0, OS_STAT_SEM, OS_STAT_PEND_OK);
         OS_EXIT_CRITICAL();
-        OS_Sched();                                   /* Find HPT ready to run                         */
+        OS_Sched(); /* Find HPT ready to run                         */
         OS_TRACE_SEM_POST_EXIT(OS_ERR_NONE);
         return (OS_ERR_NONE);
     }
-    if (pevent->OSEventCnt < 65535u) {                /* Make sure semaphore will not overflow         */
-        pevent->OSEventCnt++;                         /* Increment semaphore count to register event   */
+    if (pevent->OSEventCnt < 65535u)
+    {                         /* Make sure semaphore will not overflow         */
+        pevent->OSEventCnt++; /* Increment semaphore count to register event   */
         OS_EXIT_CRITICAL();
         OS_TRACE_SEM_POST_EXIT(OS_ERR_NONE);
         return (OS_ERR_NONE);
     }
-    OS_EXIT_CRITICAL();                               /* Semaphore value has reached its maximum       */
+    OS_EXIT_CRITICAL(); /* Semaphore value has reached its maximum       */
     OS_TRACE_SEM_POST_EXIT(OS_ERR_SEM_OVF);
 
     return (OS_ERR_SEM_OVF);
 }
-
 
 /*
 *********************************************************************************************************
@@ -571,42 +587,42 @@ INT8U  OSSemPost (OS_EVENT *pevent)
 */
 
 #if OS_SEM_QUERY_EN > 0u
-INT8U  OSSemQuery (OS_EVENT     *pevent,
-                   OS_SEM_DATA  *p_sem_data)
+INT8U OSSemQuery(OS_EVENT *pevent, OS_SEM_DATA *p_sem_data)
 {
-    INT8U       i;
-    OS_PRIO    *psrc;
-    OS_PRIO    *pdest;
-#if OS_CRITICAL_METHOD == 3u                               /* Allocate storage for CPU status register */
-    OS_CPU_SR   cpu_sr = 0u;
+    INT8U i;
+    OS_PRIO *psrc;
+    OS_PRIO *pdest;
+#if OS_CRITICAL_METHOD == 3u /* Allocate storage for CPU status register */
+    OS_CPU_SR cpu_sr = 0u;
 #endif
 
-
-
 #if OS_ARG_CHK_EN > 0u
-    if (pevent == (OS_EVENT *)0) {                         /* Validate 'pevent'                        */
+    if (pevent == (OS_EVENT *)0)
+    { /* Validate 'pevent'                        */
         return (OS_ERR_PEVENT_NULL);
     }
-    if (p_sem_data == (OS_SEM_DATA *)0) {                  /* Validate 'p_sem_data'                    */
+    if (p_sem_data == (OS_SEM_DATA *)0)
+    { /* Validate 'p_sem_data'                    */
         return (OS_ERR_PDATA_NULL);
     }
 #endif
-    if (pevent->OSEventType != OS_EVENT_TYPE_SEM) {        /* Validate event block type                */
+    if (pevent->OSEventType != OS_EVENT_TYPE_SEM)
+    { /* Validate event block type                */
         return (OS_ERR_EVENT_TYPE);
     }
     OS_ENTER_CRITICAL();
-    p_sem_data->OSEventGrp = pevent->OSEventGrp;           /* Copy message mailbox wait list           */
-    psrc                   = &pevent->OSEventTbl[0];
-    pdest                  = &p_sem_data->OSEventTbl[0];
-    for (i = 0u; i < OS_EVENT_TBL_SIZE; i++) {
+    p_sem_data->OSEventGrp = pevent->OSEventGrp; /* Copy message mailbox wait list           */
+    psrc = &pevent->OSEventTbl[0];
+    pdest = &p_sem_data->OSEventTbl[0];
+    for (i = 0u; i < OS_EVENT_TBL_SIZE; i++)
+    {
         *pdest++ = *psrc++;
     }
-    p_sem_data->OSCnt = pevent->OSEventCnt;                /* Get semaphore count                      */
+    p_sem_data->OSCnt = pevent->OSEventCnt; /* Get semaphore count                      */
     OS_EXIT_CRITICAL();
     return (OS_ERR_NONE);
 }
-#endif                                                     /* OS_SEM_QUERY_EN                          */
-
+#endif /* OS_SEM_QUERY_EN                          */
 
 /*
 *********************************************************************************************************
@@ -633,47 +649,52 @@ INT8U  OSSemQuery (OS_EVENT     *pevent,
 */
 
 #if OS_SEM_SET_EN > 0u
-void  OSSemSet (OS_EVENT  *pevent,
-                INT16U     cnt,
-                INT8U     *perr)
+void OSSemSet(OS_EVENT *pevent, INT16U cnt, INT8U *perr)
 {
-#if OS_CRITICAL_METHOD == 3u                          /* Allocate storage for CPU status register      */
-    OS_CPU_SR  cpu_sr = 0u;
+#if OS_CRITICAL_METHOD == 3u /* Allocate storage for CPU status register      */
+    OS_CPU_SR cpu_sr = 0u;
 #endif
 
-
-
 #ifdef OS_SAFETY_CRITICAL
-    if (perr == (INT8U *)0) {
+    if (perr == (INT8U *)0)
+    {
         OS_SAFETY_CRITICAL_EXCEPTION();
         return;
     }
 #endif
 
 #if OS_ARG_CHK_EN > 0u
-    if (pevent == (OS_EVENT *)0) {                    /* Validate 'pevent'                             */
+    if (pevent == (OS_EVENT *)0)
+    { /* Validate 'pevent'                             */
         *perr = OS_ERR_PEVENT_NULL;
         return;
     }
 #endif
-    if (pevent->OSEventType != OS_EVENT_TYPE_SEM) {   /* Validate event block type                     */
+    if (pevent->OSEventType != OS_EVENT_TYPE_SEM)
+    { /* Validate event block type                     */
         *perr = OS_ERR_EVENT_TYPE;
         return;
     }
     OS_ENTER_CRITICAL();
     *perr = OS_ERR_NONE;
-    if (pevent->OSEventCnt > 0u) {                    /* See if semaphore already has a count          */
-        pevent->OSEventCnt = cnt;                     /* Yes, set it to the new value specified.       */
-    } else {                                          /* No                                            */
-        if (pevent->OSEventGrp == 0u) {               /*      See if task(s) waiting?                  */
-            pevent->OSEventCnt = cnt;                 /*      No, OK to set the value                  */
-        } else {
-            *perr              = OS_ERR_TASK_WAITING;
+    if (pevent->OSEventCnt > 0u)
+    {                             /* See if semaphore already has a count          */
+        pevent->OSEventCnt = cnt; /* Yes, set it to the new value specified.       */
+    }
+    else
+    { /* No                                            */
+        if (pevent->OSEventGrp == 0u)
+        {                             /*      See if task(s) waiting?                  */
+            pevent->OSEventCnt = cnt; /*      No, OK to set the value                  */
+        }
+        else
+        {
+            *perr = OS_ERR_TASK_WAITING;
         }
     }
     OS_EXIT_CRITICAL();
 }
 #endif
 
-#endif                                                /* OS_SEM_EN                                     */
-#endif                                                /* OS_SEM_C                                      */
+#endif /* OS_SEM_EN                                     */
+#endif /* OS_SEM_C                                      */

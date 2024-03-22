@@ -23,9 +23,8 @@
 *********************************************************************************************************
 */
 
-#ifndef  _APP_CFG_H_
-#define  _APP_CFG_H_
-
+#ifndef _APP_CFG_H_
+#define _APP_CFG_H_
 
 /*
 *********************************************************************************************************
@@ -33,9 +32,8 @@
 *********************************************************************************************************
 */
 
-#include  <stdarg.h>
-#include  <stdio.h>
-
+#include <stdarg.h>
+#include <stdio.h>
 
 /*
 *********************************************************************************************************
@@ -43,17 +41,15 @@
 *********************************************************************************************************
 */
 
-
 /*
 *********************************************************************************************************
 *                                           TASK PRIORITIES
 *********************************************************************************************************
 */
 
-#define  APP_CFG_STARTUP_TASK_PRIO          3u
+#define APP_CFG_STARTUP_TASK_PRIO 3u
 
-#define  OS_TASK_TMR_PRIO                  (OS_LOWEST_PRIO - 2u)
-
+#define OS_TASK_TMR_PRIO (OS_LOWEST_PRIO - 2u)
 
 /*
 *********************************************************************************************************
@@ -62,8 +58,7 @@
 *********************************************************************************************************
 */
 
-#define  APP_CFG_STARTUP_TASK_STK_SIZE    128u
-
+#define APP_CFG_STARTUP_TASK_STK_SIZE 128u
 
 /*
 *********************************************************************************************************
@@ -71,24 +66,23 @@
 *********************************************************************************************************
 */
 
-#ifndef  TRACE_LEVEL_OFF
-#define  TRACE_LEVEL_OFF                    0u
+#ifndef TRACE_LEVEL_OFF
+#define TRACE_LEVEL_OFF 0u
 #endif
 
-#ifndef  TRACE_LEVEL_INFO
-#define  TRACE_LEVEL_INFO                   1u
+#ifndef TRACE_LEVEL_INFO
+#define TRACE_LEVEL_INFO 1u
 #endif
 
-#ifndef  TRACE_LEVEL_DBG
-#define  TRACE_LEVEL_DBG                    2u
+#ifndef TRACE_LEVEL_DBG
+#define TRACE_LEVEL_DBG 2u
 #endif
 
-#define  APP_TRACE_LEVEL                   TRACE_LEVEL_OFF
-#define  APP_TRACE                         printf
+#define APP_TRACE_LEVEL TRACE_LEVEL_OFF
+#define APP_TRACE printf
 
-#define  APP_TRACE_INFO(x)    ((APP_TRACE_LEVEL >= TRACE_LEVEL_INFO)  ? (void)(APP_TRACE x) : (void)0)
-#define  APP_TRACE_DBG(x)     ((APP_TRACE_LEVEL >= TRACE_LEVEL_DBG)   ? (void)(APP_TRACE x) : (void)0)
-
+#define APP_TRACE_INFO(x) ((APP_TRACE_LEVEL >= TRACE_LEVEL_INFO) ? (void)(APP_TRACE x) : (void)0)
+#define APP_TRACE_DBG(x) ((APP_TRACE_LEVEL >= TRACE_LEVEL_DBG) ? (void)(APP_TRACE x) : (void)0)
 
 /*
 *********************************************************************************************************
@@ -96,4 +90,4 @@
 *********************************************************************************************************
 */
 
-#endif                                                          /* End of module include.              */
+#endif /* End of module include.              */

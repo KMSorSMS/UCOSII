@@ -14,7 +14,6 @@
 *********************************************************************************************************
 */
 
-
 /*
 *********************************************************************************************************
 * Filename : ucos_ii.c
@@ -22,11 +21,10 @@
 *********************************************************************************************************
 */
 
-#define  OS_GLOBALS                           /* Declare GLOBAL variables                              */
+#define OS_GLOBALS /* Declare GLOBAL variables                              */
 #include <ucos_ii.h>
 
-
-#define  OS_MASTER_FILE                       /* Prevent the following files from including includes.h */
+#define OS_MASTER_FILE /* Prevent the following files from including includes.h */
 #include <os_core.c>
 #include <os_flag.c>
 #include <os_mbox.c>

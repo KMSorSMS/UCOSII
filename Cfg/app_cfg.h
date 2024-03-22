@@ -1,4 +1,4 @@
-#define  OS_TASK_TMR_PRIO                  (OS_LOWEST_PRIO - 2u)
+#define OS_TASK_TMR_PRIO (OS_LOWEST_PRIO - 2u)
 // 不受内核管理的中断等级，使用 BOUNDARY 寄存器设置任务切换时的中断屏蔽
 #ifndef CPU_CFG_KA_IPL_BOUNDARY
 #define CPU_CFG_KA_IPL_BOUNDARY 4u

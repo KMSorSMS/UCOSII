@@ -14,7 +14,6 @@
 *********************************************************************************************************
 */
 
-
 /*
 *********************************************************************************************************
 *
@@ -25,12 +24,12 @@
 *********************************************************************************************************
 */
 
-#ifndef  OS_FLAG_C
-#define  OS_FLAG_C
+#ifndef OS_FLAG_C
+#define OS_FLAG_C
 
-#define  MICRIUM_SOURCE
+#define MICRIUM_SOURCE
 
-#ifndef  OS_MASTER_FILE
+#ifndef OS_MASTER_FILE
 #include <ucos_ii.h>
 #endif
 
@@ -41,9 +40,8 @@
 *********************************************************************************************************
 */
 
-static  void     OS_FlagBlock(OS_FLAG_GRP *pgrp, OS_FLAG_NODE *pnode, OS_FLAGS flags, INT8U wait_type, INT32U timeout);
-static  BOOLEAN  OS_FlagTaskRdy(OS_FLAG_NODE *pnode, OS_FLAGS flags_rdy, INT8U pend_stat);
-
+static void OS_FlagBlock(OS_FLAG_GRP *pgrp, OS_FLAG_NODE *pnode, OS_FLAGS flags, INT8U wait_type, INT32U timeout);
+static BOOLEAN OS_FlagTaskRdy(OS_FLAG_NODE *pnode, OS_FLAGS flags_rdy, INT8U pend_stat);
 
 /*
 *********************************************************************************************************
@@ -98,108 +96,125 @@ static  BOOLEAN  OS_FlagTaskRdy(OS_FLAG_NODE *pnode, OS_FLAGS flags_rdy, INT8U p
 */
 
 #if OS_FLAG_ACCEPT_EN > 0u
-OS_FLAGS  OSFlagAccept (OS_FLAG_GRP  *pgrp,
-                        OS_FLAGS      flags,
-                        INT8U         wait_type,
-                        INT8U        *perr)
+OS_FLAGS OSFlagAccept(OS_FLAG_GRP *pgrp, OS_FLAGS flags, INT8U wait_type, INT8U *perr)
 {
-    OS_FLAGS      flags_rdy;
-    INT8U         result;
-    BOOLEAN       consume;
-#if OS_CRITICAL_METHOD == 3u                               /* Allocate storage for CPU status register */
-    OS_CPU_SR     cpu_sr = 0u;
+    OS_FLAGS flags_rdy;
+    INT8U result;
+    BOOLEAN consume;
+#if OS_CRITICAL_METHOD == 3u /* Allocate storage for CPU status register */
+    OS_CPU_SR cpu_sr = 0u;
 #endif
 
-
-
 #ifdef OS_SAFETY_CRITICAL
-    if (perr == (INT8U *)0) {
+    if (perr == (INT8U *)0)
+    {
         OS_SAFETY_CRITICAL_EXCEPTION();
         return ((OS_FLAGS)0);
     }
 #endif
 
 #if OS_ARG_CHK_EN > 0u
-    if (pgrp == (OS_FLAG_GRP *)0) {                        /* Validate 'pgrp'                          */
+    if (pgrp == (OS_FLAG_GRP *)0)
+    { /* Validate 'pgrp'                          */
         *perr = OS_ERR_FLAG_INVALID_PGRP;
         return ((OS_FLAGS)0);
     }
 #endif
-    if (pgrp->OSFlagType != OS_EVENT_TYPE_FLAG) {          /* Validate event block type                */
+    if (pgrp->OSFlagType != OS_EVENT_TYPE_FLAG)
+    { /* Validate event block type                */
         *perr = OS_ERR_EVENT_TYPE;
         return ((OS_FLAGS)0);
     }
     result = (INT8U)(wait_type & OS_FLAG_CONSUME);
-    if (result != (INT8U)0) {                              /* See if we need to consume the flags      */
+    if (result != (INT8U)0)
+    { /* See if we need to consume the flags      */
         wait_type &= ~OS_FLAG_CONSUME;
-        consume    = OS_TRUE;
-    } else {
-        consume    = OS_FALSE;
+        consume = OS_TRUE;
+    }
+    else
+    {
+        consume = OS_FALSE;
     }
 
-    *perr = OS_ERR_NONE;                                   /* Assume NO error until proven otherwise.  */
+    *perr = OS_ERR_NONE; /* Assume NO error until proven otherwise.  */
     OS_ENTER_CRITICAL();
-    switch (wait_type) {
-        case OS_FLAG_WAIT_SET_ALL:                         /* See if all required flags are set        */
-             flags_rdy = (OS_FLAGS)(pgrp->OSFlagFlags & flags);     /* Extract only the bits we want   */
-             if (flags_rdy == flags) {                     /* Must match ALL the bits that we want     */
-                 if (consume == OS_TRUE) {                 /* See if we need to consume the flags      */
-                     pgrp->OSFlagFlags &= (OS_FLAGS)~flags_rdy;     /* Clear ONLY the flags we wanted  */
-                 }
-             } else {
-                 *perr = OS_ERR_FLAG_NOT_RDY;
-             }
-             OS_EXIT_CRITICAL();
-             break;
+    switch (wait_type)
+    {
+        case OS_FLAG_WAIT_SET_ALL:                             /* See if all required flags are set        */
+            flags_rdy = (OS_FLAGS)(pgrp->OSFlagFlags & flags); /* Extract only the bits we want   */
+            if (flags_rdy == flags)
+            { /* Must match ALL the bits that we want     */
+                if (consume == OS_TRUE)
+                {                                              /* See if we need to consume the flags      */
+                    pgrp->OSFlagFlags &= (OS_FLAGS)~flags_rdy; /* Clear ONLY the flags we wanted  */
+                }
+            }
+            else
+            {
+                *perr = OS_ERR_FLAG_NOT_RDY;
+            }
+            OS_EXIT_CRITICAL();
+            break;
 
         case OS_FLAG_WAIT_SET_ANY:
-             flags_rdy = (OS_FLAGS)(pgrp->OSFlagFlags & flags);     /* Extract only the bits we want   */
-             if (flags_rdy != (OS_FLAGS)0) {               /* See if any flag set                      */
-                 if (consume == OS_TRUE) {                 /* See if we need to consume the flags      */
-                     pgrp->OSFlagFlags &= (OS_FLAGS)~flags_rdy;     /* Clear ONLY the flags we got     */
-                 }
-             } else {
-                 *perr = OS_ERR_FLAG_NOT_RDY;
-             }
-             OS_EXIT_CRITICAL();
-             break;
+            flags_rdy = (OS_FLAGS)(pgrp->OSFlagFlags & flags); /* Extract only the bits we want   */
+            if (flags_rdy != (OS_FLAGS)0)
+            { /* See if any flag set                      */
+                if (consume == OS_TRUE)
+                {                                              /* See if we need to consume the flags      */
+                    pgrp->OSFlagFlags &= (OS_FLAGS)~flags_rdy; /* Clear ONLY the flags we got     */
+                }
+            }
+            else
+            {
+                *perr = OS_ERR_FLAG_NOT_RDY;
+            }
+            OS_EXIT_CRITICAL();
+            break;
 
 #if OS_FLAG_WAIT_CLR_EN > 0u
-        case OS_FLAG_WAIT_CLR_ALL:                         /* See if all required flags are cleared    */
-             flags_rdy = (OS_FLAGS)~pgrp->OSFlagFlags & flags;    /* Extract only the bits we want     */
-             if (flags_rdy == flags) {                     /* Must match ALL the bits that we want     */
-                 if (consume == OS_TRUE) {                 /* See if we need to consume the flags      */
-                     pgrp->OSFlagFlags |= flags_rdy;       /* Set ONLY the flags that we wanted        */
-                 }
-             } else {
-                 *perr = OS_ERR_FLAG_NOT_RDY;
-             }
-             OS_EXIT_CRITICAL();
-             break;
+        case OS_FLAG_WAIT_CLR_ALL:                            /* See if all required flags are cleared    */
+            flags_rdy = (OS_FLAGS)~pgrp->OSFlagFlags & flags; /* Extract only the bits we want     */
+            if (flags_rdy == flags)
+            { /* Must match ALL the bits that we want     */
+                if (consume == OS_TRUE)
+                {                                   /* See if we need to consume the flags      */
+                    pgrp->OSFlagFlags |= flags_rdy; /* Set ONLY the flags that we wanted        */
+                }
+            }
+            else
+            {
+                *perr = OS_ERR_FLAG_NOT_RDY;
+            }
+            OS_EXIT_CRITICAL();
+            break;
 
         case OS_FLAG_WAIT_CLR_ANY:
-             flags_rdy = (OS_FLAGS)~pgrp->OSFlagFlags & flags;   /* Extract only the bits we want      */
-             if (flags_rdy != (OS_FLAGS)0) {               /* See if any flag cleared                  */
-                 if (consume == OS_TRUE) {                 /* See if we need to consume the flags      */
-                     pgrp->OSFlagFlags |= flags_rdy;       /* Set ONLY the flags that we got           */
-                 }
-             } else {
-                 *perr = OS_ERR_FLAG_NOT_RDY;
-             }
-             OS_EXIT_CRITICAL();
-             break;
+            flags_rdy = (OS_FLAGS)~pgrp->OSFlagFlags & flags; /* Extract only the bits we want      */
+            if (flags_rdy != (OS_FLAGS)0)
+            { /* See if any flag cleared                  */
+                if (consume == OS_TRUE)
+                {                                   /* See if we need to consume the flags      */
+                    pgrp->OSFlagFlags |= flags_rdy; /* Set ONLY the flags that we got           */
+                }
+            }
+            else
+            {
+                *perr = OS_ERR_FLAG_NOT_RDY;
+            }
+            OS_EXIT_CRITICAL();
+            break;
 #endif
 
         default:
-             OS_EXIT_CRITICAL();
-             flags_rdy = (OS_FLAGS)0;
-             *perr     = OS_ERR_FLAG_WAIT_TYPE;
-             break;
+            OS_EXIT_CRITICAL();
+            flags_rdy = (OS_FLAGS)0;
+            *perr = OS_ERR_FLAG_WAIT_TYPE;
+            break;
     }
     return (flags_rdy);
 }
 #endif
-
 
 /*
 *********************************************************************************************************
@@ -223,56 +238,58 @@ OS_FLAGS  OSFlagAccept (OS_FLAG_GRP  *pgrp,
 *********************************************************************************************************
 */
 
-OS_FLAG_GRP  *OSFlagCreate (OS_FLAGS  flags,
-                            INT8U    *perr)
+OS_FLAG_GRP *OSFlagCreate(OS_FLAGS flags, INT8U *perr)
 {
     OS_FLAG_GRP *pgrp;
-#if OS_CRITICAL_METHOD == 3u                        /* Allocate storage for CPU status register        */
-    OS_CPU_SR    cpu_sr = 0u;
+#if OS_CRITICAL_METHOD == 3u /* Allocate storage for CPU status register        */
+    OS_CPU_SR cpu_sr = 0u;
 #endif
 
-
-
 #ifdef OS_SAFETY_CRITICAL
-    if (perr == (INT8U *)0) {
+    if (perr == (INT8U *)0)
+    {
         OS_SAFETY_CRITICAL_EXCEPTION();
         return ((OS_FLAG_GRP *)0);
     }
 #endif
 
 #ifdef OS_SAFETY_CRITICAL_IEC61508
-    if (OSSafetyCriticalStartFlag == OS_TRUE) {
+    if (OSSafetyCriticalStartFlag == OS_TRUE)
+    {
         OS_SAFETY_CRITICAL_EXCEPTION();
         *perr = OS_ERR_ILLEGAL_CREATE_RUN_TIME;
         return ((OS_FLAG_GRP *)0);
     }
 #endif
 
-    if (OSIntNesting > 0u) {                        /* See if called from ISR ...                      */
-        *perr = OS_ERR_CREATE_ISR;                  /* ... can't CREATE from an ISR                    */
+    if (OSIntNesting > 0u)
+    {                              /* See if called from ISR ...                      */
+        *perr = OS_ERR_CREATE_ISR; /* ... can't CREATE from an ISR                    */
         return ((OS_FLAG_GRP *)0);
     }
     OS_ENTER_CRITICAL();
-    pgrp = OSFlagFreeList;                          /* Get next free event flag                        */
-    if (pgrp != (OS_FLAG_GRP *)0) {                 /* See if we have event flag groups available      */
-                                                    /* Adjust free list                                */
-        OSFlagFreeList       = (OS_FLAG_GRP *)OSFlagFreeList->OSFlagWaitList;
-        pgrp->OSFlagType     = OS_EVENT_TYPE_FLAG;  /* Set to event flag group type                    */
-        pgrp->OSFlagFlags    = flags;               /* Set to desired initial value                    */
-        pgrp->OSFlagWaitList = (void *)0;           /* Clear list of tasks waiting on flags            */
+    pgrp = OSFlagFreeList; /* Get next free event flag                        */
+    if (pgrp != (OS_FLAG_GRP *)0)
+    {   /* See if we have event flag groups available      */
+        /* Adjust free list                                */
+        OSFlagFreeList = (OS_FLAG_GRP *)OSFlagFreeList->OSFlagWaitList;
+        pgrp->OSFlagType = OS_EVENT_TYPE_FLAG; /* Set to event flag group type                    */
+        pgrp->OSFlagFlags = flags;             /* Set to desired initial value                    */
+        pgrp->OSFlagWaitList = (void *)0;      /* Clear list of tasks waiting on flags            */
 #if OS_FLAG_NAME_EN > 0u
-        pgrp->OSFlagName     = (INT8U *)(void *)"?";
+        pgrp->OSFlagName = (INT8U *)(void *)"?";
 #endif
         OS_TRACE_FLAG_CREATE(pgrp, pgrp->OSFlagName);
         OS_EXIT_CRITICAL();
-        *perr                = OS_ERR_NONE;
-    } else {
-        OS_EXIT_CRITICAL();
-        *perr                = OS_ERR_FLAG_GRP_DEPLETED;
+        *perr = OS_ERR_NONE;
     }
-    return (pgrp);                                  /* Return pointer to event flag group              */
+    else
+    {
+        OS_EXIT_CRITICAL();
+        *perr = OS_ERR_FLAG_GRP_DEPLETED;
+    }
+    return (pgrp); /* Return pointer to event flag group              */
 }
-
 
 /*
 *********************************************************************************************************
@@ -315,27 +332,26 @@ OS_FLAG_GRP  *OSFlagCreate (OS_FLAGS  flags,
 */
 
 #if OS_FLAG_DEL_EN > 0u
-OS_FLAG_GRP  *OSFlagDel (OS_FLAG_GRP  *pgrp,
-                         INT8U         opt,
-                         INT8U        *perr)
+OS_FLAG_GRP *OSFlagDel(OS_FLAG_GRP *pgrp, INT8U opt, INT8U *perr)
 {
-    BOOLEAN       tasks_waiting;
+    BOOLEAN tasks_waiting;
     OS_FLAG_NODE *pnode;
-    OS_FLAG_GRP  *pgrp_return;
-#if OS_CRITICAL_METHOD == 3u                               /* Allocate storage for CPU status register */
-    OS_CPU_SR     cpu_sr = 0u;
+    OS_FLAG_GRP *pgrp_return;
+#if OS_CRITICAL_METHOD == 3u /* Allocate storage for CPU status register */
+    OS_CPU_SR cpu_sr = 0u;
 #endif
 
-
 #ifdef OS_SAFETY_CRITICAL
-    if (perr == (INT8U *)0) {
+    if (perr == (INT8U *)0)
+    {
         OS_SAFETY_CRITICAL_EXCEPTION();
         return ((OS_FLAG_GRP *)0);
     }
 #endif
 
 #ifdef OS_SAFETY_CRITICAL_IEC61508
-    if (OSSafetyCriticalStartFlag == OS_TRUE) {
+    if (OSSafetyCriticalStartFlag == OS_TRUE)
+    {
         OS_SAFETY_CRITICAL_EXCEPTION();
         *perr = OS_ERR_ILLEGAL_DEL_RUN_TIME;
         return ((OS_FLAG_GRP *)0);
@@ -343,7 +359,8 @@ OS_FLAG_GRP  *OSFlagDel (OS_FLAG_GRP  *pgrp,
 #endif
 
 #if OS_ARG_CHK_EN > 0u
-    if (pgrp == (OS_FLAG_GRP *)0) {                        /* Validate 'pgrp'                          */
+    if (pgrp == (OS_FLAG_GRP *)0)
+    { /* Validate 'pgrp'                          */
         *perr = OS_ERR_FLAG_INVALID_PGRP;
         return (pgrp);
     }
@@ -351,68 +368,79 @@ OS_FLAG_GRP  *OSFlagDel (OS_FLAG_GRP  *pgrp,
 
     OS_TRACE_FLAG_DEL_ENTER(pgrp, opt);
 
-    if (OSIntNesting > 0u) {                               /* See if called from ISR ...               */
-        *perr = OS_ERR_DEL_ISR;                            /* ... can't DELETE from an ISR             */
+    if (OSIntNesting > 0u)
+    {                           /* See if called from ISR ...               */
+        *perr = OS_ERR_DEL_ISR; /* ... can't DELETE from an ISR             */
         OS_TRACE_FLAG_DEL_EXIT(*perr);
         return (pgrp);
     }
-    if (pgrp->OSFlagType != OS_EVENT_TYPE_FLAG) {          /* Validate event group type                */
+    if (pgrp->OSFlagType != OS_EVENT_TYPE_FLAG)
+    { /* Validate event group type                */
         *perr = OS_ERR_EVENT_TYPE;
         OS_TRACE_FLAG_DEL_EXIT(*perr);
         return (pgrp);
     }
     OS_ENTER_CRITICAL();
-    if (pgrp->OSFlagWaitList != (void *)0) {               /* See if any tasks waiting on event flags  */
-        tasks_waiting = OS_TRUE;                           /* Yes                                      */
-    } else {
-        tasks_waiting = OS_FALSE;                          /* No                                       */
+    if (pgrp->OSFlagWaitList != (void *)0)
+    {                            /* See if any tasks waiting on event flags  */
+        tasks_waiting = OS_TRUE; /* Yes                                      */
     }
-    switch (opt) {
-        case OS_DEL_NO_PEND:                               /* Delete group if no task waiting          */
-             if (tasks_waiting == OS_FALSE) {
+    else
+    {
+        tasks_waiting = OS_FALSE; /* No                                       */
+    }
+    switch (opt)
+    {
+        case OS_DEL_NO_PEND: /* Delete group if no task waiting          */
+            if (tasks_waiting == OS_FALSE)
+            {
 #if OS_FLAG_NAME_EN > 0u
-                 pgrp->OSFlagName     = (INT8U *)(void *)"?";
+                pgrp->OSFlagName = (INT8U *)(void *)"?";
 #endif
-                 pgrp->OSFlagType     = OS_EVENT_TYPE_UNUSED;
-                 pgrp->OSFlagWaitList = (void *)OSFlagFreeList; /* Return group to free list           */
-                 pgrp->OSFlagFlags    = (OS_FLAGS)0;
-                 OSFlagFreeList       = pgrp;
-                 OS_EXIT_CRITICAL();
-                 *perr                = OS_ERR_NONE;
-                 pgrp_return          = (OS_FLAG_GRP *)0;  /* Event Flag Group has been deleted        */
-             } else {
-                 OS_EXIT_CRITICAL();
-                 *perr                = OS_ERR_TASK_WAITING;
-                 pgrp_return          = pgrp;
-             }
-             break;
+                pgrp->OSFlagType = OS_EVENT_TYPE_UNUSED;
+                pgrp->OSFlagWaitList = (void *)OSFlagFreeList; /* Return group to free list           */
+                pgrp->OSFlagFlags = (OS_FLAGS)0;
+                OSFlagFreeList = pgrp;
+                OS_EXIT_CRITICAL();
+                *perr = OS_ERR_NONE;
+                pgrp_return = (OS_FLAG_GRP *)0; /* Event Flag Group has been deleted        */
+            }
+            else
+            {
+                OS_EXIT_CRITICAL();
+                *perr = OS_ERR_TASK_WAITING;
+                pgrp_return = pgrp;
+            }
+            break;
 
-        case OS_DEL_ALWAYS:                                /* Always delete the event flag group       */
-             pnode = (OS_FLAG_NODE *)pgrp->OSFlagWaitList;
-             while (pnode != (OS_FLAG_NODE *)0) {          /* Ready ALL tasks waiting for flags        */
-                 (void)OS_FlagTaskRdy(pnode, (OS_FLAGS)0, OS_STAT_PEND_ABORT);
-                 pnode = (OS_FLAG_NODE *)pnode->OSFlagNodeNext;
-             }
+        case OS_DEL_ALWAYS: /* Always delete the event flag group       */
+            pnode = (OS_FLAG_NODE *)pgrp->OSFlagWaitList;
+            while (pnode != (OS_FLAG_NODE *)0)
+            { /* Ready ALL tasks waiting for flags        */
+                (void)OS_FlagTaskRdy(pnode, (OS_FLAGS)0, OS_STAT_PEND_ABORT);
+                pnode = (OS_FLAG_NODE *)pnode->OSFlagNodeNext;
+            }
 #if OS_FLAG_NAME_EN > 0u
-             pgrp->OSFlagName     = (INT8U *)(void *)"?";
+            pgrp->OSFlagName = (INT8U *)(void *)"?";
 #endif
-             pgrp->OSFlagType     = OS_EVENT_TYPE_UNUSED;
-             pgrp->OSFlagWaitList = (void *)OSFlagFreeList;/* Return group to free list                */
-             pgrp->OSFlagFlags    = (OS_FLAGS)0;
-             OSFlagFreeList       = pgrp;
-             OS_EXIT_CRITICAL();
-             if (tasks_waiting == OS_TRUE) {               /* Reschedule only if task(s) were waiting  */
-                 OS_Sched();                               /* Find highest priority task ready to run  */
-             }
-             *perr = OS_ERR_NONE;
-             pgrp_return          = (OS_FLAG_GRP *)0;      /* Event Flag Group has been deleted        */
-             break;
+            pgrp->OSFlagType = OS_EVENT_TYPE_UNUSED;
+            pgrp->OSFlagWaitList = (void *)OSFlagFreeList; /* Return group to free list                */
+            pgrp->OSFlagFlags = (OS_FLAGS)0;
+            OSFlagFreeList = pgrp;
+            OS_EXIT_CRITICAL();
+            if (tasks_waiting == OS_TRUE)
+            {               /* Reschedule only if task(s) were waiting  */
+                OS_Sched(); /* Find highest priority task ready to run  */
+            }
+            *perr = OS_ERR_NONE;
+            pgrp_return = (OS_FLAG_GRP *)0; /* Event Flag Group has been deleted        */
+            break;
 
         default:
-             OS_EXIT_CRITICAL();
-             *perr                = OS_ERR_INVALID_OPT;
-             pgrp_return          = pgrp;
-             break;
+            OS_EXIT_CRITICAL();
+            *perr = OS_ERR_INVALID_OPT;
+            pgrp_return = pgrp;
+            break;
     }
 
     OS_TRACE_FLAG_DEL_EXIT(*perr);
@@ -420,7 +448,6 @@ OS_FLAG_GRP  *OSFlagDel (OS_FLAG_GRP  *pgrp,
     return (pgrp_return);
 }
 #endif
-
 
 /*
 *********************************************************************************************************
@@ -446,52 +473,52 @@ OS_FLAG_GRP  *OSFlagDel (OS_FLAG_GRP  *pgrp,
 */
 
 #if OS_FLAG_NAME_EN > 0u
-INT8U  OSFlagNameGet (OS_FLAG_GRP   *pgrp,
-                      INT8U        **pname,
-                      INT8U         *perr)
+INT8U OSFlagNameGet(OS_FLAG_GRP *pgrp, INT8U **pname, INT8U *perr)
 {
-    INT8U      len;
-#if OS_CRITICAL_METHOD == 3u                     /* Allocate storage for CPU status register           */
-    OS_CPU_SR  cpu_sr = 0u;
+    INT8U len;
+#if OS_CRITICAL_METHOD == 3u /* Allocate storage for CPU status register           */
+    OS_CPU_SR cpu_sr = 0u;
 #endif
 
-
-
 #ifdef OS_SAFETY_CRITICAL
-    if (perr == (INT8U *)0) {
+    if (perr == (INT8U *)0)
+    {
         OS_SAFETY_CRITICAL_EXCEPTION();
         return (0u);
     }
 #endif
 
 #if OS_ARG_CHK_EN > 0u
-    if (pgrp == (OS_FLAG_GRP *)0) {              /* Is 'pgrp' a NULL pointer?                          */
+    if (pgrp == (OS_FLAG_GRP *)0)
+    { /* Is 'pgrp' a NULL pointer?                          */
         *perr = OS_ERR_FLAG_INVALID_PGRP;
         return (0u);
     }
-    if (pname == (INT8U **)0) {                   /* Is 'pname' a NULL pointer?                         */
+    if (pname == (INT8U **)0)
+    { /* Is 'pname' a NULL pointer?                         */
         *perr = OS_ERR_PNAME_NULL;
         return (0u);
     }
 #endif
-    if (OSIntNesting > 0u) {                     /* See if trying to call from an ISR                  */
+    if (OSIntNesting > 0u)
+    { /* See if trying to call from an ISR                  */
         *perr = OS_ERR_NAME_GET_ISR;
         return (0u);
     }
     OS_ENTER_CRITICAL();
-    if (pgrp->OSFlagType != OS_EVENT_TYPE_FLAG) {
+    if (pgrp->OSFlagType != OS_EVENT_TYPE_FLAG)
+    {
         OS_EXIT_CRITICAL();
         *perr = OS_ERR_EVENT_TYPE;
         return (0u);
     }
     *pname = pgrp->OSFlagName;
-    len    = OS_StrLen(*pname);
+    len = OS_StrLen(*pname);
     OS_EXIT_CRITICAL();
-    *perr  = OS_ERR_NONE;
+    *perr = OS_ERR_NONE;
     return (len);
 }
 #endif
-
 
 /*
 *********************************************************************************************************
@@ -517,39 +544,40 @@ INT8U  OSFlagNameGet (OS_FLAG_GRP   *pgrp,
 */
 
 #if OS_FLAG_NAME_EN > 0u
-void  OSFlagNameSet (OS_FLAG_GRP  *pgrp,
-                     INT8U        *pname,
-                     INT8U        *perr)
+void OSFlagNameSet(OS_FLAG_GRP *pgrp, INT8U *pname, INT8U *perr)
 {
-#if OS_CRITICAL_METHOD == 3u                     /* Allocate storage for CPU status register           */
-    OS_CPU_SR  cpu_sr = 0u;
+#if OS_CRITICAL_METHOD == 3u /* Allocate storage for CPU status register           */
+    OS_CPU_SR cpu_sr = 0u;
 #endif
 
-
-
 #ifdef OS_SAFETY_CRITICAL
-    if (perr == (INT8U *)0) {
+    if (perr == (INT8U *)0)
+    {
         OS_SAFETY_CRITICAL_EXCEPTION();
         return;
     }
 #endif
 
 #if OS_ARG_CHK_EN > 0u
-    if (pgrp == (OS_FLAG_GRP *)0) {              /* Is 'pgrp' a NULL pointer?                          */
+    if (pgrp == (OS_FLAG_GRP *)0)
+    { /* Is 'pgrp' a NULL pointer?                          */
         *perr = OS_ERR_FLAG_INVALID_PGRP;
         return;
     }
-    if (pname == (INT8U *)0) {                   /* Is 'pname' a NULL pointer?                         */
+    if (pname == (INT8U *)0)
+    { /* Is 'pname' a NULL pointer?                         */
         *perr = OS_ERR_PNAME_NULL;
         return;
     }
 #endif
-    if (OSIntNesting > 0u) {                     /* See if trying to call from an ISR                  */
+    if (OSIntNesting > 0u)
+    { /* See if trying to call from an ISR                  */
         *perr = OS_ERR_NAME_SET_ISR;
         return;
     }
     OS_ENTER_CRITICAL();
-    if (pgrp->OSFlagType != OS_EVENT_TYPE_FLAG) {
+    if (pgrp->OSFlagType != OS_EVENT_TYPE_FLAG)
+    {
         OS_EXIT_CRITICAL();
         *perr = OS_ERR_EVENT_TYPE;
         return;
@@ -557,11 +585,10 @@ void  OSFlagNameSet (OS_FLAG_GRP  *pgrp,
     pgrp->OSFlagName = pname;
     OS_EXIT_CRITICAL();
     OS_TRACE_EVENT_NAME_SET(pgrp, pname);
-    *perr            = OS_ERR_NONE;
+    *perr = OS_ERR_NONE;
     return;
 }
 #endif
-
 
 /*
 *********************************************************************************************************
@@ -617,31 +644,28 @@ void  OSFlagNameSet (OS_FLAG_GRP  *pgrp,
 *********************************************************************************************************
 */
 
-OS_FLAGS  OSFlagPend (OS_FLAG_GRP  *pgrp,
-                      OS_FLAGS      flags,
-                      INT8U         wait_type,
-                      INT32U        timeout,
-                      INT8U        *perr)
+OS_FLAGS OSFlagPend(OS_FLAG_GRP *pgrp, OS_FLAGS flags, INT8U wait_type, INT32U timeout, INT8U *perr)
 {
-    OS_FLAG_NODE  node;
-    OS_FLAGS      flags_rdy;
-    INT8U         result;
-    INT8U         pend_stat;
-    BOOLEAN       consume;
-#if OS_CRITICAL_METHOD == 3u                               /* Allocate storage for CPU status register */
-    OS_CPU_SR     cpu_sr = 0u;
+    OS_FLAG_NODE node;
+    OS_FLAGS flags_rdy;
+    INT8U result;
+    INT8U pend_stat;
+    BOOLEAN consume;
+#if OS_CRITICAL_METHOD == 3u /* Allocate storage for CPU status register */
+    OS_CPU_SR cpu_sr = 0u;
 #endif
 
-
 #ifdef OS_SAFETY_CRITICAL
-    if (perr == (INT8U *)0) {
+    if (perr == (INT8U *)0)
+    {
         OS_SAFETY_CRITICAL_EXCEPTION();
         return ((OS_FLAGS)0);
     }
 #endif
 
 #if OS_ARG_CHK_EN > 0u
-    if (pgrp == (OS_FLAG_GRP *)0) {                        /* Validate 'pgrp'                          */
+    if (pgrp == (OS_FLAG_GRP *)0)
+    { /* Validate 'pgrp'                          */
         *perr = OS_ERR_FLAG_INVALID_PGRP;
         return ((OS_FLAGS)0);
     }
@@ -649,158 +673,180 @@ OS_FLAGS  OSFlagPend (OS_FLAG_GRP  *pgrp,
 
     OS_TRACE_FLAG_PEND_ENTER(pgrp, flags, timeout, wait_type);
 
-    if (OSIntNesting > 0u) {                               /* See if called from ISR ...               */
-        *perr = OS_ERR_PEND_ISR;                           /* ... can't PEND from an ISR               */
+    if (OSIntNesting > 0u)
+    {                            /* See if called from ISR ...               */
+        *perr = OS_ERR_PEND_ISR; /* ... can't PEND from an ISR               */
         OS_TRACE_FLAG_PEND_EXIT(*perr);
         return ((OS_FLAGS)0);
     }
-    if (OSLockNesting > 0u) {                              /* See if called with scheduler locked ...  */
-        *perr = OS_ERR_PEND_LOCKED;                        /* ... can't PEND when locked               */
+    if (OSLockNesting > 0u)
+    {                               /* See if called with scheduler locked ...  */
+        *perr = OS_ERR_PEND_LOCKED; /* ... can't PEND when locked               */
         OS_TRACE_FLAG_PEND_EXIT(*perr);
         return ((OS_FLAGS)0);
     }
-    if (pgrp->OSFlagType != OS_EVENT_TYPE_FLAG) {          /* Validate event block type                */
+    if (pgrp->OSFlagType != OS_EVENT_TYPE_FLAG)
+    { /* Validate event block type                */
         *perr = OS_ERR_EVENT_TYPE;
         OS_TRACE_FLAG_PEND_EXIT(*perr);
         return ((OS_FLAGS)0);
     }
     result = (INT8U)(wait_type & OS_FLAG_CONSUME);
-    if (result != (INT8U)0) {                              /* See if we need to consume the flags      */
-        wait_type &= (INT8U)~(INT8U)OS_FLAG_CONSUME;
-        consume    = OS_TRUE;
-    } else {
-        consume    = OS_FALSE;
+    if (result != (INT8U)0)
+    { /* See if we need to consume the flags      */
+        wait_type &= (INT8U) ~(INT8U)OS_FLAG_CONSUME;
+        consume = OS_TRUE;
+    }
+    else
+    {
+        consume = OS_FALSE;
     }
 
     OS_ENTER_CRITICAL();
-    switch (wait_type) {
-        case OS_FLAG_WAIT_SET_ALL:                         /* See if all required flags are set        */
-             flags_rdy = (OS_FLAGS)(pgrp->OSFlagFlags & flags);   /* Extract only the bits we want     */
-             if (flags_rdy == flags) {                     /* Must match ALL the bits that we want     */
-                 if (consume == OS_TRUE) {                 /* See if we need to consume the flags      */
-                     pgrp->OSFlagFlags &= (OS_FLAGS)~flags_rdy;   /* Clear ONLY the flags we wanted    */
-                 }
-                 OSTCBCur->OSTCBFlagsRdy = flags_rdy;      /* Save flags that were ready               */
-                 OS_EXIT_CRITICAL();                       /* Yes, condition met, return to caller     */
-                 *perr                   = OS_ERR_NONE;
-                 OS_TRACE_FLAG_PEND_EXIT(*perr);
-                 return (flags_rdy);
-             } else {                                      /* Block task until events occur or timeout */
-                 OS_FlagBlock(pgrp, &node, flags, wait_type, timeout);
-                 OS_EXIT_CRITICAL();
-             }
-             break;
+    switch (wait_type)
+    {
+        case OS_FLAG_WAIT_SET_ALL:                             /* See if all required flags are set        */
+            flags_rdy = (OS_FLAGS)(pgrp->OSFlagFlags & flags); /* Extract only the bits we want     */
+            if (flags_rdy == flags)
+            { /* Must match ALL the bits that we want     */
+                if (consume == OS_TRUE)
+                {                                              /* See if we need to consume the flags      */
+                    pgrp->OSFlagFlags &= (OS_FLAGS)~flags_rdy; /* Clear ONLY the flags we wanted    */
+                }
+                OSTCBCur->OSTCBFlagsRdy = flags_rdy; /* Save flags that were ready               */
+                OS_EXIT_CRITICAL();                  /* Yes, condition met, return to caller     */
+                *perr = OS_ERR_NONE;
+                OS_TRACE_FLAG_PEND_EXIT(*perr);
+                return (flags_rdy);
+            }
+            else
+            { /* Block task until events occur or timeout */
+                OS_FlagBlock(pgrp, &node, flags, wait_type, timeout);
+                OS_EXIT_CRITICAL();
+            }
+            break;
 
         case OS_FLAG_WAIT_SET_ANY:
-             flags_rdy = (OS_FLAGS)(pgrp->OSFlagFlags & flags);    /* Extract only the bits we want    */
-             if (flags_rdy != (OS_FLAGS)0) {               /* See if any flag set                      */
-                 if (consume == OS_TRUE) {                 /* See if we need to consume the flags      */
-                     pgrp->OSFlagFlags &= (OS_FLAGS)~flags_rdy;    /* Clear ONLY the flags that we got */
-                 }
-                 OSTCBCur->OSTCBFlagsRdy = flags_rdy;      /* Save flags that were ready               */
-                 OS_EXIT_CRITICAL();                       /* Yes, condition met, return to caller     */
-                 *perr                   = OS_ERR_NONE;
-                 OS_TRACE_FLAG_PEND_EXIT(*perr);
-                 return (flags_rdy);
-             } else {                                      /* Block task until events occur or timeout */
-                 OS_FlagBlock(pgrp, &node, flags, wait_type, timeout);
-                 OS_EXIT_CRITICAL();
-             }
-             break;
+            flags_rdy = (OS_FLAGS)(pgrp->OSFlagFlags & flags); /* Extract only the bits we want    */
+            if (flags_rdy != (OS_FLAGS)0)
+            { /* See if any flag set                      */
+                if (consume == OS_TRUE)
+                {                                              /* See if we need to consume the flags      */
+                    pgrp->OSFlagFlags &= (OS_FLAGS)~flags_rdy; /* Clear ONLY the flags that we got */
+                }
+                OSTCBCur->OSTCBFlagsRdy = flags_rdy; /* Save flags that were ready               */
+                OS_EXIT_CRITICAL();                  /* Yes, condition met, return to caller     */
+                *perr = OS_ERR_NONE;
+                OS_TRACE_FLAG_PEND_EXIT(*perr);
+                return (flags_rdy);
+            }
+            else
+            { /* Block task until events occur or timeout */
+                OS_FlagBlock(pgrp, &node, flags, wait_type, timeout);
+                OS_EXIT_CRITICAL();
+            }
+            break;
 
 #if OS_FLAG_WAIT_CLR_EN > 0u
-        case OS_FLAG_WAIT_CLR_ALL:                         /* See if all required flags are cleared    */
-             flags_rdy = (OS_FLAGS)~pgrp->OSFlagFlags & flags;    /* Extract only the bits we want     */
-             if (flags_rdy == flags) {                     /* Must match ALL the bits that we want     */
-                 if (consume == OS_TRUE) {                 /* See if we need to consume the flags      */
-                     pgrp->OSFlagFlags |= flags_rdy;       /* Set ONLY the flags that we wanted        */
-                 }
-                 OSTCBCur->OSTCBFlagsRdy = flags_rdy;      /* Save flags that were ready               */
-                 OS_EXIT_CRITICAL();                       /* Yes, condition met, return to caller     */
-                 *perr                   = OS_ERR_NONE;
-                 OS_TRACE_FLAG_PEND_EXIT(*perr);
-                 return (flags_rdy);
-             } else {                                      /* Block task until events occur or timeout */
-                 OS_FlagBlock(pgrp, &node, flags, wait_type, timeout);
-                 OS_EXIT_CRITICAL();
-             }
-             break;
+        case OS_FLAG_WAIT_CLR_ALL:                            /* See if all required flags are cleared    */
+            flags_rdy = (OS_FLAGS)~pgrp->OSFlagFlags & flags; /* Extract only the bits we want     */
+            if (flags_rdy == flags)
+            { /* Must match ALL the bits that we want     */
+                if (consume == OS_TRUE)
+                {                                   /* See if we need to consume the flags      */
+                    pgrp->OSFlagFlags |= flags_rdy; /* Set ONLY the flags that we wanted        */
+                }
+                OSTCBCur->OSTCBFlagsRdy = flags_rdy; /* Save flags that were ready               */
+                OS_EXIT_CRITICAL();                  /* Yes, condition met, return to caller     */
+                *perr = OS_ERR_NONE;
+                OS_TRACE_FLAG_PEND_EXIT(*perr);
+                return (flags_rdy);
+            }
+            else
+            { /* Block task until events occur or timeout */
+                OS_FlagBlock(pgrp, &node, flags, wait_type, timeout);
+                OS_EXIT_CRITICAL();
+            }
+            break;
 
         case OS_FLAG_WAIT_CLR_ANY:
-             flags_rdy = (OS_FLAGS)~pgrp->OSFlagFlags & flags;   /* Extract only the bits we want      */
-             if (flags_rdy != (OS_FLAGS)0) {               /* See if any flag cleared                  */
-                 if (consume == OS_TRUE) {                 /* See if we need to consume the flags      */
-                     pgrp->OSFlagFlags |= flags_rdy;       /* Set ONLY the flags that we got           */
-                 }
-                 OSTCBCur->OSTCBFlagsRdy = flags_rdy;      /* Save flags that were ready               */
-                 OS_EXIT_CRITICAL();                       /* Yes, condition met, return to caller     */
-                 *perr                   = OS_ERR_NONE;
-                 OS_TRACE_FLAG_PEND_EXIT(*perr);
-                 return (flags_rdy);
-             } else {                                      /* Block task until events occur or timeout */
-                 OS_FlagBlock(pgrp, &node, flags, wait_type, timeout);
-                 OS_EXIT_CRITICAL();
-             }
-             break;
+            flags_rdy = (OS_FLAGS)~pgrp->OSFlagFlags & flags; /* Extract only the bits we want      */
+            if (flags_rdy != (OS_FLAGS)0)
+            { /* See if any flag cleared                  */
+                if (consume == OS_TRUE)
+                {                                   /* See if we need to consume the flags      */
+                    pgrp->OSFlagFlags |= flags_rdy; /* Set ONLY the flags that we got           */
+                }
+                OSTCBCur->OSTCBFlagsRdy = flags_rdy; /* Save flags that were ready               */
+                OS_EXIT_CRITICAL();                  /* Yes, condition met, return to caller     */
+                *perr = OS_ERR_NONE;
+                OS_TRACE_FLAG_PEND_EXIT(*perr);
+                return (flags_rdy);
+            }
+            else
+            { /* Block task until events occur or timeout */
+                OS_FlagBlock(pgrp, &node, flags, wait_type, timeout);
+                OS_EXIT_CRITICAL();
+            }
+            break;
 #endif
 
         default:
-             OS_EXIT_CRITICAL();
-             flags_rdy = (OS_FLAGS)0;
-             *perr      = OS_ERR_FLAG_WAIT_TYPE;
-             OS_TRACE_FLAG_PEND_EXIT(*perr);
-             return (flags_rdy);
+            OS_EXIT_CRITICAL();
+            flags_rdy = (OS_FLAGS)0;
+            *perr = OS_ERR_FLAG_WAIT_TYPE;
+            OS_TRACE_FLAG_PEND_EXIT(*perr);
+            return (flags_rdy);
     }
 
-    OS_Sched();                                            /* Find next HPT ready to run               */
+    OS_Sched(); /* Find next HPT ready to run               */
     OS_ENTER_CRITICAL();
-    if (OSTCBCur->OSTCBStatPend != OS_STAT_PEND_OK) {      /* Have we timed-out or aborted?            */
-        pend_stat                = OSTCBCur->OSTCBStatPend;
-        OSTCBCur->OSTCBStatPend  = OS_STAT_PEND_OK;
+    if (OSTCBCur->OSTCBStatPend != OS_STAT_PEND_OK)
+    { /* Have we timed-out or aborted?            */
+        pend_stat = OSTCBCur->OSTCBStatPend;
+        OSTCBCur->OSTCBStatPend = OS_STAT_PEND_OK;
         OS_FlagUnlink(&node);
-        OSTCBCur->OSTCBStat      = OS_STAT_RDY;            /* Yes, make task ready-to-run              */
+        OSTCBCur->OSTCBStat = OS_STAT_RDY; /* Yes, make task ready-to-run              */
         OS_EXIT_CRITICAL();
-        flags_rdy                = (OS_FLAGS)0;
-        switch (pend_stat) {
+        flags_rdy = (OS_FLAGS)0;
+        switch (pend_stat)
+        {
             case OS_STAT_PEND_ABORT:
-                 *perr = OS_ERR_PEND_ABORT;                /* Indicate that we aborted   waiting       */
-                 break;
+                *perr = OS_ERR_PEND_ABORT; /* Indicate that we aborted   waiting       */
+                break;
 
             case OS_STAT_PEND_TO:
             default:
-                 *perr = OS_ERR_TIMEOUT;                   /* Indicate that we timed-out waiting       */
-                 break;
+                *perr = OS_ERR_TIMEOUT; /* Indicate that we timed-out waiting       */
+                break;
         }
         OS_TRACE_FLAG_PEND_EXIT(*perr);
         return (flags_rdy);
     }
     flags_rdy = OSTCBCur->OSTCBFlagsRdy;
-    if (consume == OS_TRUE) {                              /* See if we need to consume the flags      */
-        switch (wait_type) {
+    if (consume == OS_TRUE)
+    { /* See if we need to consume the flags      */
+        switch (wait_type)
+        {
             case OS_FLAG_WAIT_SET_ALL:
-            case OS_FLAG_WAIT_SET_ANY:                     /* Clear ONLY the flags we got              */
-                 pgrp->OSFlagFlags &= (OS_FLAGS)~flags_rdy;
-                 break;
+            case OS_FLAG_WAIT_SET_ANY: /* Clear ONLY the flags we got              */ pgrp->OSFlagFlags &= (OS_FLAGS)~flags_rdy; break;
 
 #if OS_FLAG_WAIT_CLR_EN > 0u
             case OS_FLAG_WAIT_CLR_ALL:
-            case OS_FLAG_WAIT_CLR_ANY:                     /* Set   ONLY the flags we got              */
-                 pgrp->OSFlagFlags |=  flags_rdy;
-                 break;
+            case OS_FLAG_WAIT_CLR_ANY: /* Set   ONLY the flags we got              */ pgrp->OSFlagFlags |= flags_rdy; break;
 #endif
             default:
-                 OS_EXIT_CRITICAL();
-                 *perr = OS_ERR_FLAG_WAIT_TYPE;
-                 OS_TRACE_FLAG_PEND_EXIT(*perr);
-                 return ((OS_FLAGS)0);
+                OS_EXIT_CRITICAL();
+                *perr = OS_ERR_FLAG_WAIT_TYPE;
+                OS_TRACE_FLAG_PEND_EXIT(*perr);
+                return ((OS_FLAGS)0);
         }
     }
     OS_EXIT_CRITICAL();
-    *perr = OS_ERR_NONE;                                   /* Event(s) must have occurred              */
+    *perr = OS_ERR_NONE; /* Event(s) must have occurred              */
     OS_TRACE_FLAG_PEND_EXIT(*perr);
     return (flags_rdy);
 }
-
 
 /*
 *********************************************************************************************************
@@ -817,21 +863,18 @@ OS_FLAGS  OSFlagPend (OS_FLAG_GRP  *pgrp,
 *********************************************************************************************************
 */
 
-OS_FLAGS  OSFlagPendGetFlagsRdy (void)
+OS_FLAGS OSFlagPendGetFlagsRdy(void)
 {
-    OS_FLAGS      flags;
-#if OS_CRITICAL_METHOD == 3u                               /* Allocate storage for CPU status register */
-    OS_CPU_SR     cpu_sr = 0u;
+    OS_FLAGS flags;
+#if OS_CRITICAL_METHOD == 3u /* Allocate storage for CPU status register */
+    OS_CPU_SR cpu_sr = 0u;
 #endif
-
-
 
     OS_ENTER_CRITICAL();
     flags = OSTCBCur->OSTCBFlagsRdy;
     OS_EXIT_CRITICAL();
     return (flags);
 }
-
 
 /*
 *********************************************************************************************************
@@ -874,30 +917,28 @@ OS_FLAGS  OSFlagPendGetFlagsRdy (void)
 *                 the event flag group.
 *********************************************************************************************************
 */
-OS_FLAGS  OSFlagPost (OS_FLAG_GRP  *pgrp,
-                      OS_FLAGS      flags,
-                      INT8U         opt,
-                      INT8U        *perr)
+OS_FLAGS OSFlagPost(OS_FLAG_GRP *pgrp, OS_FLAGS flags, INT8U opt, INT8U *perr)
 {
     OS_FLAG_NODE *pnode;
-    BOOLEAN       sched;
-    OS_FLAGS      flags_cur;
-    OS_FLAGS      flags_rdy;
-    BOOLEAN       rdy;
-#if OS_CRITICAL_METHOD == 3u                         /* Allocate storage for CPU status register       */
-    OS_CPU_SR     cpu_sr = 0u;
+    BOOLEAN sched;
+    OS_FLAGS flags_cur;
+    OS_FLAGS flags_rdy;
+    BOOLEAN rdy;
+#if OS_CRITICAL_METHOD == 3u /* Allocate storage for CPU status register       */
+    OS_CPU_SR cpu_sr = 0u;
 #endif
 
-
 #ifdef OS_SAFETY_CRITICAL
-    if (perr == (INT8U *)0) {
+    if (perr == (INT8U *)0)
+    {
         OS_SAFETY_CRITICAL_EXCEPTION();
         return ((OS_FLAGS)0);
     }
 #endif
 
 #if OS_ARG_CHK_EN > 0u
-    if (pgrp == (OS_FLAG_GRP *)0) {                  /* Validate 'pgrp'                                */
+    if (pgrp == (OS_FLAG_GRP *)0)
+    { /* Validate 'pgrp'                                */
         *perr = OS_ERR_FLAG_INVALID_PGRP;
         return ((OS_FLAGS)0);
     }
@@ -905,94 +946,106 @@ OS_FLAGS  OSFlagPost (OS_FLAG_GRP  *pgrp,
 
     OS_TRACE_FLAG_POST_ENTER(pgrp, flags, opt);
 
-    if (pgrp->OSFlagType != OS_EVENT_TYPE_FLAG) {    /* Make sure we are pointing to an event flag grp */
+    if (pgrp->OSFlagType != OS_EVENT_TYPE_FLAG)
+    { /* Make sure we are pointing to an event flag grp */
         *perr = OS_ERR_EVENT_TYPE;
         OS_TRACE_FLAG_POST_EXIT(*perr);
         return ((OS_FLAGS)0);
     }
 
     OS_ENTER_CRITICAL();
-    switch (opt) {
+    switch (opt)
+    {
         case OS_FLAG_CLR:
-             pgrp->OSFlagFlags &= (OS_FLAGS)~flags;  /* Clear the flags specified in the group         */
-             break;
+            pgrp->OSFlagFlags &= (OS_FLAGS)~flags; /* Clear the flags specified in the group         */
+            break;
 
         case OS_FLAG_SET:
-             pgrp->OSFlagFlags |=  flags;            /* Set   the flags specified in the group         */
-             break;
+            pgrp->OSFlagFlags |= flags; /* Set   the flags specified in the group         */
+            break;
 
         default:
-             OS_EXIT_CRITICAL();                     /* INVALID option                                 */
-             *perr = OS_ERR_FLAG_INVALID_OPT;
-             OS_TRACE_FLAG_POST_EXIT(*perr);
-             return ((OS_FLAGS)0);
+            OS_EXIT_CRITICAL(); /* INVALID option                                 */
+            *perr = OS_ERR_FLAG_INVALID_OPT;
+            OS_TRACE_FLAG_POST_EXIT(*perr);
+            return ((OS_FLAGS)0);
     }
-    sched = OS_FALSE;                                /* Indicate that we don't need rescheduling       */
+    sched = OS_FALSE; /* Indicate that we don't need rescheduling       */
     pnode = (OS_FLAG_NODE *)pgrp->OSFlagWaitList;
-    while (pnode != (OS_FLAG_NODE *)0) {             /* Go through all tasks waiting on event flag(s)  */
-        switch (pnode->OSFlagNodeWaitType) {
-            case OS_FLAG_WAIT_SET_ALL:               /* See if all req. flags are set for current node */
-                 flags_rdy = (OS_FLAGS)(pgrp->OSFlagFlags & pnode->OSFlagNodeFlags);
-                 if (flags_rdy == pnode->OSFlagNodeFlags) {   /* Make task RTR, event(s) Rx'd          */
-                     rdy = OS_FlagTaskRdy(pnode, flags_rdy, OS_STAT_PEND_OK);
-                     if (rdy == OS_TRUE) {
-                         sched = OS_TRUE;                     /* When done we will reschedule          */
-                     }
-                 }
-                 break;
+    while (pnode != (OS_FLAG_NODE *)0)
+    { /* Go through all tasks waiting on event flag(s)  */
+        switch (pnode->OSFlagNodeWaitType)
+        {
+            case OS_FLAG_WAIT_SET_ALL: /* See if all req. flags are set for current node */
+                flags_rdy = (OS_FLAGS)(pgrp->OSFlagFlags & pnode->OSFlagNodeFlags);
+                if (flags_rdy == pnode->OSFlagNodeFlags)
+                { /* Make task RTR, event(s) Rx'd          */
+                    rdy = OS_FlagTaskRdy(pnode, flags_rdy, OS_STAT_PEND_OK);
+                    if (rdy == OS_TRUE)
+                    {
+                        sched = OS_TRUE; /* When done we will reschedule          */
+                    }
+                }
+                break;
 
-            case OS_FLAG_WAIT_SET_ANY:               /* See if any flag set                            */
-                 flags_rdy = (OS_FLAGS)(pgrp->OSFlagFlags & pnode->OSFlagNodeFlags);
-                 if (flags_rdy != (OS_FLAGS)0) {              /* Make task RTR, event(s) Rx'd          */
-                     rdy = OS_FlagTaskRdy(pnode, flags_rdy, OS_STAT_PEND_OK);
-                     if (rdy == OS_TRUE) {
-                         sched = OS_TRUE;                     /* When done we will reschedule          */
-                     }
-                 }
-                 break;
+            case OS_FLAG_WAIT_SET_ANY: /* See if any flag set                            */
+                flags_rdy = (OS_FLAGS)(pgrp->OSFlagFlags & pnode->OSFlagNodeFlags);
+                if (flags_rdy != (OS_FLAGS)0)
+                { /* Make task RTR, event(s) Rx'd          */
+                    rdy = OS_FlagTaskRdy(pnode, flags_rdy, OS_STAT_PEND_OK);
+                    if (rdy == OS_TRUE)
+                    {
+                        sched = OS_TRUE; /* When done we will reschedule          */
+                    }
+                }
+                break;
 
 #if OS_FLAG_WAIT_CLR_EN > 0u
-            case OS_FLAG_WAIT_CLR_ALL:               /* See if all req. flags are set for current node */
-                 flags_rdy = (OS_FLAGS)~pgrp->OSFlagFlags & pnode->OSFlagNodeFlags;
-                 if (flags_rdy == pnode->OSFlagNodeFlags) {   /* Make task RTR, event(s) Rx'd          */
-                     rdy = OS_FlagTaskRdy(pnode, flags_rdy, OS_STAT_PEND_OK);
-                     if (rdy == OS_TRUE) {
-                         sched = OS_TRUE;                     /* When done we will reschedule          */
-                     }
-                 }
-                 break;
+            case OS_FLAG_WAIT_CLR_ALL: /* See if all req. flags are set for current node */
+                flags_rdy = (OS_FLAGS)~pgrp->OSFlagFlags & pnode->OSFlagNodeFlags;
+                if (flags_rdy == pnode->OSFlagNodeFlags)
+                { /* Make task RTR, event(s) Rx'd          */
+                    rdy = OS_FlagTaskRdy(pnode, flags_rdy, OS_STAT_PEND_OK);
+                    if (rdy == OS_TRUE)
+                    {
+                        sched = OS_TRUE; /* When done we will reschedule          */
+                    }
+                }
+                break;
 
-            case OS_FLAG_WAIT_CLR_ANY:               /* See if any flag set                            */
-                 flags_rdy = (OS_FLAGS)~pgrp->OSFlagFlags & pnode->OSFlagNodeFlags;
-                 if (flags_rdy != (OS_FLAGS)0) {              /* Make task RTR, event(s) Rx'd          */
-                     rdy = OS_FlagTaskRdy(pnode, flags_rdy, OS_STAT_PEND_OK);
-                     if (rdy == OS_TRUE) {
-                         sched = OS_TRUE;                     /* When done we will reschedule          */
-                     }
-                 }
-                 break;
+            case OS_FLAG_WAIT_CLR_ANY: /* See if any flag set                            */
+                flags_rdy = (OS_FLAGS)~pgrp->OSFlagFlags & pnode->OSFlagNodeFlags;
+                if (flags_rdy != (OS_FLAGS)0)
+                { /* Make task RTR, event(s) Rx'd          */
+                    rdy = OS_FlagTaskRdy(pnode, flags_rdy, OS_STAT_PEND_OK);
+                    if (rdy == OS_TRUE)
+                    {
+                        sched = OS_TRUE; /* When done we will reschedule          */
+                    }
+                }
+                break;
 #endif
             default:
-                 OS_EXIT_CRITICAL();
-                 *perr = OS_ERR_FLAG_WAIT_TYPE;
-                 OS_TRACE_FLAG_POST_EXIT(*perr);
-                 return ((OS_FLAGS)0);
+                OS_EXIT_CRITICAL();
+                *perr = OS_ERR_FLAG_WAIT_TYPE;
+                OS_TRACE_FLAG_POST_EXIT(*perr);
+                return ((OS_FLAGS)0);
         }
         pnode = (OS_FLAG_NODE *)pnode->OSFlagNodeNext; /* Point to next task waiting for event flag(s) */
     }
     OS_EXIT_CRITICAL();
-    if (sched == OS_TRUE) {
+    if (sched == OS_TRUE)
+    {
         OS_Sched();
     }
     OS_ENTER_CRITICAL();
     flags_cur = pgrp->OSFlagFlags;
     OS_EXIT_CRITICAL();
-    *perr     = OS_ERR_NONE;
+    *perr = OS_ERR_NONE;
     OS_TRACE_FLAG_POST_EXIT(*perr);
 
     return (flags_cur);
 }
-
 
 /*
 *********************************************************************************************************
@@ -1014,30 +1067,30 @@ OS_FLAGS  OSFlagPost (OS_FLAG_GRP  *pgrp,
 */
 
 #if OS_FLAG_QUERY_EN > 0u
-OS_FLAGS  OSFlagQuery (OS_FLAG_GRP  *pgrp,
-                       INT8U        *perr)
+OS_FLAGS OSFlagQuery(OS_FLAG_GRP *pgrp, INT8U *perr)
 {
-    OS_FLAGS   flags;
-#if OS_CRITICAL_METHOD == 3u                      /* Allocate storage for CPU status register          */
-    OS_CPU_SR  cpu_sr = 0u;
+    OS_FLAGS flags;
+#if OS_CRITICAL_METHOD == 3u /* Allocate storage for CPU status register          */
+    OS_CPU_SR cpu_sr = 0u;
 #endif
 
-
-
 #ifdef OS_SAFETY_CRITICAL
-    if (perr == (INT8U *)0) {
+    if (perr == (INT8U *)0)
+    {
         OS_SAFETY_CRITICAL_EXCEPTION();
         return ((OS_FLAGS)0);
     }
 #endif
 
 #if OS_ARG_CHK_EN > 0u
-    if (pgrp == (OS_FLAG_GRP *)0) {               /* Validate 'pgrp'                                   */
+    if (pgrp == (OS_FLAG_GRP *)0)
+    { /* Validate 'pgrp'                                   */
         *perr = OS_ERR_FLAG_INVALID_PGRP;
         return ((OS_FLAGS)0);
     }
 #endif
-    if (pgrp->OSFlagType != OS_EVENT_TYPE_FLAG) { /* Validate event block type                         */
+    if (pgrp->OSFlagType != OS_EVENT_TYPE_FLAG)
+    { /* Validate event block type                         */
         *perr = OS_ERR_EVENT_TYPE;
         return ((OS_FLAGS)0);
     }
@@ -1045,10 +1098,9 @@ OS_FLAGS  OSFlagQuery (OS_FLAG_GRP  *pgrp,
     flags = pgrp->OSFlagFlags;
     OS_EXIT_CRITICAL();
     *perr = OS_ERR_NONE;
-    return (flags);                               /* Return the current value of the event flags       */
+    return (flags); /* Return the current value of the event flags       */
 }
 #endif
-
 
 /*
 *********************************************************************************************************
@@ -1087,42 +1139,38 @@ OS_FLAGS  OSFlagQuery (OS_FLAG_GRP  *pgrp,
 *********************************************************************************************************
 */
 
-static  void  OS_FlagBlock (OS_FLAG_GRP  *pgrp,
-                            OS_FLAG_NODE *pnode,
-                            OS_FLAGS      flags,
-                            INT8U         wait_type,
-                            INT32U        timeout)
+static void OS_FlagBlock(OS_FLAG_GRP *pgrp, OS_FLAG_NODE *pnode, OS_FLAGS flags, INT8U wait_type, INT32U timeout)
 {
-    OS_FLAG_NODE  *pnode_next;
-    INT8U          y;
+    OS_FLAG_NODE *pnode_next;
+    INT8U y;
 
-
-    OSTCBCur->OSTCBStat      |= OS_STAT_FLAG;
-    OSTCBCur->OSTCBStatPend   = OS_STAT_PEND_OK;
-    OSTCBCur->OSTCBDly        = timeout;              /* Store timeout in task's TCB                   */
+    OSTCBCur->OSTCBStat |= OS_STAT_FLAG;
+    OSTCBCur->OSTCBStatPend = OS_STAT_PEND_OK;
+    OSTCBCur->OSTCBDly = timeout; /* Store timeout in task's TCB                   */
 #if OS_TASK_DEL_EN > 0u
-    OSTCBCur->OSTCBFlagNode   = pnode;                /* TCB to link to node                           */
+    OSTCBCur->OSTCBFlagNode = pnode; /* TCB to link to node                           */
 #endif
-    pnode->OSFlagNodeFlags    = flags;                /* Save the flags that we need to wait for       */
-    pnode->OSFlagNodeWaitType = wait_type;            /* Save the type of wait we are doing            */
-    pnode->OSFlagNodeTCB      = (void *)OSTCBCur;     /* Link to task's TCB                            */
-    pnode->OSFlagNodeNext     = pgrp->OSFlagWaitList; /* Add node at beginning of event flag wait list */
-    pnode->OSFlagNodePrev     = (void *)0;
-    pnode->OSFlagNodeFlagGrp  = (void *)pgrp;         /* Link to Event Flag Group                      */
-    pnode_next                = (OS_FLAG_NODE *)pgrp->OSFlagWaitList;
-    if (pnode_next != (void *)0) {                    /* Is this the first NODE to insert?             */
-        pnode_next->OSFlagNodePrev = pnode;           /* No, link in doubly linked list                */
+    pnode->OSFlagNodeFlags = flags;               /* Save the flags that we need to wait for       */
+    pnode->OSFlagNodeWaitType = wait_type;        /* Save the type of wait we are doing            */
+    pnode->OSFlagNodeTCB = (void *)OSTCBCur;      /* Link to task's TCB                            */
+    pnode->OSFlagNodeNext = pgrp->OSFlagWaitList; /* Add node at beginning of event flag wait list */
+    pnode->OSFlagNodePrev = (void *)0;
+    pnode->OSFlagNodeFlagGrp = (void *)pgrp; /* Link to Event Flag Group                      */
+    pnode_next = (OS_FLAG_NODE *)pgrp->OSFlagWaitList;
+    if (pnode_next != (void *)0)
+    {                                       /* Is this the first NODE to insert?             */
+        pnode_next->OSFlagNodePrev = pnode; /* No, link in doubly linked list                */
     }
     pgrp->OSFlagWaitList = (void *)pnode;
 
-    y            =  OSTCBCur->OSTCBY;                 /* Suspend current task until flag(s) received   */
+    y = OSTCBCur->OSTCBY; /* Suspend current task until flag(s) received   */
     OSRdyTbl[y] &= (OS_PRIO)~OSTCBCur->OSTCBBitX;
     OS_TRACE_TASK_SUSPENDED(OSTCBCur);
-    if (OSRdyTbl[y] == 0x00u) {
+    if (OSRdyTbl[y] == 0x00u)
+    {
         OSRdyGrp &= (OS_PRIO)~OSTCBCur->OSTCBBitY;
     }
 }
-
 
 /*
 *********************************************************************************************************
@@ -1139,46 +1187,45 @@ static  void  OS_FlagBlock (OS_FLAG_GRP  *pgrp,
 *********************************************************************************************************
 */
 
-void  OS_FlagInit (void)
+void OS_FlagInit(void)
 {
 #if OS_MAX_FLAGS == 1u
-    OSFlagFreeList                 = (OS_FLAG_GRP *)&OSFlagTbl[0];  /* Only ONE event flag group!      */
-    OSFlagFreeList->OSFlagType     = OS_EVENT_TYPE_UNUSED;
+    OSFlagFreeList = (OS_FLAG_GRP *)&OSFlagTbl[0]; /* Only ONE event flag group!      */
+    OSFlagFreeList->OSFlagType = OS_EVENT_TYPE_UNUSED;
     OSFlagFreeList->OSFlagWaitList = (void *)0;
-    OSFlagFreeList->OSFlagFlags    = (OS_FLAGS)0;
+    OSFlagFreeList->OSFlagFlags = (OS_FLAGS)0;
 #if OS_FLAG_NAME_EN > 0u
-    OSFlagFreeList->OSFlagName     = (INT8U *)"?";
+    OSFlagFreeList->OSFlagName = (INT8U *)"?";
 #endif
 #endif
 
 #if OS_MAX_FLAGS >= 2u
-    INT16U        ix;
-    INT16U        ix_next;
-    OS_FLAG_GRP  *pgrp1;
-    OS_FLAG_GRP  *pgrp2;
+    INT16U ix;
+    INT16U ix_next;
+    OS_FLAG_GRP *pgrp1;
+    OS_FLAG_GRP *pgrp2;
 
-
-    OS_MemClr((INT8U *)&OSFlagTbl[0], sizeof(OSFlagTbl));           /* Clear the flag group table      */
-    for (ix = 0u; ix < (OS_MAX_FLAGS - 1u); ix++) {                 /* Init. list of free EVENT FLAGS  */
+    OS_MemClr((INT8U *)&OSFlagTbl[0], sizeof(OSFlagTbl)); /* Clear the flag group table      */
+    for (ix = 0u; ix < (OS_MAX_FLAGS - 1u); ix++)
+    { /* Init. list of free EVENT FLAGS  */
         ix_next = ix + 1u;
         pgrp1 = &OSFlagTbl[ix];
         pgrp2 = &OSFlagTbl[ix_next];
-        pgrp1->OSFlagType     = OS_EVENT_TYPE_UNUSED;
+        pgrp1->OSFlagType = OS_EVENT_TYPE_UNUSED;
         pgrp1->OSFlagWaitList = (void *)pgrp2;
 #if OS_FLAG_NAME_EN > 0u
-        pgrp1->OSFlagName     = (INT8U *)(void *)"?";               /* Unknown name                    */
+        pgrp1->OSFlagName = (INT8U *)(void *)"?"; /* Unknown name                    */
 #endif
     }
-    pgrp1                 = &OSFlagTbl[ix];
-    pgrp1->OSFlagType     = OS_EVENT_TYPE_UNUSED;
+    pgrp1 = &OSFlagTbl[ix];
+    pgrp1->OSFlagType = OS_EVENT_TYPE_UNUSED;
     pgrp1->OSFlagWaitList = (void *)0;
 #if OS_FLAG_NAME_EN > 0u
-    pgrp1->OSFlagName     = (INT8U *)(void *)"?";                   /* Unknown name                    */
+    pgrp1->OSFlagName = (INT8U *)(void *)"?"; /* Unknown name                    */
 #endif
-    OSFlagFreeList        = &OSFlagTbl[0];
+    OSFlagFreeList = &OSFlagTbl[0];
 #endif
 }
-
 
 /*
 *********************************************************************************************************
@@ -1206,31 +1253,30 @@ void  OS_FlagInit (void)
 *********************************************************************************************************
 */
 
-static  BOOLEAN  OS_FlagTaskRdy (OS_FLAG_NODE *pnode,
-                                 OS_FLAGS      flags_rdy,
-                                 INT8U         pend_stat)
+static BOOLEAN OS_FlagTaskRdy(OS_FLAG_NODE *pnode, OS_FLAGS flags_rdy, INT8U pend_stat)
 {
-    OS_TCB   *ptcb;
-    BOOLEAN   sched;
+    OS_TCB *ptcb;
+    BOOLEAN sched;
 
-
-    ptcb                 = (OS_TCB *)pnode->OSFlagNodeTCB; /* Point to TCB of waiting task             */
-    ptcb->OSTCBDly       = 0u;
-    ptcb->OSTCBFlagsRdy  = flags_rdy;
-    ptcb->OSTCBStat     &= (INT8U)~(INT8U)OS_STAT_FLAG;
-    ptcb->OSTCBStatPend  = pend_stat;
-    if (ptcb->OSTCBStat == OS_STAT_RDY) {                  /* Task now ready?                          */
-        OSRdyGrp               |= ptcb->OSTCBBitY;         /* Put task into ready list                 */
+    ptcb = (OS_TCB *)pnode->OSFlagNodeTCB; /* Point to TCB of waiting task             */
+    ptcb->OSTCBDly = 0u;
+    ptcb->OSTCBFlagsRdy = flags_rdy;
+    ptcb->OSTCBStat &= (INT8U) ~(INT8U)OS_STAT_FLAG;
+    ptcb->OSTCBStatPend = pend_stat;
+    if (ptcb->OSTCBStat == OS_STAT_RDY)
+    {                                /* Task now ready?                          */
+        OSRdyGrp |= ptcb->OSTCBBitY; /* Put task into ready list                 */
         OSRdyTbl[ptcb->OSTCBY] |= ptcb->OSTCBBitX;
         OS_TRACE_TASK_READY(ptcb);
-        sched                   = OS_TRUE;
-    } else {
-        sched                   = OS_FALSE;
+        sched = OS_TRUE;
+    }
+    else
+    {
+        sched = OS_FALSE;
     }
     OS_FlagUnlink(pnode);
     return (sched);
 }
-
 
 /*
 *********************************************************************************************************
@@ -1253,34 +1299,38 @@ static  BOOLEAN  OS_FlagTaskRdy (OS_FLAG_NODE *pnode,
 *********************************************************************************************************
 */
 
-void  OS_FlagUnlink (OS_FLAG_NODE *pnode)
+void OS_FlagUnlink(OS_FLAG_NODE *pnode)
 {
 #if OS_TASK_DEL_EN > 0u
-    OS_TCB       *ptcb;
+    OS_TCB *ptcb;
 #endif
-    OS_FLAG_GRP  *pgrp;
+    OS_FLAG_GRP *pgrp;
     OS_FLAG_NODE *pnode_prev;
     OS_FLAG_NODE *pnode_next;
 
-
     pnode_prev = (OS_FLAG_NODE *)pnode->OSFlagNodePrev;
     pnode_next = (OS_FLAG_NODE *)pnode->OSFlagNodeNext;
-    if (pnode_prev == (OS_FLAG_NODE *)0) {                      /* Is it first node in wait list?      */
-        pgrp                 = (OS_FLAG_GRP *)pnode->OSFlagNodeFlagGrp;
-        pgrp->OSFlagWaitList = (void *)pnode_next;              /*      Update list for new 1st node   */
-        if (pnode_next != (OS_FLAG_NODE *)0) {
-            pnode_next->OSFlagNodePrev = (OS_FLAG_NODE *)0;     /*      Link new 1st node PREV to NULL */
+    if (pnode_prev == (OS_FLAG_NODE *)0)
+    { /* Is it first node in wait list?      */
+        pgrp = (OS_FLAG_GRP *)pnode->OSFlagNodeFlagGrp;
+        pgrp->OSFlagWaitList = (void *)pnode_next; /*      Update list for new 1st node   */
+        if (pnode_next != (OS_FLAG_NODE *)0)
+        {
+            pnode_next->OSFlagNodePrev = (OS_FLAG_NODE *)0; /*      Link new 1st node PREV to NULL */
         }
-    } else {                                                    /* No,  A node somewhere in the list   */
-        pnode_prev->OSFlagNodeNext = pnode_next;                /*      Link around the node to unlink */
-        if (pnode_next != (OS_FLAG_NODE *)0) {                  /*      Was this the LAST node?        */
-            pnode_next->OSFlagNodePrev = pnode_prev;            /*      No, Link around current node   */
+    }
+    else
+    {                                            /* No,  A node somewhere in the list   */
+        pnode_prev->OSFlagNodeNext = pnode_next; /*      Link around the node to unlink */
+        if (pnode_next != (OS_FLAG_NODE *)0)
+        {                                            /*      Was this the LAST node?        */
+            pnode_next->OSFlagNodePrev = pnode_prev; /*      No, Link around current node   */
         }
     }
 #if OS_TASK_DEL_EN > 0u
-    ptcb                = (OS_TCB *)pnode->OSFlagNodeTCB;
+    ptcb = (OS_TCB *)pnode->OSFlagNodeTCB;
     ptcb->OSTCBFlagNode = (OS_FLAG_NODE *)0;
 #endif
 }
 #endif
-#endif                                                          /* OS_FLAG_C                           */
+#endif /* OS_FLAG_C                           */

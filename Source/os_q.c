@@ -14,7 +14,6 @@
 *********************************************************************************************************
 */
 
-
 /*
 *********************************************************************************************************
 *
@@ -25,12 +24,12 @@
 *********************************************************************************************************
 */
 
-#ifndef  OS_Q_C
-#define  OS_Q_C
+#ifndef OS_Q_C
+#define OS_Q_C
 
-#define  MICRIUM_SOURCE
+#define MICRIUM_SOURCE
 
-#ifndef  OS_MASTER_FILE
+#ifndef OS_MASTER_FILE
 #include <ucos_ii.h>
 #endif
 
@@ -67,52 +66,55 @@
 */
 
 #if OS_Q_ACCEPT_EN > 0u
-void  *OSQAccept (OS_EVENT  *pevent,
-                  INT8U     *perr)
+void *OSQAccept(OS_EVENT *pevent, INT8U *perr)
 {
-    void      *pmsg;
-    OS_Q      *pq;
-#if OS_CRITICAL_METHOD == 3u                     /* Allocate storage for CPU status register           */
-    OS_CPU_SR  cpu_sr = 0u;
+    void *pmsg;
+    OS_Q *pq;
+#if OS_CRITICAL_METHOD == 3u /* Allocate storage for CPU status register           */
+    OS_CPU_SR cpu_sr = 0u;
 #endif
 
-
-
 #ifdef OS_SAFETY_CRITICAL
-    if (perr == (INT8U *)0) {
+    if (perr == (INT8U *)0)
+    {
         OS_SAFETY_CRITICAL_EXCEPTION();
         return ((void *)0);
     }
 #endif
 
 #if OS_ARG_CHK_EN > 0u
-    if (pevent == (OS_EVENT *)0) {               /* Validate 'pevent'                                  */
+    if (pevent == (OS_EVENT *)0)
+    { /* Validate 'pevent'                                  */
         *perr = OS_ERR_PEVENT_NULL;
         return ((void *)0);
     }
 #endif
-    if (pevent->OSEventType != OS_EVENT_TYPE_Q) {/* Validate event block type                          */
+    if (pevent->OSEventType != OS_EVENT_TYPE_Q)
+    { /* Validate event block type                          */
         *perr = OS_ERR_EVENT_TYPE;
         return ((void *)0);
     }
     OS_ENTER_CRITICAL();
-    pq = (OS_Q *)pevent->OSEventPtr;             /* Point at queue control block                       */
-    if (pq->OSQEntries > 0u) {                   /* See if any messages in the queue                   */
-        pmsg = *pq->OSQOut++;                    /* Yes, extract oldest message from the queue         */
-        pq->OSQEntries--;                        /* Update the number of entries in the queue          */
-        if (pq->OSQOut == pq->OSQEnd) {          /* Wrap OUT pointer if we are at the end of the queue */
+    pq = (OS_Q *)pevent->OSEventPtr; /* Point at queue control block                       */
+    if (pq->OSQEntries > 0u)
+    {                         /* See if any messages in the queue                   */
+        pmsg = *pq->OSQOut++; /* Yes, extract oldest message from the queue         */
+        pq->OSQEntries--;     /* Update the number of entries in the queue          */
+        if (pq->OSQOut == pq->OSQEnd)
+        { /* Wrap OUT pointer if we are at the end of the queue */
             pq->OSQOut = pq->OSQStart;
         }
         *perr = OS_ERR_NONE;
-    } else {
+    }
+    else
+    {
         *perr = OS_ERR_Q_EMPTY;
-        pmsg  = (void *)0;                       /* Queue is empty                                     */
+        pmsg = (void *)0; /* Queue is empty                                     */
     }
     OS_EXIT_CRITICAL();
-    return (pmsg);                               /* Return message received (or NULL)                  */
+    return (pmsg); /* Return message received (or NULL)                  */
 }
 #endif
-
 
 /*
 *********************************************************************************************************
@@ -133,64 +135,67 @@ void  *OSQAccept (OS_EVENT  *pevent,
 *********************************************************************************************************
 */
 
-OS_EVENT  *OSQCreate (void    **start,
-                      INT16U    size)
+OS_EVENT *OSQCreate(void **start, INT16U size)
 {
-    OS_EVENT  *pevent;
-    OS_Q      *pq;
-#if OS_CRITICAL_METHOD == 3u                     /* Allocate storage for CPU status register           */
-    OS_CPU_SR  cpu_sr = 0u;
+    OS_EVENT *pevent;
+    OS_Q *pq;
+#if OS_CRITICAL_METHOD == 3u /* Allocate storage for CPU status register           */
+    OS_CPU_SR cpu_sr = 0u;
 #endif
 
-
-
 #ifdef OS_SAFETY_CRITICAL_IEC61508
-    if (OSSafetyCriticalStartFlag == OS_TRUE) {
+    if (OSSafetyCriticalStartFlag == OS_TRUE)
+    {
         OS_SAFETY_CRITICAL_EXCEPTION();
         return ((OS_EVENT *)0);
     }
 #endif
 
-    if (OSIntNesting > 0u) {                     /* See if called from ISR ...                         */
-        return ((OS_EVENT *)0);                  /* ... can't CREATE from an ISR                       */
+    if (OSIntNesting > 0u)
+    {                           /* See if called from ISR ...                         */
+        return ((OS_EVENT *)0); /* ... can't CREATE from an ISR                       */
     }
     OS_ENTER_CRITICAL();
-    pevent = OSEventFreeList;                    /* Get next free event control block                  */
-    if (OSEventFreeList != (OS_EVENT *)0) {      /* See if pool of free ECB pool was empty             */
+    pevent = OSEventFreeList; /* Get next free event control block                  */
+    if (OSEventFreeList != (OS_EVENT *)0)
+    { /* See if pool of free ECB pool was empty             */
         OSEventFreeList = (OS_EVENT *)OSEventFreeList->OSEventPtr;
     }
     OS_EXIT_CRITICAL();
-    if (pevent != (OS_EVENT *)0) {               /* See if we have an event control block              */
+    if (pevent != (OS_EVENT *)0)
+    { /* See if we have an event control block              */
         OS_ENTER_CRITICAL();
-        pq = OSQFreeList;                        /* Get a free queue control block                     */
-        if (pq != (OS_Q *)0) {                   /* Were we able to get a queue control block ?        */
-            OSQFreeList            = OSQFreeList->OSQPtr; /* Yes, Adjust free list pointer to next free*/
+        pq = OSQFreeList; /* Get a free queue control block                     */
+        if (pq != (OS_Q *)0)
+        {                                      /* Were we able to get a queue control block ?        */
+            OSQFreeList = OSQFreeList->OSQPtr; /* Yes, Adjust free list pointer to next free*/
             OS_EXIT_CRITICAL();
-            pq->OSQStart           = start;               /*      Initialize the queue                 */
-            pq->OSQEnd             = &start[size];
-            pq->OSQIn              = start;
-            pq->OSQOut             = start;
-            pq->OSQSize            = size;
-            pq->OSQEntries         = 0u;
-            pevent->OSEventType    = OS_EVENT_TYPE_Q;
-            pevent->OSEventCnt     = 0u;
-            pevent->OSEventPtr     = pq;
+            pq->OSQStart = start; /*      Initialize the queue                 */
+            pq->OSQEnd = &start[size];
+            pq->OSQIn = start;
+            pq->OSQOut = start;
+            pq->OSQSize = size;
+            pq->OSQEntries = 0u;
+            pevent->OSEventType = OS_EVENT_TYPE_Q;
+            pevent->OSEventCnt = 0u;
+            pevent->OSEventPtr = pq;
 #if OS_EVENT_NAME_EN > 0u
-            pevent->OSEventName    = (INT8U *)(void *)"?";
+            pevent->OSEventName = (INT8U *)(void *)"?";
 #endif
-            OS_EventWaitListInit(pevent);                 /*      Initialize the wait list             */
+            OS_EventWaitListInit(pevent); /*      Initialize the wait list             */
 
             OS_TRACE_Q_CREATE(pevent, pevent->OSEventName);
-        } else {
+        }
+        else
+        {
             pevent->OSEventPtr = (void *)OSEventFreeList; /* No,  Return event control block on error  */
-            OSEventFreeList    = pevent;
+            OSEventFreeList = pevent;
             OS_EXIT_CRITICAL();
             pevent = (OS_EVENT *)0;
         }
     }
     return (pevent);
 }
-
 
 /*
 *********************************************************************************************************
@@ -238,27 +243,26 @@ OS_EVENT  *OSQCreate (void    **start,
 */
 
 #if OS_Q_DEL_EN > 0u
-OS_EVENT  *OSQDel (OS_EVENT  *pevent,
-                   INT8U      opt,
-                   INT8U     *perr)
+OS_EVENT *OSQDel(OS_EVENT *pevent, INT8U opt, INT8U *perr)
 {
-    BOOLEAN    tasks_waiting;
-    OS_EVENT  *pevent_return;
-    OS_Q      *pq;
-#if OS_CRITICAL_METHOD == 3u                               /* Allocate storage for CPU status register */
-    OS_CPU_SR  cpu_sr = 0u;
+    BOOLEAN tasks_waiting;
+    OS_EVENT *pevent_return;
+    OS_Q *pq;
+#if OS_CRITICAL_METHOD == 3u /* Allocate storage for CPU status register */
+    OS_CPU_SR cpu_sr = 0u;
 #endif
 
-
 #ifdef OS_SAFETY_CRITICAL
-    if (perr == (INT8U *)0) {
+    if (perr == (INT8U *)0)
+    {
         OS_SAFETY_CRITICAL_EXCEPTION();
         return ((OS_EVENT *)0);
     }
 #endif
 
 #ifdef OS_SAFETY_CRITICAL_IEC61508
-    if (OSSafetyCriticalStartFlag == OS_TRUE) {
+    if (OSSafetyCriticalStartFlag == OS_TRUE)
+    {
         OS_SAFETY_CRITICAL_EXCEPTION();
         *perr = OS_ERR_ILLEGAL_DEL_RUN_TIME;
         return ((OS_EVENT *)0);
@@ -266,7 +270,8 @@ OS_EVENT  *OSQDel (OS_EVENT  *pevent,
 #endif
 
 #if OS_ARG_CHK_EN > 0u
-    if (pevent == (OS_EVENT *)0) {                         /* Validate 'pevent'                        */
+    if (pevent == (OS_EVENT *)0)
+    { /* Validate 'pevent'                        */
         *perr = OS_ERR_PEVENT_NULL;
         return (pevent);
     }
@@ -274,72 +279,83 @@ OS_EVENT  *OSQDel (OS_EVENT  *pevent,
 
     OS_TRACE_Q_DEL_ENTER(pevent, opt);
 
-    if (pevent->OSEventType != OS_EVENT_TYPE_Q) {          /* Validate event block type                */
+    if (pevent->OSEventType != OS_EVENT_TYPE_Q)
+    { /* Validate event block type                */
         *perr = OS_ERR_EVENT_TYPE;
         OS_TRACE_Q_DEL_EXIT(*perr);
         return (pevent);
     }
-    if (OSIntNesting > 0u) {                               /* See if called from ISR ...               */
-        *perr = OS_ERR_DEL_ISR;                            /* ... can't DELETE from an ISR             */
+    if (OSIntNesting > 0u)
+    {                           /* See if called from ISR ...               */
+        *perr = OS_ERR_DEL_ISR; /* ... can't DELETE from an ISR             */
         OS_TRACE_Q_DEL_EXIT(*perr);
         return (pevent);
     }
     OS_ENTER_CRITICAL();
-    if (pevent->OSEventGrp != 0u) {                        /* See if any tasks waiting on queue        */
-        tasks_waiting = OS_TRUE;                           /* Yes                                      */
-    } else {
-        tasks_waiting = OS_FALSE;                          /* No                                       */
+    if (pevent->OSEventGrp != 0u)
+    {                            /* See if any tasks waiting on queue        */
+        tasks_waiting = OS_TRUE; /* Yes                                      */
     }
-    switch (opt) {
-        case OS_DEL_NO_PEND:                               /* Delete queue only if no task waiting     */
-             if (tasks_waiting == OS_FALSE) {
+    else
+    {
+        tasks_waiting = OS_FALSE; /* No                                       */
+    }
+    switch (opt)
+    {
+        case OS_DEL_NO_PEND: /* Delete queue only if no task waiting     */
+            if (tasks_waiting == OS_FALSE)
+            {
 #if OS_EVENT_NAME_EN > 0u
-                 pevent->OSEventName    = (INT8U *)(void *)"?";
+                pevent->OSEventName = (INT8U *)(void *)"?";
 #endif
-                 pq                     = (OS_Q *)pevent->OSEventPtr;  /* Return OS_Q to free list     */
-                 pq->OSQPtr             = OSQFreeList;
-                 OSQFreeList            = pq;
-                 pevent->OSEventType    = OS_EVENT_TYPE_UNUSED;
-                 pevent->OSEventPtr     = OSEventFreeList; /* Return Event Control Block to free list  */
-                 pevent->OSEventCnt     = 0u;
-                 OSEventFreeList        = pevent;          /* Get next free event control block        */
-                 OS_EXIT_CRITICAL();
-                 *perr                  = OS_ERR_NONE;
-                 pevent_return          = (OS_EVENT *)0;   /* Queue has been deleted                   */
-             } else {
-                 OS_EXIT_CRITICAL();
-                 *perr                  = OS_ERR_TASK_WAITING;
-                 pevent_return          = pevent;
-             }
-             break;
+                pq = (OS_Q *)pevent->OSEventPtr; /* Return OS_Q to free list     */
+                pq->OSQPtr = OSQFreeList;
+                OSQFreeList = pq;
+                pevent->OSEventType = OS_EVENT_TYPE_UNUSED;
+                pevent->OSEventPtr = OSEventFreeList; /* Return Event Control Block to free list  */
+                pevent->OSEventCnt = 0u;
+                OSEventFreeList = pevent; /* Get next free event control block        */
+                OS_EXIT_CRITICAL();
+                *perr = OS_ERR_NONE;
+                pevent_return = (OS_EVENT *)0; /* Queue has been deleted                   */
+            }
+            else
+            {
+                OS_EXIT_CRITICAL();
+                *perr = OS_ERR_TASK_WAITING;
+                pevent_return = pevent;
+            }
+            break;
 
-        case OS_DEL_ALWAYS:                                /* Always delete the queue                  */
-             while (pevent->OSEventGrp != 0u) {            /* Ready ALL tasks waiting for queue        */
-                 (void)OS_EventTaskRdy(pevent, (void *)0, OS_STAT_Q, OS_STAT_PEND_ABORT);
-             }
+        case OS_DEL_ALWAYS: /* Always delete the queue                  */
+            while (pevent->OSEventGrp != 0u)
+            { /* Ready ALL tasks waiting for queue        */
+                (void)OS_EventTaskRdy(pevent, (void *)0, OS_STAT_Q, OS_STAT_PEND_ABORT);
+            }
 #if OS_EVENT_NAME_EN > 0u
-             pevent->OSEventName    = (INT8U *)(void *)"?";
+            pevent->OSEventName = (INT8U *)(void *)"?";
 #endif
-             pq                     = (OS_Q *)pevent->OSEventPtr;   /* Return OS_Q to free list        */
-             pq->OSQPtr             = OSQFreeList;
-             OSQFreeList            = pq;
-             pevent->OSEventType    = OS_EVENT_TYPE_UNUSED;
-             pevent->OSEventPtr     = OSEventFreeList;     /* Return Event Control Block to free list  */
-             pevent->OSEventCnt     = 0u;
-             OSEventFreeList        = pevent;              /* Get next free event control block        */
-             OS_EXIT_CRITICAL();
-             if (tasks_waiting == OS_TRUE) {               /* Reschedule only if task(s) were waiting  */
-                 OS_Sched();                               /* Find highest priority task ready to run  */
-             }
-             *perr                  = OS_ERR_NONE;
-             pevent_return          = (OS_EVENT *)0;       /* Queue has been deleted                   */
-             break;
+            pq = (OS_Q *)pevent->OSEventPtr; /* Return OS_Q to free list        */
+            pq->OSQPtr = OSQFreeList;
+            OSQFreeList = pq;
+            pevent->OSEventType = OS_EVENT_TYPE_UNUSED;
+            pevent->OSEventPtr = OSEventFreeList; /* Return Event Control Block to free list  */
+            pevent->OSEventCnt = 0u;
+            OSEventFreeList = pevent; /* Get next free event control block        */
+            OS_EXIT_CRITICAL();
+            if (tasks_waiting == OS_TRUE)
+            {               /* Reschedule only if task(s) were waiting  */
+                OS_Sched(); /* Find highest priority task ready to run  */
+            }
+            *perr = OS_ERR_NONE;
+            pevent_return = (OS_EVENT *)0; /* Queue has been deleted                   */
+            break;
 
         default:
-             OS_EXIT_CRITICAL();
-             *perr                  = OS_ERR_INVALID_OPT;
-             pevent_return          = pevent;
-             break;
+            OS_EXIT_CRITICAL();
+            *perr = OS_ERR_INVALID_OPT;
+            pevent_return = pevent;
+            break;
     }
 
     OS_TRACE_Q_DEL_EXIT(*perr);
@@ -347,7 +363,6 @@ OS_EVENT  *OSQDel (OS_EVENT  *pevent,
     return (pevent_return);
 }
 #endif
-
 
 /*
 *********************************************************************************************************
@@ -369,33 +384,32 @@ OS_EVENT  *OSQDel (OS_EVENT  *pevent,
 */
 
 #if OS_Q_FLUSH_EN > 0u
-INT8U  OSQFlush (OS_EVENT *pevent)
+INT8U OSQFlush(OS_EVENT *pevent)
 {
-    OS_Q      *pq;
-#if OS_CRITICAL_METHOD == 3u                          /* Allocate storage for CPU status register      */
-    OS_CPU_SR  cpu_sr = 0u;
+    OS_Q *pq;
+#if OS_CRITICAL_METHOD == 3u /* Allocate storage for CPU status register      */
+    OS_CPU_SR cpu_sr = 0u;
 #endif
 
-
-
 #if OS_ARG_CHK_EN > 0u
-    if (pevent == (OS_EVENT *)0) {                    /* Validate 'pevent'                             */
+    if (pevent == (OS_EVENT *)0)
+    { /* Validate 'pevent'                             */
         return (OS_ERR_PEVENT_NULL);
     }
-    if (pevent->OSEventType != OS_EVENT_TYPE_Q) {     /* Validate event block type                     */
+    if (pevent->OSEventType != OS_EVENT_TYPE_Q)
+    { /* Validate event block type                     */
         return (OS_ERR_EVENT_TYPE);
     }
 #endif
     OS_ENTER_CRITICAL();
-    pq             = (OS_Q *)pevent->OSEventPtr;      /* Point to queue storage structure              */
-    pq->OSQIn      = pq->OSQStart;
-    pq->OSQOut     = pq->OSQStart;
+    pq = (OS_Q *)pevent->OSEventPtr; /* Point to queue storage structure              */
+    pq->OSQIn = pq->OSQStart;
+    pq->OSQOut = pq->OSQStart;
     pq->OSQEntries = 0u;
     OS_EXIT_CRITICAL();
     return (OS_ERR_NONE);
 }
 #endif
-
 
 /*
 *********************************************************************************************************
@@ -433,26 +447,25 @@ INT8U  OSQFlush (OS_EVENT *pevent)
 *********************************************************************************************************
 */
 
-void  *OSQPend (OS_EVENT  *pevent,
-                INT32U     timeout,
-                INT8U     *perr)
+void *OSQPend(OS_EVENT *pevent, INT32U timeout, INT8U *perr)
 {
-    void      *pmsg;
-    OS_Q      *pq;
-#if OS_CRITICAL_METHOD == 3u                     /* Allocate storage for CPU status register           */
-    OS_CPU_SR  cpu_sr = 0u;
+    void *pmsg;
+    OS_Q *pq;
+#if OS_CRITICAL_METHOD == 3u /* Allocate storage for CPU status register           */
+    OS_CPU_SR cpu_sr = 0u;
 #endif
 
-
 #ifdef OS_SAFETY_CRITICAL
-    if (perr == (INT8U *)0) {
+    if (perr == (INT8U *)0)
+    {
         OS_SAFETY_CRITICAL_EXCEPTION();
         return ((void *)0);
     }
 #endif
 
 #if OS_ARG_CHK_EN > 0u
-    if (pevent == (OS_EVENT *)0) {               /* Validate 'pevent'                                  */
+    if (pevent == (OS_EVENT *)0)
+    { /* Validate 'pevent'                                  */
         *perr = OS_ERR_PEVENT_NULL;
         return ((void *)0);
     }
@@ -460,73 +473,78 @@ void  *OSQPend (OS_EVENT  *pevent,
 
     OS_TRACE_Q_PEND_ENTER(pevent, timeout);
 
-    if (pevent->OSEventType != OS_EVENT_TYPE_Q) {/* Validate event block type                          */
+    if (pevent->OSEventType != OS_EVENT_TYPE_Q)
+    { /* Validate event block type                          */
         *perr = OS_ERR_EVENT_TYPE;
         OS_TRACE_Q_PEND_EXIT(*perr);
         return ((void *)0);
     }
-    if (OSIntNesting > 0u) {                     /* See if called from ISR ...                         */
-        *perr = OS_ERR_PEND_ISR;                 /* ... can't PEND from an ISR                         */
+    if (OSIntNesting > 0u)
+    {                            /* See if called from ISR ...                         */
+        *perr = OS_ERR_PEND_ISR; /* ... can't PEND from an ISR                         */
         OS_TRACE_Q_PEND_EXIT(*perr);
         return ((void *)0);
     }
-    if (OSLockNesting > 0u) {                    /* See if called with scheduler locked ...            */
-        *perr = OS_ERR_PEND_LOCKED;              /* ... can't PEND when locked                         */
+    if (OSLockNesting > 0u)
+    {                               /* See if called with scheduler locked ...            */
+        *perr = OS_ERR_PEND_LOCKED; /* ... can't PEND when locked                         */
         OS_TRACE_Q_PEND_EXIT(*perr);
         return ((void *)0);
     }
     OS_ENTER_CRITICAL();
-    pq = (OS_Q *)pevent->OSEventPtr;             /* Point at queue control block                       */
-    if (pq->OSQEntries > 0u) {                   /* See if any messages in the queue                   */
-        pmsg = *pq->OSQOut++;                    /* Yes, extract oldest message from the queue         */
-        pq->OSQEntries--;                        /* Update the number of entries in the queue          */
-        if (pq->OSQOut == pq->OSQEnd) {          /* Wrap OUT pointer if we are at the end of the queue */
+    pq = (OS_Q *)pevent->OSEventPtr; /* Point at queue control block                       */
+    if (pq->OSQEntries > 0u)
+    {                         /* See if any messages in the queue                   */
+        pmsg = *pq->OSQOut++; /* Yes, extract oldest message from the queue         */
+        pq->OSQEntries--;     /* Update the number of entries in the queue          */
+        if (pq->OSQOut == pq->OSQEnd)
+        { /* Wrap OUT pointer if we are at the end of the queue */
             pq->OSQOut = pq->OSQStart;
         }
         OS_EXIT_CRITICAL();
         *perr = OS_ERR_NONE;
         OS_TRACE_Q_PEND_EXIT(*perr);
-        return (pmsg);                           /* Return message received                            */
+        return (pmsg); /* Return message received                            */
     }
-    OSTCBCur->OSTCBStat     |= OS_STAT_Q;        /* Task will have to pend for a message to be posted  */
-    OSTCBCur->OSTCBStatPend  = OS_STAT_PEND_OK;
-    OSTCBCur->OSTCBDly       = timeout;          /* Load timeout into TCB                              */
-    OS_EventTaskWait(pevent);                    /* Suspend task until event or timeout occurs         */
+    OSTCBCur->OSTCBStat |= OS_STAT_Q; /* Task will have to pend for a message to be posted  */
+    OSTCBCur->OSTCBStatPend = OS_STAT_PEND_OK;
+    OSTCBCur->OSTCBDly = timeout; /* Load timeout into TCB                              */
+    OS_EventTaskWait(pevent);     /* Suspend task until event or timeout occurs         */
     OS_EXIT_CRITICAL();
-    OS_Sched();                                  /* Find next highest priority task ready to run       */
+    OS_Sched(); /* Find next highest priority task ready to run       */
     OS_ENTER_CRITICAL();
-    switch (OSTCBCur->OSTCBStatPend) {                /* See if we timed-out or aborted                */
-        case OS_STAT_PEND_OK:                         /* Extract message from TCB (Put there by QPost) */
-             pmsg =  OSTCBCur->OSTCBMsg;
-            *perr =  OS_ERR_NONE;
-             break;
+    switch (OSTCBCur->OSTCBStatPend)
+    {                         /* See if we timed-out or aborted                */
+        case OS_STAT_PEND_OK: /* Extract message from TCB (Put there by QPost) */
+            pmsg = OSTCBCur->OSTCBMsg;
+            *perr = OS_ERR_NONE;
+            break;
 
         case OS_STAT_PEND_ABORT:
-             pmsg = (void *)0;
-            *perr =  OS_ERR_PEND_ABORT;               /* Indicate that we aborted                      */
-             break;
+            pmsg = (void *)0;
+            *perr = OS_ERR_PEND_ABORT; /* Indicate that we aborted                      */
+            break;
 
         case OS_STAT_PEND_TO:
         default:
-             OS_EventTaskRemove(OSTCBCur, pevent);
-             pmsg = (void *)0;
-            *perr =  OS_ERR_TIMEOUT;                  /* Indicate that we didn't get event within TO   */
-             break;
+            OS_EventTaskRemove(OSTCBCur, pevent);
+            pmsg = (void *)0;
+            *perr = OS_ERR_TIMEOUT; /* Indicate that we didn't get event within TO   */
+            break;
     }
-    OSTCBCur->OSTCBStat          =  OS_STAT_RDY;      /* Set   task  status to ready                   */
-    OSTCBCur->OSTCBStatPend      =  OS_STAT_PEND_OK;  /* Clear pend  status                            */
-    OSTCBCur->OSTCBEventPtr      = (OS_EVENT  *)0;    /* Clear event pointers                          */
+    OSTCBCur->OSTCBStat = OS_STAT_RDY;         /* Set   task  status to ready                   */
+    OSTCBCur->OSTCBStatPend = OS_STAT_PEND_OK; /* Clear pend  status                            */
+    OSTCBCur->OSTCBEventPtr = (OS_EVENT *)0;   /* Clear event pointers                          */
 #if (OS_EVENT_MULTI_EN > 0u)
     OSTCBCur->OSTCBEventMultiPtr = (OS_EVENT **)0;
-    OSTCBCur->OSTCBEventMultiRdy = (OS_EVENT  *)0;
+    OSTCBCur->OSTCBEventMultiRdy = (OS_EVENT *)0;
 #endif
-    OSTCBCur->OSTCBMsg           = (void      *)0;    /* Clear  received message                       */
+    OSTCBCur->OSTCBMsg = (void *)0; /* Clear  received message                       */
     OS_EXIT_CRITICAL();
     OS_TRACE_Q_PEND_EXIT(*perr);
 
-    return (pmsg);                                    /* Return received message                       */
+    return (pmsg); /* Return received message                       */
 }
-
 
 /*
 *********************************************************************************************************
@@ -561,62 +579,63 @@ void  *OSQPend (OS_EVENT  *pevent,
 */
 
 #if OS_Q_PEND_ABORT_EN > 0u
-INT8U  OSQPendAbort (OS_EVENT  *pevent,
-                     INT8U      opt,
-                     INT8U     *perr)
+INT8U OSQPendAbort(OS_EVENT *pevent, INT8U opt, INT8U *perr)
 {
-    INT8U      nbr_tasks;
-#if OS_CRITICAL_METHOD == 3u                               /* Allocate storage for CPU status register */
-    OS_CPU_SR  cpu_sr = 0u;
+    INT8U nbr_tasks;
+#if OS_CRITICAL_METHOD == 3u /* Allocate storage for CPU status register */
+    OS_CPU_SR cpu_sr = 0u;
 #endif
 
-
-
 #ifdef OS_SAFETY_CRITICAL
-    if (perr == (INT8U *)0) {
+    if (perr == (INT8U *)0)
+    {
         OS_SAFETY_CRITICAL_EXCEPTION();
         return (0u);
     }
 #endif
 
 #if OS_ARG_CHK_EN > 0u
-    if (pevent == (OS_EVENT *)0) {                         /* Validate 'pevent'                        */
+    if (pevent == (OS_EVENT *)0)
+    { /* Validate 'pevent'                        */
         *perr = OS_ERR_PEVENT_NULL;
         return (0u);
     }
 #endif
-    if (pevent->OSEventType != OS_EVENT_TYPE_Q) {          /* Validate event block type                */
+    if (pevent->OSEventType != OS_EVENT_TYPE_Q)
+    { /* Validate event block type                */
         *perr = OS_ERR_EVENT_TYPE;
         return (0u);
     }
     OS_ENTER_CRITICAL();
-    if (pevent->OSEventGrp != 0u) {                        /* See if any task waiting on queue?        */
+    if (pevent->OSEventGrp != 0u)
+    { /* See if any task waiting on queue?        */
         nbr_tasks = 0u;
-        switch (opt) {
-            case OS_PEND_OPT_BROADCAST:                    /* Do we need to abort ALL waiting tasks?   */
-                 while (pevent->OSEventGrp != 0u) {        /* Yes, ready ALL tasks waiting on queue    */
-                     (void)OS_EventTaskRdy(pevent, (void *)0, OS_STAT_Q, OS_STAT_PEND_ABORT);
-                     nbr_tasks++;
-                 }
-                 break;
+        switch (opt)
+        {
+            case OS_PEND_OPT_BROADCAST: /* Do we need to abort ALL waiting tasks?   */
+                while (pevent->OSEventGrp != 0u)
+                { /* Yes, ready ALL tasks waiting on queue    */
+                    (void)OS_EventTaskRdy(pevent, (void *)0, OS_STAT_Q, OS_STAT_PEND_ABORT);
+                    nbr_tasks++;
+                }
+                break;
 
             case OS_PEND_OPT_NONE:
-            default:                                       /* No,  ready HPT       waiting on queue    */
-                 (void)OS_EventTaskRdy(pevent, (void *)0, OS_STAT_Q, OS_STAT_PEND_ABORT);
-                 nbr_tasks++;
-                 break;
+            default: /* No,  ready HPT       waiting on queue    */
+                (void)OS_EventTaskRdy(pevent, (void *)0, OS_STAT_Q, OS_STAT_PEND_ABORT);
+                nbr_tasks++;
+                break;
         }
         OS_EXIT_CRITICAL();
-        OS_Sched();                                        /* Find HPT ready to run                    */
+        OS_Sched(); /* Find HPT ready to run                    */
         *perr = OS_ERR_PEND_ABORT;
         return (nbr_tasks);
     }
     OS_EXIT_CRITICAL();
     *perr = OS_ERR_NONE;
-    return (0u);                                           /* No tasks waiting on queue                */
+    return (0u); /* No tasks waiting on queue                */
 }
 #endif
-
 
 /*
 *********************************************************************************************************
@@ -638,45 +657,48 @@ INT8U  OSQPendAbort (OS_EVENT  *pevent,
 */
 
 #if OS_Q_POST_EN > 0u
-INT8U  OSQPost (OS_EVENT  *pevent,
-                void      *pmsg)
+INT8U OSQPost(OS_EVENT *pevent, void *pmsg)
 {
-    OS_Q      *pq;
-#if OS_CRITICAL_METHOD == 3u                           /* Allocate storage for CPU status register     */
-    OS_CPU_SR  cpu_sr = 0u;
+    OS_Q *pq;
+#if OS_CRITICAL_METHOD == 3u /* Allocate storage for CPU status register     */
+    OS_CPU_SR cpu_sr = 0u;
 #endif
 
-
 #if OS_ARG_CHK_EN > 0u
-    if (pevent == (OS_EVENT *)0) {                     /* Validate 'pevent'                            */
+    if (pevent == (OS_EVENT *)0)
+    { /* Validate 'pevent'                            */
         return (OS_ERR_PEVENT_NULL);
     }
 #endif
 
     OS_TRACE_Q_POST_ENTER(pevent);
 
-    if (pevent->OSEventType != OS_EVENT_TYPE_Q) {      /* Validate event block type                    */
+    if (pevent->OSEventType != OS_EVENT_TYPE_Q)
+    { /* Validate event block type                    */
         OS_TRACE_Q_POST_EXIT(OS_ERR_EVENT_TYPE);
         return (OS_ERR_EVENT_TYPE);
     }
     OS_ENTER_CRITICAL();
-    if (pevent->OSEventGrp != 0u) {                    /* See if any task pending on queue             */
-                                                       /* Ready highest priority task waiting on event */
+    if (pevent->OSEventGrp != 0u)
+    {   /* See if any task pending on queue             */
+        /* Ready highest priority task waiting on event */
         (void)OS_EventTaskRdy(pevent, pmsg, OS_STAT_Q, OS_STAT_PEND_OK);
         OS_EXIT_CRITICAL();
-        OS_Sched();                                    /* Find highest priority task ready to run      */
+        OS_Sched(); /* Find highest priority task ready to run      */
         OS_TRACE_Q_POST_EXIT(OS_ERR_NONE);
         return (OS_ERR_NONE);
     }
-    pq = (OS_Q *)pevent->OSEventPtr;                   /* Point to queue control block                 */
-    if (pq->OSQEntries >= pq->OSQSize) {               /* Make sure queue is not full                  */
+    pq = (OS_Q *)pevent->OSEventPtr; /* Point to queue control block                 */
+    if (pq->OSQEntries >= pq->OSQSize)
+    { /* Make sure queue is not full                  */
         OS_EXIT_CRITICAL();
         OS_TRACE_Q_POST_EXIT(OS_ERR_Q_FULL);
         return (OS_ERR_Q_FULL);
     }
-    *pq->OSQIn++ = pmsg;                               /* Insert message into queue                    */
-    pq->OSQEntries++;                                  /* Update the nbr of entries in the queue       */
-    if (pq->OSQIn == pq->OSQEnd) {                     /* Wrap IN ptr if we are at end of queue        */
+    *pq->OSQIn++ = pmsg; /* Insert message into queue                    */
+    pq->OSQEntries++;    /* Update the nbr of entries in the queue       */
+    if (pq->OSQIn == pq->OSQEnd)
+    { /* Wrap IN ptr if we are at end of queue        */
         pq->OSQIn = pq->OSQStart;
     }
     OS_EXIT_CRITICAL();
@@ -685,7 +707,6 @@ INT8U  OSQPost (OS_EVENT  *pevent,
     return (OS_ERR_NONE);
 }
 #endif
-
 
 /*
 *********************************************************************************************************
@@ -709,55 +730,56 @@ INT8U  OSQPost (OS_EVENT  *pevent,
 */
 
 #if OS_Q_POST_FRONT_EN > 0u
-INT8U  OSQPostFront (OS_EVENT  *pevent,
-                     void      *pmsg)
+INT8U OSQPostFront(OS_EVENT *pevent, void *pmsg)
 {
-    OS_Q      *pq;
-#if OS_CRITICAL_METHOD == 3u                          /* Allocate storage for CPU status register      */
-    OS_CPU_SR  cpu_sr = 0u;
+    OS_Q *pq;
+#if OS_CRITICAL_METHOD == 3u /* Allocate storage for CPU status register      */
+    OS_CPU_SR cpu_sr = 0u;
 #endif
 
-
-
 #if OS_ARG_CHK_EN > 0u
-    if (pevent == (OS_EVENT *)0) {                    /* Validate 'pevent'                             */
+    if (pevent == (OS_EVENT *)0)
+    { /* Validate 'pevent'                             */
         return (OS_ERR_PEVENT_NULL);
     }
 #endif
 
     OS_TRACE_Q_POST_FRONT_ENTER(pevent);
 
-    if (pevent->OSEventType != OS_EVENT_TYPE_Q) {     /* Validate event block type                     */
+    if (pevent->OSEventType != OS_EVENT_TYPE_Q)
+    { /* Validate event block type                     */
         OS_TRACE_Q_POST_FRONT_EXIT(OS_ERR_EVENT_TYPE);
         return (OS_ERR_EVENT_TYPE);
     }
     OS_ENTER_CRITICAL();
-    if (pevent->OSEventGrp != 0u) {                   /* See if any task pending on queue              */
-                                                      /* Ready highest priority task waiting on event  */
+    if (pevent->OSEventGrp != 0u)
+    {   /* See if any task pending on queue              */
+        /* Ready highest priority task waiting on event  */
         (void)OS_EventTaskRdy(pevent, pmsg, OS_STAT_Q, OS_STAT_PEND_OK);
         OS_EXIT_CRITICAL();
-        OS_Sched();                                   /* Find highest priority task ready to run       */
+        OS_Sched(); /* Find highest priority task ready to run       */
         OS_TRACE_Q_POST_FRONT_EXIT(OS_ERR_NONE);
         return (OS_ERR_NONE);
     }
-    pq = (OS_Q *)pevent->OSEventPtr;                  /* Point to queue control block                  */
-    if (pq->OSQEntries >= pq->OSQSize) {              /* Make sure queue is not full                   */
+    pq = (OS_Q *)pevent->OSEventPtr; /* Point to queue control block                  */
+    if (pq->OSQEntries >= pq->OSQSize)
+    { /* Make sure queue is not full                   */
         OS_EXIT_CRITICAL();
         OS_TRACE_Q_POST_FRONT_EXIT(OS_ERR_Q_FULL);
         return (OS_ERR_Q_FULL);
     }
-    if (pq->OSQOut == pq->OSQStart) {                 /* Wrap OUT ptr if we are at the 1st queue entry */
+    if (pq->OSQOut == pq->OSQStart)
+    { /* Wrap OUT ptr if we are at the 1st queue entry */
         pq->OSQOut = pq->OSQEnd;
     }
     pq->OSQOut--;
-    *pq->OSQOut = pmsg;                               /* Insert message into queue                     */
-    pq->OSQEntries++;                                 /* Update the nbr of entries in the queue        */
+    *pq->OSQOut = pmsg; /* Insert message into queue                     */
+    pq->OSQEntries++;   /* Update the nbr of entries in the queue        */
     OS_EXIT_CRITICAL();
     OS_TRACE_Q_POST_FRONT_EXIT(OS_ERR_NONE);
     return (OS_ERR_NONE);
 }
 #endif
-
 
 /*
 *********************************************************************************************************
@@ -789,70 +811,79 @@ INT8U  OSQPostFront (OS_EVENT  *pevent,
 */
 
 #if OS_Q_POST_OPT_EN > 0u
-INT8U  OSQPostOpt (OS_EVENT  *pevent,
-                   void      *pmsg,
-                   INT8U      opt)
+INT8U OSQPostOpt(OS_EVENT *pevent, void *pmsg, INT8U opt)
 {
-    OS_Q      *pq;
-#if OS_CRITICAL_METHOD == 3u                          /* Allocate storage for CPU status register      */
-    OS_CPU_SR  cpu_sr = 0u;
+    OS_Q *pq;
+#if OS_CRITICAL_METHOD == 3u /* Allocate storage for CPU status register      */
+    OS_CPU_SR cpu_sr = 0u;
 #endif
 
-
-
 #if OS_ARG_CHK_EN > 0u
-    if (pevent == (OS_EVENT *)0) {                    /* Validate 'pevent'                             */
+    if (pevent == (OS_EVENT *)0)
+    { /* Validate 'pevent'                             */
         return (OS_ERR_PEVENT_NULL);
     }
 #endif
 
     OS_TRACE_Q_POST_OPT_ENTER(pevent, opt);
 
-    if (pevent->OSEventType != OS_EVENT_TYPE_Q) {     /* Validate event block type                     */
+    if (pevent->OSEventType != OS_EVENT_TYPE_Q)
+    { /* Validate event block type                     */
         OS_TRACE_Q_POST_OPT_EXIT(OS_ERR_EVENT_TYPE);
         return (OS_ERR_EVENT_TYPE);
     }
     OS_ENTER_CRITICAL();
-    if (pevent->OSEventGrp != 0x00u) {                /* See if any task pending on queue              */
-        if ((opt & OS_POST_OPT_BROADCAST) != 0x00u) { /* Do we need to post msg to ALL waiting tasks ? */
-            while (pevent->OSEventGrp != 0u) {        /* Yes, Post to ALL tasks waiting on queue       */
+    if (pevent->OSEventGrp != 0x00u)
+    { /* See if any task pending on queue              */
+        if ((opt & OS_POST_OPT_BROADCAST) != 0x00u)
+        { /* Do we need to post msg to ALL waiting tasks ? */
+            while (pevent->OSEventGrp != 0u)
+            { /* Yes, Post to ALL tasks waiting on queue       */
                 (void)OS_EventTaskRdy(pevent, pmsg, OS_STAT_Q, OS_STAT_PEND_OK);
             }
-        } else {                                      /* No,  Post to HPT waiting on queue             */
+        }
+        else
+        { /* No,  Post to HPT waiting on queue             */
             (void)OS_EventTaskRdy(pevent, pmsg, OS_STAT_Q, OS_STAT_PEND_OK);
         }
         OS_EXIT_CRITICAL();
-        if ((opt & OS_POST_OPT_NO_SCHED) == 0u) {     /* See if scheduler needs to be invoked          */
-            OS_Sched();                               /* Find highest priority task ready to run       */
+        if ((opt & OS_POST_OPT_NO_SCHED) == 0u)
+        {               /* See if scheduler needs to be invoked          */
+            OS_Sched(); /* Find highest priority task ready to run       */
         }
         OS_TRACE_Q_POST_OPT_EXIT(OS_ERR_NONE);
         return (OS_ERR_NONE);
     }
-    pq = (OS_Q *)pevent->OSEventPtr;                  /* Point to queue control block                  */
-    if (pq->OSQEntries >= pq->OSQSize) {              /* Make sure queue is not full                   */
+    pq = (OS_Q *)pevent->OSEventPtr; /* Point to queue control block                  */
+    if (pq->OSQEntries >= pq->OSQSize)
+    { /* Make sure queue is not full                   */
         OS_EXIT_CRITICAL();
         OS_TRACE_Q_POST_OPT_EXIT(OS_ERR_Q_FULL);
         return (OS_ERR_Q_FULL);
     }
-    if ((opt & OS_POST_OPT_FRONT) != 0x00u) {         /* Do we post to the FRONT of the queue?         */
-        if (pq->OSQOut == pq->OSQStart) {             /* Yes, Post as LIFO, Wrap OUT pointer if we ... */
-            pq->OSQOut = pq->OSQEnd;                  /*      ... are at the 1st queue entry           */
+    if ((opt & OS_POST_OPT_FRONT) != 0x00u)
+    { /* Do we post to the FRONT of the queue?         */
+        if (pq->OSQOut == pq->OSQStart)
+        {                            /* Yes, Post as LIFO, Wrap OUT pointer if we ... */
+            pq->OSQOut = pq->OSQEnd; /*      ... are at the 1st queue entry           */
         }
         pq->OSQOut--;
-        *pq->OSQOut = pmsg;                           /*      Insert message into queue                */
-    } else {                                          /* No,  Post as FIFO                             */
-        *pq->OSQIn++ = pmsg;                          /*      Insert message into queue                */
-        if (pq->OSQIn == pq->OSQEnd) {                /*      Wrap IN ptr if we are at end of queue    */
+        *pq->OSQOut = pmsg; /*      Insert message into queue                */
+    }
+    else
+    {                        /* No,  Post as FIFO                             */
+        *pq->OSQIn++ = pmsg; /*      Insert message into queue                */
+        if (pq->OSQIn == pq->OSQEnd)
+        { /*      Wrap IN ptr if we are at end of queue    */
             pq->OSQIn = pq->OSQStart;
         }
     }
-    pq->OSQEntries++;                                 /* Update the nbr of entries in the queue        */
+    pq->OSQEntries++; /* Update the nbr of entries in the queue        */
     OS_EXIT_CRITICAL();
     OS_TRACE_Q_POST_OPT_EXIT(OS_ERR_NONE);
     return (OS_ERR_NONE);
 }
 #endif
-
 
 /*
 *********************************************************************************************************
@@ -873,41 +904,45 @@ INT8U  OSQPostOpt (OS_EVENT  *pevent,
 */
 
 #if OS_Q_QUERY_EN > 0u
-INT8U  OSQQuery (OS_EVENT  *pevent,
-                 OS_Q_DATA *p_q_data)
+INT8U OSQQuery(OS_EVENT *pevent, OS_Q_DATA *p_q_data)
 {
-    OS_Q       *pq;
-    INT8U       i;
-    OS_PRIO    *psrc;
-    OS_PRIO    *pdest;
-#if OS_CRITICAL_METHOD == 3u                           /* Allocate storage for CPU status register     */
-    OS_CPU_SR   cpu_sr = 0u;
+    OS_Q *pq;
+    INT8U i;
+    OS_PRIO *psrc;
+    OS_PRIO *pdest;
+#if OS_CRITICAL_METHOD == 3u /* Allocate storage for CPU status register     */
+    OS_CPU_SR cpu_sr = 0u;
 #endif
 
-
-
 #if OS_ARG_CHK_EN > 0u
-    if (pevent == (OS_EVENT *)0) {                     /* Validate 'pevent'                            */
+    if (pevent == (OS_EVENT *)0)
+    { /* Validate 'pevent'                            */
         return (OS_ERR_PEVENT_NULL);
     }
-    if (p_q_data == (OS_Q_DATA *)0) {                  /* Validate 'p_q_data'                          */
+    if (p_q_data == (OS_Q_DATA *)0)
+    { /* Validate 'p_q_data'                          */
         return (OS_ERR_PDATA_NULL);
     }
 #endif
-    if (pevent->OSEventType != OS_EVENT_TYPE_Q) {      /* Validate event block type                    */
+    if (pevent->OSEventType != OS_EVENT_TYPE_Q)
+    { /* Validate event block type                    */
         return (OS_ERR_EVENT_TYPE);
     }
     OS_ENTER_CRITICAL();
-    p_q_data->OSEventGrp = pevent->OSEventGrp;         /* Copy message queue wait list                 */
-    psrc                 = &pevent->OSEventTbl[0];
-    pdest                = &p_q_data->OSEventTbl[0];
-    for (i = 0u; i < OS_EVENT_TBL_SIZE; i++) {
+    p_q_data->OSEventGrp = pevent->OSEventGrp; /* Copy message queue wait list                 */
+    psrc = &pevent->OSEventTbl[0];
+    pdest = &p_q_data->OSEventTbl[0];
+    for (i = 0u; i < OS_EVENT_TBL_SIZE; i++)
+    {
         *pdest++ = *psrc++;
     }
     pq = (OS_Q *)pevent->OSEventPtr;
-    if (pq->OSQEntries > 0u) {
-        p_q_data->OSMsg = *pq->OSQOut;                 /* Get next message to return if available      */
-    } else {
+    if (pq->OSQEntries > 0u)
+    {
+        p_q_data->OSMsg = *pq->OSQOut; /* Get next message to return if available      */
+    }
+    else
+    {
         p_q_data->OSMsg = (void *)0;
     }
     p_q_data->OSNMsgs = pq->OSQEntries;
@@ -915,8 +950,7 @@ INT8U  OSQQuery (OS_EVENT  *pevent,
     OS_EXIT_CRITICAL();
     return (OS_ERR_NONE);
 }
-#endif                                                 /* OS_Q_QUERY_EN                                */
-
+#endif /* OS_Q_QUERY_EN                                */
 
 /*
 *********************************************************************************************************
@@ -933,32 +967,31 @@ INT8U  OSQQuery (OS_EVENT  *pevent,
 *********************************************************************************************************
 */
 
-void  OS_QInit (void)
+void OS_QInit(void)
 {
 #if OS_MAX_QS == 1u
-    OSQFreeList         = &OSQTbl[0];                /* Only ONE queue!                                */
+    OSQFreeList = &OSQTbl[0]; /* Only ONE queue!                                */
     OSQFreeList->OSQPtr = (OS_Q *)0;
 #endif
 
 #if OS_MAX_QS >= 2u
-    INT16U   ix;
-    INT16U   ix_next;
-    OS_Q    *pq1;
-    OS_Q    *pq2;
+    INT16U ix;
+    INT16U ix_next;
+    OS_Q *pq1;
+    OS_Q *pq2;
 
-
-
-    OS_MemClr((INT8U *)&OSQTbl[0], sizeof(OSQTbl));  /* Clear the queue table                          */
-    for (ix = 0u; ix < (OS_MAX_QS - 1u); ix++) {     /* Init. list of free QUEUE control blocks        */
+    OS_MemClr((INT8U *)&OSQTbl[0], sizeof(OSQTbl)); /* Clear the queue table                          */
+    for (ix = 0u; ix < (OS_MAX_QS - 1u); ix++)
+    { /* Init. list of free QUEUE control blocks        */
         ix_next = ix + 1u;
         pq1 = &OSQTbl[ix];
         pq2 = &OSQTbl[ix_next];
         pq1->OSQPtr = pq2;
     }
-    pq1         = &OSQTbl[ix];
+    pq1 = &OSQTbl[ix];
     pq1->OSQPtr = (OS_Q *)0;
     OSQFreeList = &OSQTbl[0];
 #endif
 }
-#endif                                               /* OS_Q_EN                                        */
-#endif                                               /* OS_Q_C                                         */
+#endif /* OS_Q_EN                                        */
+#endif /* OS_Q_C                                         */
