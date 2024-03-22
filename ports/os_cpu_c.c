@@ -108,3 +108,7 @@ void OSInitHookBegin(void){
 
     OS_KA_BASEPRI_Boundary = (INT32U)(CPU_CFG_KA_IPL_BOUNDARY << (8u - CPU_CFG_NVIC_PRIO_BITS));
 }
+
+void OSTaskIdleHook(void){
+    // Do nothing
+}

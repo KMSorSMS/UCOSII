@@ -37,6 +37,8 @@ void       OS_CPU_SR_Restore      (OS_CPU_SR  cpu_sr);
 OS_CPU_EXT  OS_STK   OS_CPU_ExceptStk[OS_CPU_EXCEPT_STK_SIZE];
 OS_CPU_EXT  OS_STK  *OS_CPU_ExceptStkBase;
 
+// 声明开始执行最高优先级函数
+void       OSStartHighRdy         (void);
 
 
 void OSTaskSwHook(void);
@@ -44,4 +46,9 @@ void OSInitHookBegin(void);
 void       OSCtxSw                (void);
 void       OSIntCtxSw             (void);
 void       PendSV_Handler         (void);
+
+// OS上下文切换
+#define  OS_TASK_SW()         OSCtxSw()
+
+
 #endif

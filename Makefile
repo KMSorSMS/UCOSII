@@ -139,4 +139,5 @@ debug:
 # 这里看你电脑的性能,因为gdb-server服务器要启动一会儿
 	sleep 7
 	arm-none-eabi-gdb -x init.gdb
-	
+format:
+	find . -iname *.h -o -iname *.c | xargs clang-format -i
