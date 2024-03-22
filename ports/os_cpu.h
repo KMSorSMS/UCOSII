@@ -42,6 +42,8 @@ void OS_CPU_SR_Restore(OS_CPU_SR cpu_sr);
 #else
 #define  OS_CPU_EXT  extern
 #endif
+// 设置堆栈段的生长方式：
+#define OS_STK_GROWTH   1u  /* Stack grows from HIGH to LOW memory on ARM         */
 
 // 设置CPU的异常堆栈大小
 #ifndef OS_CPU_EXCEPT_STK_SIZE
