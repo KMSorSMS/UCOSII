@@ -19,6 +19,10 @@ void RCC_Configuration(void)
     RCC->CFGR &= ~0xE000;
     // 设置启动HSE，开启PLL和PLL2S
     RCC->CR |= 0b00000101000000010000000000000000; //0x5010000
+    // 加入保护代码，检查HSE和PLL、PLL2S的启动状态：
+    while((RCC->CR & 0x00020000) == 0); // 等待HSE启动成功
+    while((RCC->CR & 0x02000000) == 0); // 等待PLL启动成功
+    while((RCC->CR & 0x08000000) == 0); // 等待PLL2S启动成功
     // HSE启动成功后，使能FLASH预存取缓冲区
     FLASH->ACR |= FLASH_ACR_PRFTEN;
     // 设置FLASH的延时周期
