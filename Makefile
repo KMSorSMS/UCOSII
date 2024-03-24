@@ -141,3 +141,6 @@ debug:
 	arm-none-eabi-gdb -x init.gdb
 format:
 	find . -iname *.h -o -iname *.c | xargs clang-format -i
+download:
+	make bear
+	openocd -f interface/stlink.cfg -f target/stm32f4x.cfg -c init -c "halt" -c "flash write_image erase build/learn_startup.bin 0x8000000" -c "reset" -c "shutdown"

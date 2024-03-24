@@ -56,6 +56,15 @@ OS_CPU_EXT OS_STK *OS_CPU_ExceptStkBase;
 
 // 声明开始执行最高优先级函数
 void OSStartHighRdy(void);
+// 根据传入的cpu HSE主频频率以及宏定义设置的systick频率来设置cnts重装载值，并调用下面的OS_CPU_SysTickInit
+void       OS_CPU_SysTickInitFreq (INT32U     cpu_freq);
+
+// 声明systick中断初始化函数,主要是初始化优先级，设置重装载值，使能systick的timer并且使能触发中断systick
+void       OS_CPU_SysTickInit     (INT32U     cnts);
+
+// SysTick中断处理函数
+void       OS_CPU_SysTickHandler  (void);
+
 
 void OSTaskSwHook(void);
 void OSInitHookBegin(void);
