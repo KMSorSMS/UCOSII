@@ -56,9 +56,9 @@ void my_task_0_t_(void *args)
 {
     while (1)
     {
+        OSTimeDly(100 * 1000 * 10); // 延时5s，因为一个tick是10微秒
         // 任务0是关灯，关完后调用OS延时函数--OSTimeDly()
         LED2_OFF()
-        OSTimeDly(100 * 1000 * 5); // 延时5s，因为一个tick是10微秒
     }
 }
 

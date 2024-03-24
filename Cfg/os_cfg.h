@@ -8,7 +8,7 @@
 
 #define OS_DEBUG_EN 0u /* Enable(1) debug variables                                    */
 
-#define OS_EVENT_MULTI_EN 1u /* Include code for OSEventPendMulti()                          */
+#define OS_EVENT_MULTI_EN 0u /* Include code for OSEventPendMulti()                          */
 #define OS_EVENT_NAME_EN 0u  /* Enable names for Sem, Mutex, Mbox and Q                      */
 
 #define OS_LOWEST_PRIO 63u /* Defines the lowest priority that can be assigned ...         */
