@@ -680,7 +680,7 @@ INT8U OSQPost(OS_EVENT *pevent, void *pmsg)
     }
     OS_ENTER_CRITICAL();
     if (pevent->OSEventGrp != 0u)
-    {   /* See if any task pending on queue             */
+    { /* See if any task pending on queue             */
         /* Ready highest priority task waiting on event */
         (void)OS_EventTaskRdy(pevent, pmsg, OS_STAT_Q, OS_STAT_PEND_OK);
         OS_EXIT_CRITICAL();
@@ -753,7 +753,7 @@ INT8U OSQPostFront(OS_EVENT *pevent, void *pmsg)
     }
     OS_ENTER_CRITICAL();
     if (pevent->OSEventGrp != 0u)
-    {   /* See if any task pending on queue              */
+    { /* See if any task pending on queue              */
         /* Ready highest priority task waiting on event  */
         (void)OS_EventTaskRdy(pevent, pmsg, OS_STAT_Q, OS_STAT_PEND_OK);
         OS_EXIT_CRITICAL();

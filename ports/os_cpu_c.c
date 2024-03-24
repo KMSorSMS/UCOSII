@@ -176,4 +176,3 @@ void OS_CPU_SysTickInit(INT32U cnts)
     /* Enable timer interrupt.                              */
     OS_CPU_CM_SYST_CSR |= OS_CPU_CM_SYST_CSR_TICKINT;
 }
-

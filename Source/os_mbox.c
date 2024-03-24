@@ -555,7 +555,7 @@ INT8U OSMboxPost(OS_EVENT *pevent, void *pmsg)
     }
     OS_ENTER_CRITICAL();
     if (pevent->OSEventGrp != 0u)
-    {   /* See if any task pending on mailbox            */
+    { /* See if any task pending on mailbox            */
         /* Ready HPT waiting on event                    */
         (void)OS_EventTaskRdy(pevent, pmsg, OS_STAT_MBOX, OS_STAT_PEND_OK);
         OS_EXIT_CRITICAL();

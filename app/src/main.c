@@ -4,8 +4,6 @@
 #include "stm32f401xe.h"
 #include "tools.h"
 
-int a = 11;
-
 // 写一个时钟初始化的函数，配置为HSE，PLLM为4，PLLN为84，PLLP分频为2，PLLQ分频为4，还有AHB的地方分频为1 ，得到主频为84Mhz
 void RCC_Configuration(void)
 {
@@ -22,12 +20,9 @@ void RCC_Configuration(void)
     // 设置启动HSE，开启PLL和PLL2S
     RCC->CR |= 0b00000101000000010000000000000000; // 0x5010000
     // 加入保护代码，检查HSE和PLL、PLL2S的启动状态：
-    while ((RCC->CR & 0x00020000) == 0)
-        ; // 等待HSE启动成功
-    while ((RCC->CR & 0x02000000) == 0)
-        ; // 等待PLL启动成功
-    while ((RCC->CR & 0x08000000) == 0)
-        ; // 等待PLL2S启动成功
+    while ((RCC->CR & 0x00020000) == 0); // 等待HSE启动成功
+    while ((RCC->CR & 0x02000000) == 0); // 等待PLL启动成功
+    while ((RCC->CR & 0x08000000) == 0); // 等待PLL2S启动成功
     // HSE启动成功后，使能FLASH预存取缓冲区
     FLASH->ACR |= FLASH_ACR_PRFTEN;
     // 设置FLASH的延时周期
@@ -61,7 +56,9 @@ void my_task_0_t_(void *args)
 {
     while (1)
     {
-        a = 10;
+        // 任务0是关灯，关完后调用OS延时函数--OSTimeDly()
+        LED2_OFF()
+        OSTimeDly(100 * 1000 * 5); // 延时5s，因为一个tick是10微秒
     }
 }
 
@@ -69,10 +66,8 @@ void my_task_1_t_(void *args)
 {
     while (1)
     {
-        Delay_Congestion(100*10000); //延时10s
+        // 任务一采用点灯，点完后调用OS延时函数--OSTimeDly()
         LED2_ON()
-        Delay_Congestion(100*10000); //延时10s
-        LED2_OFF()
-        a = 11;
+        OSTimeDly(100 * 1000 * 5); // 延时5s，因为一个tick是10微秒
     }
 }

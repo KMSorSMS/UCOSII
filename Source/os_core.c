@@ -2102,7 +2102,7 @@ INT8U OS_TCBInit(INT8U prio, OS_STK *ptos, OS_STK *pbos, INT16U id, INT32U stk_s
         OS_ENTER_CRITICAL();
         OSTCBPrioTbl[prio] = ptcb;
         OS_EXIT_CRITICAL();
-#if OS_CPU_HOOKS_EN >0
+#if OS_CPU_HOOKS_EN > 0
         OSTaskCreateHook(ptcb); /* Call user defined hook                   */
 #endif
 

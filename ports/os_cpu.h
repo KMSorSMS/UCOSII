@@ -37,13 +37,13 @@ void OS_CPU_SR_Restore(OS_CPU_SR cpu_sr);
     } while (0)
 #endif
 
-#ifdef   OS_CPU_GLOBALS
-#define  OS_CPU_EXT
+#ifdef OS_CPU_GLOBALS
+#define OS_CPU_EXT
 #else
-#define  OS_CPU_EXT  extern
+#define OS_CPU_EXT extern
 #endif
 // 设置堆栈段的生长方式：
-#define OS_STK_GROWTH   1u  /* Stack grows from HIGH to LOW memory on ARM         */
+#define OS_STK_GROWTH 1u /* Stack grows from HIGH to LOW memory on ARM         */
 
 // 设置CPU的异常堆栈大小
 #ifndef OS_CPU_EXCEPT_STK_SIZE
@@ -57,14 +57,13 @@ OS_CPU_EXT OS_STK *OS_CPU_ExceptStkBase;
 // 声明开始执行最高优先级函数
 void OSStartHighRdy(void);
 // 根据传入的cpu HSE主频频率以及宏定义设置的systick频率来设置cnts重装载值，并调用下面的OS_CPU_SysTickInit
-void       OS_CPU_SysTickInitFreq (INT32U     cpu_freq);
+void OS_CPU_SysTickInitFreq(INT32U cpu_freq);
 
 // 声明systick中断初始化函数,主要是初始化优先级，设置重装载值，使能systick的timer并且使能触发中断systick
-void       OS_CPU_SysTickInit     (INT32U     cnts);
+void OS_CPU_SysTickInit(INT32U cnts);
 
 // SysTick中断处理函数
-void       OS_CPU_SysTickHandler  (void);
-
+void OS_CPU_SysTickHandler(void);
 
 void OSTaskSwHook(void);
 void OSInitHookBegin(void);

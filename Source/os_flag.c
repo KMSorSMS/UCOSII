@@ -270,7 +270,7 @@ OS_FLAG_GRP *OSFlagCreate(OS_FLAGS flags, INT8U *perr)
     OS_ENTER_CRITICAL();
     pgrp = OSFlagFreeList; /* Get next free event flag                        */
     if (pgrp != (OS_FLAG_GRP *)0)
-    {   /* See if we have event flag groups available      */
+    { /* See if we have event flag groups available      */
         /* Adjust free list                                */
         OSFlagFreeList = (OS_FLAG_GRP *)OSFlagFreeList->OSFlagWaitList;
         pgrp->OSFlagType = OS_EVENT_TYPE_FLAG; /* Set to event flag group type                    */

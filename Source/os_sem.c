@@ -546,7 +546,7 @@ INT8U OSSemPost(OS_EVENT *pevent)
     }
     OS_ENTER_CRITICAL();
     if (pevent->OSEventGrp != 0u)
-    {   /* See if any task waiting for semaphore         */
+    { /* See if any task waiting for semaphore         */
         /* Ready HPT waiting on event                    */
         (void)OS_EventTaskRdy(pevent, (void *)0, OS_STAT_SEM, OS_STAT_PEND_OK);
         OS_EXIT_CRITICAL();

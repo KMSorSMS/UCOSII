@@ -720,7 +720,7 @@ INT8U OSMutexPost(OS_EVENT *pevent)
         OSTCBPrioTbl[pcp] = OS_TCB_RESERVED; /* Reserve table entry                           */
     }
     if (pevent->OSEventGrp != 0u)
-    {   /* Any task waiting for the mutex?               */
+    { /* Any task waiting for the mutex?               */
         /* Yes, Make HPT waiting for mutex ready         */
         prio = OS_EventTaskRdy(pevent, (void *)0, OS_STAT_MUTEX, OS_STAT_PEND_OK);
         pevent->OSEventCnt &= OS_MUTEX_KEEP_UPPER_8; /*      Save priority of mutex's new owner       */
