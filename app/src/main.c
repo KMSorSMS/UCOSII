@@ -35,15 +35,30 @@ void RCC_Configuration(void)
     RCC->AHB1ENR |= 0x00000001;
 }
 
+OS_MEM *CommTxBuf;
+INT8U   CommTxPart[100][32];
+
+extern void cli();
+
+int testArgs(int a1,int a2,int a3,int a4,int a5,int a6){
+    cli();
+    a3 = a1+a2;
+    a4 = a3+a5;
+    return a1;
+}
+
 int main()
 {
     // 时钟初始化
     RCC_Configuration();
+    testArgs(1,2,3,4,5,6);
     // 启动systick中断
     OS_CPU_SysTickInitFreq(84000000); // 84Mhz
     // LED2初始化
     LED2_Init();
     OSInit();
+    INT8U err=0;
+    CommTxBuf = OSMemCreate(CommTxPart, 100, 32, &err);
     // 创建两个个自己的任务
     (void)OSTaskCreate(my_task_0_t_, (void *)0, &my_task_0[MY_TASK_SIZE_0 - 1u], 20);
     (void)OSTaskCreate(my_task_1_t_, (void *)0, &my_task_1[MY_TASK_SIZE_1 - 1u], 10);

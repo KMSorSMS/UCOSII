@@ -9,6 +9,7 @@
     .global  OSIntCtxSw
     .global  OSCtxSw
     .global  PendSV_Handler
+    .global  cli
 
 @                     OS_ENTER_CRITICAL();             /* cpu_sr = OS_CPU_SR_Save(new_basepri);    */
 @                     OS_EXIT_CRITICAL();              /* OS_CPU_RestoreSR(cpu_sr);                */
@@ -199,5 +200,10 @@ OSStartHighRdy:
     LDMFD    SP!, {R1, R2}                                      @ Load PC and discard xPSR
     CPSIE    I
     BX       R1
+
+cli:
+    MRS R0, xPSR
+    STMFD sp!,{R0}
+    MOV PC,LR
 
 .end
