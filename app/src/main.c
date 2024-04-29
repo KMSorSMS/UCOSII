@@ -3,6 +3,8 @@
 #include "os_cpu.h"
 #include "stm32f401xe.h"
 #include "tools.h"
+#include "ucos_ii.h"
+#include "gy86_task.h"
 
 // 写一个时钟初始化的函数，配置为HSE，PLLM为4，PLLN为84，PLLP分频为2，PLLQ分频为4，还有AHB的地方分频为1 ，得到主频为84Mhz
 void RCC_Configuration(void)
@@ -38,20 +40,11 @@ void RCC_Configuration(void)
 OS_MEM *CommTxBuf;
 INT8U   CommTxPart[100][32];
 
-extern void cli();
-
-int testArgs(int a1,int a2,int a3,int a4,int a5,int a6){
-    cli();
-    a3 = a1+a2;
-    a4 = a3+a5;
-    return a1;
-}
 
 int main()
 {
     // 时钟初始化
     RCC_Configuration();
-    testArgs(1,2,3,4,5,6);
     // 启动systick中断
     OS_CPU_SysTickInitFreq(84000000); // 84Mhz
     // LED2初始化
@@ -62,6 +55,7 @@ int main()
     // 创建两个个自己的任务
     (void)OSTaskCreate(my_task_0_t_, (void *)0, &my_task_0[MY_TASK_SIZE_0 - 1u], 20);
     (void)OSTaskCreate(my_task_1_t_, (void *)0, &my_task_1[MY_TASK_SIZE_1 - 1u], 10);
+    OSTaskCreate(GY86_task, 0, &my_task_2[MY_TASK_SIZE_2-1u], 13);
     // OS启动
     OSStart();
     return 0;
