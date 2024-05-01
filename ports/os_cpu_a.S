@@ -77,7 +77,7 @@ PendSV_Handler:
     DSB
     ISB
     CPSIE   I
-@ 保存当前任务的上下文,这里PSP是任务的堆栈指针，只需要存储R4-R11,R14
+@ 保存当前任务的上下文,这里PSP是任务的堆栈指针,只需要存储R4-R11,R14
     MRS     R0, PSP                                             @ PSP is process stack pointer
     STMFD   R0!, {R4-R11, R14}                                  @ Save remaining regs r4-11, R14 on process stack
 @ 存储当前任务的堆栈指针到任务的TCB的Ptr位置
@@ -96,7 +96,7 @@ PendSV_Handler:
     @ MOVT    R0, #:upper16:OSPrioCur
     @ MOVW    R1, #:lower16:OSPrioHighRdy
     @ MOVT    R1, #:upper16:OSPrioHighRdy
-    @ 转换当前的运行优先级，变成找出的OSPrioHighRdy
+    @ 转换当前的运行优先级,变成找出的OSPrioHighRdy
     LDR     R0, =OSPrioCur
     LDR     R1, =OSPrioHighRdy
     LDRB    R2, [R1]

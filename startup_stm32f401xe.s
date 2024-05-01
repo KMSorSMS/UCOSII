@@ -61,8 +61,11 @@ Reset_Handler:
   ldr   sp, =_estack    		 /* set stack pointer */
 
 /* Copy the data segment initializers from flash to SRAM */  
+  //ram
   ldr r0, =_sdata
+  //ram结束地址
   ldr r1, =_edata
+  //flash
   ldr r2, =_sidata
   movs r3, #0
   b LoopCopyDataInit
