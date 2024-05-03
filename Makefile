@@ -6,8 +6,8 @@ OPT = -O0
 # Build path
 BUILD_DIR = build
 C_SOURCES = $(wildcard app/src/*.c)
-C_SOURCES += \
-Source/ucos_ii.c \
+C_SOURCES += $(wildcard app/HARDWARE/*.c)  # 添加 app/HARDWARE/*.c 中的所有 .c 文件
+C_SOURCES += Source/ucos_ii.c \
 ports/os_cpu_c.c \
 
 ASM_SOURCES = startup_stm32f401xe.s
@@ -49,6 +49,7 @@ C_INCLUDES =  \
 -ICfg \
 -Iports \
 -Iapp/inc \
+-Iapp/HARDWARE \
 
 
 # compile gcc flags
@@ -131,12 +132,10 @@ clean:
 # bear -o build/compile_commands.json make -j4
 # arm-none-eabi-gdb -x init.gdb
 bear:
-	make clean
-	bear -- make -j4
-	mv compile_commands.json build/
+	bear -- make
 
 debug:
-	make bear
+#	make bear
 # 需要下载tmux
 	tmux has-session -t test0 2>/dev/null && tmux kill-session -t test0 || true
 	tmux new-session -d -s test0 'openocd -f interface/stlink.cfg -f target/stm32f4x.cfg -c init -c "halt" -c "flash write_image erase build/learn_startup.bin 0x8000000" -c reset'
@@ -148,3 +147,5 @@ format:
 download:
 	make bear
 	openocd -f interface/stlink.cfg -f target/stm32f4x.cfg -c init -c "halt" -c "flash write_image erase build/learn_startup.bin 0x8000000" -c "reset" -c "shutdown"
+
+	
