@@ -1,7 +1,6 @@
 #include "main.h"
 #include "OS_stk.h"
 #include "os_cpu.h"
-#include "stm32f401xe.h"
 #include "tools.h"
 
 // 写一个时钟初始化的函数，配置为HSE，PLLM为4，PLLN为84，PLLP分频为2，PLLQ分频为4，还有AHB的地方分频为1 ，得到主频为84Mhz
@@ -56,12 +55,20 @@ int main()
     OS_CPU_SysTickInitFreq(84000000); // 84Mhz
     // LED2初始化
     LED2_Init();
+    //usart初始化
+    USART_Init(115200);
+    usart_send("usart_send:Hello World\n");
     OSInit();
+    // 创建串口发送互斥信号量(需要注意的是信号量的创建只能在OSInit之后，因为需要使用OSInit中的事件队列)
+    uasrt_tx_sem=OSSemCreate(1);
+    uasrt_rx_sem=OSSemCreate(0);
     INT8U err=0;
     CommTxBuf = OSMemCreate(CommTxPart, 100, 32, &err);
     // 创建两个个自己的任务
     (void)OSTaskCreate(my_task_0_t_, (void *)0, &my_task_0[MY_TASK_SIZE_0 - 1u], 20);
     (void)OSTaskCreate(my_task_1_t_, (void *)0, &my_task_1[MY_TASK_SIZE_1 - 1u], 10);
+    //串口接收数据任务（发送不创建任务，而是直接使用线程安全的print）
+    (void)OSTaskCreate(usart_receive, (void *)0, &uasrt_rx_task[USART_RX_TASK_SIZE - 1u], 5);
     // OS启动
     OSStart();
     return 0;
@@ -71,9 +78,10 @@ void my_task_0_t_(void *args)
 {
     while (1)
     {
-        OSTimeDly(100 * 1000 * 10); // 延时5s，因为一个tick是10微秒
         // 任务0是关灯，关完后调用OS延时函数--OSTimeDly()
         LED2_OFF()
+        usart_send("LED2_OFF\n");
+        OSTimeDly(100 * 1000 * 10); // 延时10s，因为一个tick是10微秒
     }
 }
 
@@ -83,6 +91,7 @@ void my_task_1_t_(void *args)
     {
         // 任务一采用点灯，点完后调用OS延时函数--OSTimeDly()
         LED2_ON()
+        usart_send("LED2_ON\n");
         OSTimeDly(100 * 1000 * 5); // 延时5s，因为一个tick是10微秒
     }
 }
