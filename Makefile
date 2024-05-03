@@ -131,8 +131,8 @@ clean:
 
 # bear -o build/compile_commands.json make -j4
 # arm-none-eabi-gdb -x init.gdb
-bear:
-	bear -- make
+bear: clean
+	rm ./compile_commands.json && bear make -j4
 
 debug:
 #	make bear
