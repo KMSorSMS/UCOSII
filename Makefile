@@ -1,5 +1,6 @@
 TARGET = learn_startup
 .PHONY: bear clean
+UBUNTU_VERSION := $(shell lsb_release -rs)
 
 DEBUG = 1
 OPT = -O0
@@ -132,8 +133,14 @@ clean:
 # bear -o build/compile_commands.json make -j4
 # arm-none-eabi-gdb -x init.gdb
 bear: clean
-	rm ./compile_commands.json && bear make -j4
-
+	@echo UBUNTU_VERSION:${UBUNTU_VERSION}
+ifeq ($(UBUNTU_VERSION),20.04)
+	rm ./compile_commands.json || true 
+	bear make -j4
+else ifeq ($(UBUNTU_VERSION),22.04)
+	rm ./compile_commands.json || true 
+	bear -- make -j4
+endif
 debug:
 #	make bear
 # 需要下载tmux
