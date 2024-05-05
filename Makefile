@@ -141,6 +141,7 @@ else ifeq ($(UBUNTU_VERSION),22.04)
 	rm ./compile_commands.json || true 
 	bear -- make -j4
 endif
+
 debug:
 #	make bear
 # 需要下载tmux
