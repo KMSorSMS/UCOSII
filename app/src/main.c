@@ -69,7 +69,7 @@ int main()
     OSTaskCreate(GY86_task, 0, &my_task_2[MY_TASK_SIZE_2-1u], 13);
     //串口接收数据任务（发送不创建任务，而是直接使用线程安全的print）
     (void)OSTaskCreate(usart_receive, (void *)0, &uasrt_rx_task[USART_RX_TASK_SIZE - 1u], 5);
-    OSTaskCreate(changeMotorTask,(void*)0,&motor_change_task_stk[MOTOR_TASK_STK_SIZE-1u],4);
+    OSTaskCreate(changeMotorTask,(void*)0,&motor_change_task_stk[MOTOR_TASK_STK_SIZE-1u],6);
     // OS启动
     OSStart();
     return 0;
@@ -82,7 +82,7 @@ void my_task_0_t_(void *args)
         // 任务0是关灯，关完后调用OS延时函数--OSTimeDly()
         LED2_OFF()
         usart_send("LED2_OFF\n");
-        OSTimeDly(100 * 1000 * 10); // 延时10s，因为一个tick是10微秒
+        OSTimeDly(1000 * 10); // 延时10s，因为一个tick是10微秒
     }
 }
 
@@ -93,6 +93,6 @@ void my_task_1_t_(void *args)
         // 任务一采用点灯，点完后调用OS延时函数--OSTimeDly()
         LED2_ON()
         usart_send("LED2_ON\n");
-        OSTimeDly(100 * 1000 * 5); // 延时5s，因为一个tick是10微秒
+        OSTimeDly(1000 * 5); // 延时5s，因为一个tick是10微秒
     }
 }

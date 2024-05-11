@@ -63,6 +63,9 @@ void iic_init(void)
     GPIOC->PUPDR |= (GPIO_PUPDR_PUPDR10_0);           // 设置为上拉模式
 }
 
+
+
+
 /**
  * @brief       IIC延时函数,用于控制IIC读写速度
  * @param       无
