@@ -8,12 +8,15 @@ OPT = -O0
 BUILD_DIR = build
 C_SOURCES = $(wildcard app/src/*.c)
 C_SOURCES += $(wildcard app/HARDWARE/*.c)  # 添加 app/HARDWARE/*.c 中的所有 .c 文件
+C_SOURCES += $(shell find Trace -name '*.c') # 添加 Trace 目录下的所有 .c 文件
 C_SOURCES += Source/ucos_ii.c \
 ports/os_cpu_c.c \
 
 ASM_SOURCES = startup_stm32f401xe.s
 ASM_SOURCES +=  \
 ports/os_cpu_a.S \
+SEGGER/SEGGER_RTT_ASM_ARMv7M.S \
+
 # ports/os_cpu_a.S 
 
 #######################################
@@ -42,7 +45,9 @@ C_DEFS =  \
 
 
 # AS includes
-AS_INCLUDES = 
+AS_INCLUDES = \
+-ITrace/ThirdPartyLib/Config \
+
 
 # C includes
 C_INCLUDES =  \
@@ -51,6 +56,10 @@ C_INCLUDES =  \
 -Iports \
 -Iapp/inc \
 -Iapp/HARDWARE \
+-ITrace/Cfg \
+-ITrace/Source \
+-ITrace/ThirdPartyLib/Config \
+-ITrace/ThirdPartyLib/SEGGER \
 
 
 # compile gcc flags
