@@ -5,5 +5,6 @@ compile_commands.json
 *.gdb
 *.tmp
 *.py
+*.cache
 Makefile
 
