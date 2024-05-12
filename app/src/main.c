@@ -4,6 +4,7 @@
 #include "Reciever.h"
 #include "os_cpu.h"
 #include "tools.h"
+#include "myiic.h"
 #include "ucos_ii.h"
 #include "gy86_task.h"
 #include "motor_change.h"
@@ -55,6 +56,7 @@ int main()
     USART_Init(115200);
     usart_send("usart_send:Hello World\n");
     PWM_TIM_Init(20000-1,84-1);
+    iic_TIM_Init(10-1,84-1);
     MotorPWMInit();
     OSInit();
     // 创建串口发送互斥信号量(需要注意的是信号量的创建只能在OSInit之后，因为需要使用OSInit中的事件队列)

@@ -22,29 +22,17 @@ uint32_t TIM2_CH1_Counter = 0;
 void PWM_TIM_Init(uint16_t arr,uint16_t psc){
 	/**初始化GPIO*/
 	RCC->AHB1ENR |= (1<<0);//打开GPIOA时钟
-	RCC->AHB1ENR |= (1<<1);//打开GPIOB时钟
+	
 	RCC->APB1ENR |= (1<<0);//打开TIM2时钟
-	RCC->APB1ENR |= (1<<2);//打开TIM4时钟
-	
-	GPIOA->MODER &= ~(0x0f);//将PA0、1MOIDER位清零
-	GPIOA->MODER |= (0x0a);//将PA0、1设置位复用模式
-	GPIOA->OSPEEDR |= (0x0a);//设置四个PA口为高速  
-	GPIOA->PUPDR |= (0x0a);//GPIO四个引脚设置为下拉，因为要判断高电平的持续时间
 	
 	
+	GPIOA->MODER &= ~(0x03);//将PA0MOIDER位清零
+	GPIOA->MODER |= (0x02);//将PA0设置位复用模式
+	GPIOA->OSPEEDR |= (0x02);//设置PA0口为高速  
+	GPIOA->PUPDR |= (0x02);//引脚设置为下拉，因为要判断高电平的持续时间
 	
 	GPIOA->AFR[0] &= ~(0xff);//将PA01复用位清零
 	GPIOA->AFR[0] |= (0x1<<0);//PA0复用为TIM2通道1
-	
-
-	
-	// GPIOB->AFR[1] &= ~(0xff);//将PB复用位清零
-	// GPIOB->AFR[0] &= ~(0xffU<<24);
-	// GPIOB->AFR[0] |= (0x2<<24);//PB6复用为TIM4通道1
-	// GPIOB->AFR[0] |= (0x2<<28);//PB7复用为TIM4通道2
-	// GPIOB->AFR[1] |= (0x1<<1);//PB8复用为TIM4通道3
-	// GPIOB->AFR[1] |= (0x1<<5);//PB9复用为TIM4通道4
-	
 	
 	/**TIM2时钟配置*/
 	TIM2->CR1 &= ~(0Xf<<1);//UEVenable，更新请求源，关闭单脉冲，向上计数
@@ -53,8 +41,6 @@ void PWM_TIM_Init(uint16_t arr,uint16_t psc){
 	
 	TIM2->PSC = psc;//设置分频系数
 	TIM2->ARR = arr;//设置重装载寄存器
-	
-	
 	
 	/**通道一*/
 	TIM2->CCMR1 &= ~(0x3<<0);//先清零
@@ -65,19 +51,9 @@ void PWM_TIM_Init(uint16_t arr,uint16_t psc){
 	TIM2->CCER |= (0x1<<0);//捕获使能CC1E
 	TIM2->CCER &= ~(0x1<<1);//捕获上升沿CC1P
 	
-	/*通道二*/
-	// TIM2->CCMR1 &= ~(0x3<<8);
-	// TIM2->CCMR1 |= (0x01<<8);//CC2S将IC2映射到TI2
-	// TIM2->CCMR1 &= ~(0x3<<10);//IC1PSC不分频
-	// TIM2->CCMR1 &= ~(0xf<<12);//IC1F不做滤波处理
-	
-	// TIM2->CCER |= (0x1<<4);//CC2E
-	// TIM2->CCER &= ~(0x1<<5);//CC2P
-	
 	TIM2->DIER |= (0x1<<0);//使能更新中断更新__HAL_TIM_ENABLE_IT
 	TIM2->DIER |= (0x1<<1);//使能channel1捕获中断HAL_TIM_IC_Start_IT
-	TIM2->DIER |= (0x1<<2);//使能channel2捕获中断
-
+	
 	
 	TIM2->CR1 |= (0x1<<0);//使能CEN计数器
 	my_nvic_set_priority(TIM2_IRQn,1,3);
@@ -85,7 +61,7 @@ void PWM_TIM_Init(uint16_t arr,uint16_t psc){
 //	HAL_NVIC_SetPriority(TIM2_IRQn,1,3);//设置中断优先级
 //	HAL_NVIC_EnableIRQ(TIM2_IRQn);//使能中断
 
-	 TIM2->CNT -= 0xffff; 
+	TIM2->CNT -= 0xffff; 
 
 	
 }
