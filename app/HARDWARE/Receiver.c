@@ -135,7 +135,7 @@ void TIM2_IRQHandler(void){
 			TIM2->CCER &= ~(0x1<<1);//捕获上升沿CC1P
 			TIM2_CH1_Counter = 0;
 		}else{//第一次捕获到上升沿
-			TIM2_CH1_End_Val &= ~(0xffff);//将后面记录的CNT值清零
+			TIM2_CH1_End_Val &= ~(0xffffu);//将后面记录的CNT值清零
 			TIM2_CH1_Cap_Sta = 0x40;//标记捕获到上升沿
 			TIM2_CH1_Start_Val = TIM2->CCR1;//记录开始得到CNT
 			TIM2->CCER |= (0x1<<1);

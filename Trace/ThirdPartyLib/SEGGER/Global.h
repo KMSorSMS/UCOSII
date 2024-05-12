@@ -45,72 +45,69 @@
 *       SystemView version: 3.52a                                    *
 *                                                                    *
 **********************************************************************
--------------------------- END-OF-HEADER -----------------------------
-
-File    : SEGGER_SYSVIEW_Config_uCOSII.c
-Purpose : Sample setup configuration of SystemView with Micrium
-          uC/OS-II.
-Revision: $Rev: 9599 $
+----------------------------------------------------------------------
+File    : Global.h
+Purpose : Global types
+          In case your application already has a Global.h, you should
+          merge the files. In order to use Segger code, the types
+          U8, U16, U32, I8, I16, I32 need to be defined in Global.h;
+          additional definitions do not hurt.
+Revision: $Rev: 12501 $
+---------------------------END-OF-HEADER------------------------------
 */
-#include "SEGGER_SYSVIEW.h"
-#include "os.h"
-// #include "cpu_core.h"
 
-#if (defined(OS_TRACE_EN) && (OS_TRACE_EN > 0u))
+#ifndef GLOBAL_H            // Guard against multiple inclusion
+#define GLOBAL_H
 
-extern const SEGGER_SYSVIEW_OS_API SYSVIEW_X_OS_TraceAPI;
-
-// CPU_ERR  local_err;
-
-/*********************************************************************
-*
-*       Defines, configurable
-*
-**********************************************************************
-*/
-// The application name to be displayed in SystemViewer
-#define SYSVIEW_APP_NAME        "ARM Cortex-M Demo"
-
-// The target device name
-#define SYSVIEW_DEVICE_NAME     "Cortex-M Device"
-
-
-
-// Frequency of the timestamp. Must match SEGGER_SYSVIEW_GET_TIMESTAMP in SEGGER_SYSVIEW_Conf.h
-#define SYSVIEW_TIMESTAMP_FREQ  (84000000)
-
-// System Frequency. SystemcoreClock is used in most CMSIS compatible projects.
-#define SYSVIEW_CPU_FREQ        (84000000)
-
-// The lowest RAM address used for IDs (pointers)
-#define SYSVIEW_RAM_BASE        (0x20000000)
-
-/*********************************************************************
-*
-*       _cbSendSystemDesc()
-*
-*  Function description
-*    Sends SystemView description strings.
-*/
-static void _cbSendSystemDesc(void) {
-  SEGGER_SYSVIEW_SendSysDesc("N="SYSVIEW_APP_NAME",D="SYSVIEW_DEVICE_NAME",O=uCOS-II");
-  SEGGER_SYSVIEW_SendSysDesc("I#15=SysTick");
-  //
-  SYSVIEW_SendResourceList();
-}
-
-/*********************************************************************
-*
-*       Global functions
-*
-**********************************************************************
-*/
-void SEGGER_SYSVIEW_Conf(void) {
-  SEGGER_SYSVIEW_Init(SYSVIEW_TIMESTAMP_FREQ, SYSVIEW_CPU_FREQ,
-                      &SYSVIEW_X_OS_TraceAPI, _cbSendSystemDesc);
-  SEGGER_SYSVIEW_SetRAMBase(SYSVIEW_RAM_BASE);
-}
-
+#define U8    unsigned char
+#define I8    signed char
+#define U16   unsigned short
+#define I16   signed short
+#ifdef __x86_64__
+#define U32   unsigned
+#define I32   int
+#else
+#define U32   unsigned long
+#define I32   signed long
 #endif
+
+//
+// CC_NO_LONG_SUPPORT can be defined to compile test
+// without long support for compilers that do not
+// support C99 and its long type.
+//
+#ifdef CC_NO_LONG_SUPPORT
+  #define PTR_ADDR  U32
+#else  // Supports long type.
+#if defined(_WIN32) && !defined(__clang__) && !defined(__MINGW32__)
+  //
+  // Microsoft VC6 compiler related
+  //
+  #define U64   unsigned __int64
+  #define U128  unsigned __int128
+  #define I64   __int64
+  #define I128  __int128
+  #if _MSC_VER <= 1200
+    #define U64_C(x) x##UI64
+  #else
+    #define U64_C(x) x##ULL
+  #endif
+#else
+  //
+  // C99 compliant compiler
+  //
+  #define U64   unsigned long long
+  #define I64   signed long long
+  #define U64_C(x) x##ULL
+#endif
+
+#if (defined(_WIN64) || defined(__LP64__))  // 64-bit symbols used by Visual Studio and GCC, maybe others as well.
+  #define PTR_ADDR  U64
+#else
+  #define PTR_ADDR  U32
+#endif
+#endif  // Supports long type.
+
+#endif                      // Avoid multiple inclusion
 
 /*************************** End of file ****************************/

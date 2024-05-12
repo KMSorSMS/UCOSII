@@ -7,6 +7,7 @@
 #include "ucos_ii.h"
 #include "gy86_task.h"
 #include "motor_change.h"
+#include "os_trace.h"
 // 写一个时钟初始化的函数，配置为HSE，PLLM为4，PLLN为84，PLLP分频为2，PLLQ分频为4，还有AHB的地方分频为1 ，得到主频为84Mhz
 void RCC_Configuration(void)
 {
@@ -56,6 +57,7 @@ int main()
     usart_send("usart_send:Hello World\n");
     PWM_TIM_Init(20000-1,84-1);
     MotorPWMInit();
+    OS_TRACE_INIT();
     OSInit();
     // 创建串口发送互斥信号量(需要注意的是信号量的创建只能在OSInit之后，因为需要使用OSInit中的事件队列)
     uasrt_tx_sem=OSSemCreate(1);
@@ -69,7 +71,7 @@ int main()
     OSTaskCreate(GY86_task, 0, &my_task_2[MY_TASK_SIZE_2-1u], 13);
     //串口接收数据任务（发送不创建任务，而是直接使用线程安全的print）
     (void)OSTaskCreate(usart_receive, (void *)0, &uasrt_rx_task[USART_RX_TASK_SIZE - 1u], 5);
-    OSTaskCreate(changeMotorTask,(void*)0,&motor_change_task_stk[MOTOR_TASK_STK_SIZE-1u],6);
+    (void)OSTaskCreate(changeMotorTask,(void*)0,&motor_change_task_stk[MOTOR_TASK_STK_SIZE-1u],6);
     // OS启动
     OSStart();
     return 0;
