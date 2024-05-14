@@ -726,7 +726,9 @@ void OSIntExit(void)
 #endif
 #endif
                     OS_TRACE_ISR_EXIT_TO_SCHEDULER();
-
+#if (defined(OS_TRACE_EN) && (OS_TRACE_EN > 0u))
+                    OS_TRACE_TASK_SWITCHED_IN(OSTCBHighRdy);
+#endif
                     OSIntCtxSw(); /* Perform interrupt level ctx switch       */
                 }
                 else
@@ -889,6 +891,9 @@ void OSStart(void)
         OSPrioCur = OSPrioHighRdy;
         OSTCBHighRdy = OSTCBPrioTbl[OSPrioHighRdy]; /* Point to highest priority task ready to run    */
         OSTCBCur = OSTCBHighRdy;
+#if (defined(OS_TRACE_EN) && (OS_TRACE_EN > 0u))
+        OS_TRACE_TASK_SWITCHED_IN(OSTCBHighRdy);
+#endif
         OSStartHighRdy(); /* Execute target specific code to start task     */
     }
 }
@@ -1480,7 +1485,8 @@ static void OS_InitTaskIdle(void)
                           OS_TASK_IDLE_PRIO,                          /* Lowest priority level                */
                           OS_TASK_IDLE_ID, &OSTaskIdleStk[0],         /* Set Bottom-Of-Stack                  */
                           OS_TASK_IDLE_STK_SIZE, (void *)0,           /* No TCB extension                     */
-                          OS_TASK_OPT_STK_CHK | OS_TASK_OPT_STK_CLR); /* Enable stack checking + clear stack  */
+                          OS_TASK_OPT_STK_CHK | OS_TASK_OPT_STK_CLR,    /* Enable stack checking + clear stack  */
+                          "IDLE");                                /* Task name                            */
 #else
     (void)OSTaskCreateExt(OS_TaskIdle, (void *)0,                                      /* No arguments passed to OS_TaskIdle() */
                           &OSTaskIdleStk[0],                                           /* Set Top-Of-Stack                     */
@@ -1701,7 +1707,9 @@ void OS_Sched(void)
                 OS_TLS_TaskSw();
 #endif
 #endif
-
+#if (defined(OS_TRACE_EN) && (OS_TRACE_EN > 0u))
+                OS_TRACE_TASK_SWITCHED_IN(OSTCBHighRdy);
+#endif
                 OS_TASK_SW(); /* Perform a context switch                     */
             }
         }
@@ -2005,7 +2013,7 @@ void OS_TaskStatStkChk(void)
 *********************************************************************************************************
 */
 
-INT8U OS_TCBInit(INT8U prio, OS_STK *ptos, OS_STK *pbos, INT16U id, INT32U stk_size, void *pext, INT16U opt)
+INT8U OS_TCBInit(INT8U prio, OS_STK *ptos, OS_STK *pbos, INT16U id, INT32U stk_size, void *pext, INT16U opt,char* name)
 {
     OS_TCB *ptcb;
 #if OS_CRITICAL_METHOD == 3u /* Allocate storage for CPU status register */
@@ -2086,7 +2094,7 @@ INT8U OS_TCBInit(INT8U prio, OS_STK *ptos, OS_STK *pbos, INT16U id, INT32U stk_s
 #endif
 
 #if OS_TASK_NAME_EN > 0u
-        ptcb->OSTCBTaskName = (INT8U *)(void *)"?";
+        ptcb->OSTCBTaskName = (INT8U *)(void *)name;
 #endif
 
 #if OS_TASK_REG_TBL_SIZE > 0u /* Initialize the task variables            */

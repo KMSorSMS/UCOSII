@@ -141,14 +141,16 @@ clean:
 
 # bear -o build/compile_commands.json make -j4
 # arm-none-eabi-gdb -x init.gdb
+# 需要在当前终端中关闭代理才能使用bear。这样在执行make bear的时候，会暂时关闭代理
 bear: clean
 	@echo UBUNTU_VERSION:${UBUNTU_VERSION}
 ifeq ($(UBUNTU_VERSION),20.04)
 	rm ./compile_commands.json || true 
 	bear make -j4
 else ifeq ($(UBUNTU_VERSION),22.04)
+
 	rm ./compile_commands.json || true 
-	bear -- make -j4
+	export https_proxy= && export http_proxy= && bear -- make -j4
 endif
 
 debug:
@@ -161,8 +163,11 @@ debug:
 	gdb-multiarch -x .gdbinit
 format:
 	find . -iname *.h -o -iname *.c | xargs clang-format -i
-download:
+STdownload:
 	make bear
 	openocd -f interface/stlink.cfg -f target/stm32f4x.cfg -c init -c "halt" -c "flash write_image erase build/learn_startup.bin 0x8000000" -c "reset" -c "shutdown"
+Jdownload:
+	make bear
+	JLinkExe -device STM32F401RE -autoconnect 1 -if SWD -speed 4000 -CommanderScript JLinkScript.jlink
 
 	

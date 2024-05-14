@@ -260,7 +260,7 @@ INT8U OSTaskCreate(void (*task)(void *p_arg), void *p_arg, OS_STK *ptos, INT8U p
                                               /* ... the same thing until task is created.              */
         OS_EXIT_CRITICAL();
         psp = OSTaskStkInit(task, p_arg, ptos, 0u); /* Initialize the task's stack         */
-        err = OS_TCBInit(prio, psp, (OS_STK *)0, 0u, 0u, (void *)0, 0u);
+        err = OS_TCBInit(prio, psp, (OS_STK *)0, 0u, 0u, (void *)0, 0u,"?");
         if (err == OS_ERR_NONE)
         {
             OS_TRACE_TASK_CREATE(OSTCBPrioTbl[prio]);
@@ -357,7 +357,7 @@ INT8U OSTaskCreate(void (*task)(void *p_arg), void *p_arg, OS_STK *ptos, INT8U p
 
 #if OS_TASK_CREATE_EXT_EN > 0u
 INT8U OSTaskCreateExt(void (*task)(void *p_arg), void *p_arg, OS_STK *ptos, INT8U prio, INT16U id, OS_STK *pbos, INT32U stk_size, void *pext,
-                      INT16U opt)
+                      INT16U opt,char* name)
 {
     OS_STK *psp;
     INT8U err;
@@ -396,7 +396,7 @@ INT8U OSTaskCreateExt(void (*task)(void *p_arg), void *p_arg, OS_STK *ptos, INT8
 #endif
 
         psp = OSTaskStkInit(task, p_arg, ptos, opt); /* Initialize the task's stack          */
-        err = OS_TCBInit(prio, psp, pbos, id, stk_size, pext, opt);
+        err = OS_TCBInit(prio, psp, pbos, id, stk_size, pext, opt,name);
         if (err == OS_ERR_NONE)
         {
             OS_TRACE_TASK_CREATE(OSTCBPrioTbl[prio]);

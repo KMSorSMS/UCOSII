@@ -1,8 +1,10 @@
 #include "myiic.h"
+#include "os_cpu.h"
 #include "stm32f401xe.h"
 #include "stm32f4xx.h"
 #include "tools.h"
 #include "NVIC.h"
+#include "ucos_ii.h"
 #include <stdint.h>
 
 static int iic_status = 0;
@@ -90,17 +92,24 @@ void iic_TIM_Init(uint16_t arr ,uint16_t psc){
 
     TIM3->DIER |= (0x1<<0);
     TIM3->CR1 |= (0x1<<0);//使能CEN计数器
-    my_nvic_set_priority(TIM3_IRQn,1,3);
+    my_nvic_set_priority(TIM3_IRQn,0,3);
 	my_nvic_enable(TIM3_IRQn);
     TIM3->CNT -= 0xffff;
 }
 
 
 void TIM3_IRQHandler(void){
+#if OS_CRITICAL_METHOD == 3u /* Allocate storage for CPU status register */
+    OS_CPU_SR cpu_sr = 0u;
+#endif
+    OS_ENTER_CRITICAL();
+    OSIntEnter();
+    OS_EXIT_CRITICAL();
     if(TIM3->SR & (0x1<<0)){
         IIC_TIME ++;
     }
     TIM3->SR &= ~(0xffff);//清除中断标志位
+    OSIntExit();
 }
 
 static inline void delay_used_by_iic(INT32U delay_10us)

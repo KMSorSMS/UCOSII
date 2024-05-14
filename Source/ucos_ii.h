@@ -1045,7 +1045,7 @@ typedef INT16U OS_PRIO;
 
 #if OS_TASK_CREATE_EXT_EN > 0u
     INT8U OSTaskCreateExt(void (*task)(void *p_arg), void *p_arg, OS_STK *ptos, INT8U prio, INT16U id, OS_STK *pbos, INT32U stk_size, void *pext,
-                          INT16U opt);
+                          INT16U opt,char* name);
 #endif
 
 #if OS_TASK_DEL_EN > 0u
@@ -1220,7 +1220,7 @@ typedef INT16U OS_PRIO;
     void OS_TaskStatStkChk(void);
 #endif
 
-    INT8U OS_TCBInit(INT8U prio, OS_STK *ptos, OS_STK *pbos, INT16U id, INT32U stk_size, void *pext, INT16U opt);
+    INT8U OS_TCBInit(INT8U prio, OS_STK *ptos, OS_STK *pbos, INT16U id, INT32U stk_size, void *pext, INT16U opt,char* name);
 
 #if OS_TMR_EN > 0u
     void OSTmr_Init(void);

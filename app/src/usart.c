@@ -1,4 +1,5 @@
 #include "usart.h"
+#include "NVIC.h"
 
 
 
@@ -71,6 +72,8 @@ void UART_MspInit() {
     NVIC->IP[(uint32_t)USART_UX_IRQn] = 0x00;                 // 设置中断优先级
     //中断号除了低五位的位就表示ISERx中的x。而低五位表示ISERx中的第几位
     NVIC->ISER[(uint32_t)(USART_UX_IRQn) >> 5] = (uint32_t)(1UL << (((uint32_t)USART_UX_IRQn) & 0x1FUL));       //使能中断
+    // my_nvic_set_priority(USART_UX_IRQn,0,0);
+    // my_nvic_enable(USART_UX_IRQn);
 }
 
 //接收完成回调函数
@@ -100,6 +103,7 @@ void UART_RxCpltCallback() {
             }
             else                                    /* 接收到的是0x0a（即换行键） */
             {
+                g_usart_rx_buf[g_usart_rx_sta & 0X3FFF] = 0x00; /* 添加结束符 */
                 g_usart_rx_sta |= 0x8000;           /* 接收完成了 */
                 //接收到一条完整的数据，发送信号量
                 OSSemPost(uasrt_rx_sem);

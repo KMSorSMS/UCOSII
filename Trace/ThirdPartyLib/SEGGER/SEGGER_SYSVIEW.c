@@ -1844,7 +1844,6 @@ void SEGGER_SYSVIEW_Start(void) {
       U8* pPayload;
       U8* pPayloadStart;
       RECORD_START(SEGGER_SYSVIEW_INFO_SIZE + 4 * SEGGER_SYSVIEW_QUANTA_U32);
-      //
       pPayload = pPayloadStart;
       ENCODE_U32(pPayload, _SYSVIEW_Globals.SysFreq);
       ENCODE_U32(pPayload, _SYSVIEW_Globals.CPUFreq);
