@@ -3,6 +3,7 @@
 
 #include "main.h"
 #include "stm32f4xx.h"
+#include "usart.h"
 
 
 #define IIC_SCL_GPIO_PORT               GPIOC
@@ -40,7 +41,9 @@ extern void Peripheral_SendBytes(uint8_t devAddress, uint8_t addr,uint8_t*buffer
 static inline void delay_used_by_iic(INT32U delay_10us)
 {
     INT32U cur_time = IIC_TIME;
-    while (IIC_TIME - cur_time < delay_10us);
+    while (IIC_TIME - cur_time < delay_10us){
+        // usart_send("IIC_TIME is %u\n",IIC_TIME);
+    }
 }
 			  
 #endif

@@ -68,47 +68,47 @@ void iic_init(void)
     GPIOC->PUPDR |= (GPIO_PUPDR_PUPDR10_0);           // 设置为上拉模式
 }
 
-/** TIM3_CH1
+/** TIM4_CH1 --- pb6
 */
 void iic_TIM_Init(uint16_t arr ,uint16_t psc){
-    RCC->AHB1ENR |= (1<<0);//打开GPIOA时钟
+    RCC->AHB1ENR |= (1<<1);//打开GPIOB时钟
 
-    RCC->APB1ENR |= (1<<1);//打开TIM3时钟
+    RCC->APB1ENR |= (1<<2);//打开TIM3时钟
 
-    GPIOA->MODER |= (0x2<<12);
-    GPIOA->OSPEEDR |= (0x2<<12);
-    GPIOA->PUPDR |= (0x2<<12);
+    GPIOB->MODER |= (0x2<<12);
+    GPIOB->OSPEEDR |= (0x2<<12);
+    GPIOB->PUPDR |= (0x2<<12);
 
-    GPIOA->AFR[0] &= ~(0xf<<20);
-    GPIOA->AFR[0] |= (0x2<<20);
+    GPIOB->AFR[0] &= ~(0xf<<24);
+    GPIOB->AFR[0] |= (0x2<<24);
 
-    TIM3->CR1 &= ~(0Xf<<1);
-    TIM3->CR1 |= (0x1<<7);//预装载影子寄存器
-	TIM3->SMCR &= ~(0x7);//选择内部时钟 Slave mode disable,这样定时器将不会受到触发事件的影响
+    TIM4->CR1 &= ~(0Xf<<1);
+    TIM4->CR1 |= (0x1<<7);//预装载影子寄存器
+	TIM4->SMCR &= ~(0x7);//选择内部时钟 Slave mode disable,这样定时器将不会受到触发事件的影响
 	
-    TIM3->PSC = psc;//设置分频系数
-	TIM3->ARR = arr;//设置重装载寄存器
+    TIM4->PSC = psc;//设置分频系数
+	TIM4->ARR = arr;//设置重装载寄存器
 
 
-    TIM3->DIER |= (0x1<<0);
-    TIM3->CR1 |= (0x1<<0);//使能CEN计数器
-    my_nvic_set_priority(TIM3_IRQn,0,3);
-	my_nvic_enable(TIM3_IRQn);
-    TIM3->CNT -= 0xffff;
+    TIM4->DIER |= (0x1<<0);
+    TIM4->CR1 |= (0x1<<0);//使能CEN计数器
+    my_nvic_set_priority(TIM4_IRQn,0,3);
+	my_nvic_enable(TIM4_IRQn);
+    TIM4->CNT -= 0xffff;
 }
 
 
-void TIM3_IRQHandler(void){
+void TIM4_IRQHandler(void){
 #if OS_CRITICAL_METHOD == 3u /* Allocate storage for CPU status register */
     OS_CPU_SR cpu_sr = 0u;
 #endif
     OS_ENTER_CRITICAL();
     OSIntEnter();
     OS_EXIT_CRITICAL();
-    if(TIM3->SR & (0x1<<0)){
+    if(TIM4->SR & (0x1<<0)){
         IIC_TIME ++;
     }
-    TIM3->SR &= ~(0xffff);//清除中断标志位
+    TIM4->SR &= ~(0xffff);//清除中断标志位
     OSIntExit();
 }
 

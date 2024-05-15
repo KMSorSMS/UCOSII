@@ -92,8 +92,11 @@ void my_task_0_t_(void *args)
 {
     while (1)
     {
-        // 任务0是关灯，关完后调用OS延时函数--OSTimeDly()
         LED2_OFF()
+        // delay_used_by_iic(100*1000*3);
+        // LED2_ON();
+        // delay_used_by_iic(100*1000*3);
+        // 任务0是关灯，关完后调用OS延时函数--OSTimeDly()
         usart_send("LED2_OFF\n");
         OSTimeDly(1000 * 4); // 延时10s，因为一个tick是10微秒
     }
