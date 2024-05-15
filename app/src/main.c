@@ -52,7 +52,6 @@ int main()
 {
     // 时钟初始化
     RCC_Configuration();
-    RCC_Configuration();
     // 启动systick中断
     OS_CPU_SysTickInitFreq(84000000); // 84Mhz
     my_nvic_priorityGroupConfig(4);

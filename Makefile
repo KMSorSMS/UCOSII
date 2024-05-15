@@ -169,5 +169,5 @@ STdownload:
 Jdownload:
 	make bear
 	JLinkExe -device STM32F401RE -autoconnect 1 -if SWD -speed 4000 -CommanderScript JLinkScript.jlink
-
-	
+pico:
+	picocom --omap crcrlf --imap lfcrlf -c -b 115200 /dev/ttyACM0
