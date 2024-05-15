@@ -77,12 +77,12 @@ int main()
     // 创建两个个自己的任务
     // pnext用于指向任务扩展部分，暂时没有用到
     // opt是可选项，根据被置位的位来进行一些额外的操作，暂时没有用到
-    (void)OSTaskCreateExt(my_task_0_t_, (void *)0, &my_task_0[MY_TASK_SIZE_0 - 1u], 40,1,my_task_0,sizeof(my_task_0),NULL,0,"LED_OFF");
-    (void)OSTaskCreateExt(my_task_1_t_, (void *)0, &my_task_1[MY_TASK_SIZE_1 - 1u], 39,2,my_task_1,sizeof(my_task_1),NULL,0,"LED_ON");
-    (void)OSTaskCreateExt(GY86_task, 0, &my_task_2[MY_TASK_SIZE_2-1u], 38,3,my_task_2,sizeof(my_task_2),NULL,0,"GY86");
+    (void)OSTaskCreateExt(my_task_0_t_, (void *)0, &my_task_0[MY_TASK_SIZE_0 - 1u], 5,1,my_task_0,sizeof(my_task_0),NULL,0,"LED_OFF");
+    (void)OSTaskCreateExt(my_task_1_t_, (void *)0, &my_task_1[MY_TASK_SIZE_1 - 1u], 4,2,my_task_1,sizeof(my_task_1),NULL,0,"LED_ON");
+    (void)OSTaskCreateExt(GY86_task, 0, &my_task_2[MY_TASK_SIZE_2-1u], 6,3,my_task_2,sizeof(my_task_2),NULL,0,"GY86");
     //串口接收数据任务（发送不创建任务，而是直接使用线程安全的print）
-    (void)OSTaskCreateExt(usart_receive, (void *)0, &uasrt_rx_task[USART_RX_TASK_SIZE - 1u], 36,4, uasrt_rx_task, sizeof(uasrt_rx_task), NULL, 0, "USART_RX");
-    (void)OSTaskCreateExt(changeMotorTask,(void*)0,&motor_change_task_stk[MOTOR_TASK_STK_SIZE-1u],37,5,motor_change_task_stk,sizeof(motor_change_task_stk),NULL,0,"motor_change");
+    (void)OSTaskCreateExt(usart_receive, (void *)0, &uasrt_rx_task[USART_RX_TASK_SIZE - 1u], 7,4, uasrt_rx_task, sizeof(uasrt_rx_task), NULL, 0, "USART_RX");
+    (void)OSTaskCreateExt(changeMotorTask,(void*)0,&motor_change_task_stk[MOTOR_TASK_STK_SIZE-1u],8,5,motor_change_task_stk,sizeof(motor_change_task_stk),NULL,0,"motor_change");
     // OS启动
     OSStart();
     return 0;
@@ -98,7 +98,7 @@ void my_task_0_t_(void *args)
         // delay_used_by_iic(100*1000*3);
         // 任务0是关灯，关完后调用OS延时函数--OSTimeDly()
         usart_send("LED2_OFF\n");
-        OSTimeDly(1000 * 4); // 延时10s，因为一个tick是10微秒
+        OSTimeDly(1000 * 4); // 延时4s，因为一个tick是1毫秒
     }
 }
 
@@ -109,6 +109,6 @@ void my_task_1_t_(void *args)
         // 任务一采用点灯，点完后调用OS延时函数--OSTimeDly()
         LED2_ON()
         usart_send("LED2_ON\n");
-        OSTimeDly(1000 * 2); // 延时5s，因为一个tick是10微秒
+        OSTimeDly(1000 * 2); // 延时2s，因为一个tick是1毫秒
     }
 }
