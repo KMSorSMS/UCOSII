@@ -123,10 +123,10 @@ void TIM2_IRQHandler(void){
 
 
 void print_capture_pwm(uint16_t arr){
-	usart_send("start PPM:%d\n",start);
-	for(int i = 0;i<8;i++){
-		usart_send("TIM2_CH%d cap: %d \n",i,(int)TIM2_Channel1_DataBuf[i]);
-	}
+	// usart_send("start PPM:%d\n",start);
+	// for(int i = 0;i<8;i++){
+	// 	usart_send("TIM2_CH%d cap: %d \n",i,(int)TIM2_Channel1_DataBuf[i]);
+	// }
 	int M1 = PPMtoPWM(TIM2_Channel1_DataBuf[0]);
 	int M2 = PPMtoPWM(TIM2_Channel1_DataBuf[0]);
 	int M3 = PPMtoPWM(TIM2_Channel1_DataBuf[0]);
