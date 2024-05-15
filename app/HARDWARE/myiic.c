@@ -112,11 +112,6 @@ void TIM3_IRQHandler(void){
     OSIntExit();
 }
 
-static inline void delay_used_by_iic(INT32U delay_10us)
-{
-    INT32U cur_time = IIC_TIME;
-    while (IIC_TIME - cur_time < delay_10us);
-}
 
 /**
  * @brief       IIC延时函数,用于控制IIC读写速度

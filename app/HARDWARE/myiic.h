@@ -36,5 +36,11 @@ extern void iic_TIM_Init(uint16_t arr ,uint16_t psc);
 extern void Peripheral_SendByte(uint8_t devAddress,uint8_t data, uint8_t addr);
 extern void Peripheral_ReadBytes(uint8_t devAddress,uint8_t address,uint8_t* buffer ,uint8_t size);
 extern void Peripheral_SendBytes(uint8_t devAddress, uint8_t addr,uint8_t*buffer, uint8_t size);
-						  
+
+static inline void delay_used_by_iic(INT32U delay_10us)
+{
+    INT32U cur_time = IIC_TIME;
+    while (IIC_TIME - cur_time < delay_10us);
+}
+			  
 #endif
