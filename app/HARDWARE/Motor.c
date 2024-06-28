@@ -83,10 +83,14 @@ void MotorPWMInit(){
 void MotorPWMSet(uint16_t M1,uint16_t M2,uint16_t M3,uint16_t M4,uint16_t M5,uint16_t M6){
     //M为接收到的数据，范围是0~500
     //设置TIM3的CH1~CH4的占空比为M，范围是0~500-1，其大小代表了占空比的大小
-    TIM3->CCR1 = M1;
-    TIM3->CCR2 = M2;
-    TIM3->CCR3 = M5;
-    TIM3->CCR4 = M6;
+    TIM3->CCR1 = (uint32_t)M1;
+    TIM3->CCR2 = (uint32_t)M2;
+    TIM3->CCR3 = (uint32_t)M3;
+    TIM3->CCR4 = (uint32_t)M4;
+    usart_send("M1: %d\n",TIM3->CCR1);
+    // usart_send("M2: %d\n",TIM3->CCR2);
+    // usart_send("M3: %d\n",TIM3->CCR3);
+    // usart_send("M4: %d\n",TIM3->CCR4);
 }
 
 

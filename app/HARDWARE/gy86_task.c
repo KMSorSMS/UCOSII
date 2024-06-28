@@ -1,7 +1,9 @@
 #include "HMC.h"
 #include "MPU6050.h"
+#include "os_cpu.h"
 #include "ucos_ii.h"
 #include "gy86_task.h"
+#include "usart.h"
 
 HmcData hmcData;
 MPU6050Data mpu6050Data;
@@ -25,6 +27,9 @@ void GY86_task()
         Multiple_Read_HMC5883(&(hmcData.x), &(hmcData.y), &(hmcData.z));
         My_ACC_Read_MPU6050(&(mpu6050Data.acc_x), &(mpu6050Data.acc_y), &(mpu6050Data.acc_z));
         My_GYRO_Read_MPU6050(&(mpu6050Data.gyro_x), &(mpu6050Data.gyro_y), &(mpu6050Data.gyro_z));
+        // usart_send("hmc.x: %d,hmc.y: %d,hmc.x: %d\n",hmcData.x,hmcData.y,hmcData.z);
+        // usart_send("MPU.acc_x: %d,MPU.acc_y: %d,MPU.acc_z: %d\n",(int)mpu6050Data.acc_x,(int)mpu6050Data.acc_y,(int)mpu6050Data.acc_z);
+        usart_send("gyro_x: %d,gyro_y: %d,gyro_z: %d\n",(int)mpu6050Data.gyro_x,(int)mpu6050Data.gyro_y,(int)mpu6050Data.gyro_z);
         // usart_send("HMC5883L\n");
         // OS_ENTER_CRITICAL();
         // if (OSIntNesting > 0u)
