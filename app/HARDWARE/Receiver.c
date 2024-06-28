@@ -127,17 +127,17 @@ void print_capture_pwm(uint16_t arr){
 	// for(int i = 0;i<8;i++){
 	// 	usart_send("TIM2_CH%d cap: %d \n",i,(int)TIM2_Channel1_DataBuf[i]);
 	// }
-	int M1 = PPMtoPWM(TIM2_Channel1_DataBuf[0]);
-	int M2 = PPMtoPWM(TIM2_Channel1_DataBuf[0]);
-	int M3 = PPMtoPWM(TIM2_Channel1_DataBuf[0]);
-	int M4 = PPMtoPWM(TIM2_Channel1_DataBuf[0]);
-	int M5 = PPMtoPWM(TIM2_Channel1_DataBuf[0]);
-	int M6 = PPMtoPWM(TIM2_Channel1_DataBuf[0]);
+	uint16_t M1 = PPMtoPWM(TIM2_Channel1_DataBuf[0]);
+	uint16_t M2 = PPMtoPWM(TIM2_Channel1_DataBuf[1]);
+	uint16_t M3 = PPMtoPWM(TIM2_Channel1_DataBuf[2]);
+	uint16_t M4 = PPMtoPWM(TIM2_Channel1_DataBuf[3]);
+	uint16_t M5 = PPMtoPWM(TIM2_Channel1_DataBuf[4]);
+	uint16_t M6 = PPMtoPWM(TIM2_Channel1_DataBuf[5]);
 	MotorPWMSet(M1,M2,M3,M4,M5,M6);
 }
 
-int PPMtoPWM(uint8_t ppm){
-	return (int)ppm+500;
+uint16_t PPMtoPWM(uint16_t ppm){
+	return (uint16_t)ppm+500;
 }
 
 

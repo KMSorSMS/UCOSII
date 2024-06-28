@@ -8,12 +8,12 @@
 // 在此处将串口2的信息修改为串口1的信息即可实现串口1的初始化
 #define USART_REC_LEN 200
 #define RXBUFFERSIZE 1
-#define USART_UX_IRQHandler USART2_IRQHandler // 串口2中断服务函数
-#define USART_UX_IRQn USART2_IRQn             // 串口2中断通道,相当于中断号
-#define USART_UX USART2                       //需要初始化的是串口2
-#define USART_TX_PIN 2                         // PA2
-#define USART_RX_PIN 3                          // PA3
-#define APB1FCK 42000000                       // 串口2的时钟频率
+#define USART_UX_IRQHandler USART1_IRQHandler // 串口2中断服务函数
+#define USART_UX_IRQn USART1_IRQn             // 串口2中断通道,相当于中断号
+#define USART_UX USART1                       //需要初始化的是串口2
+#define USART_TX_PIN 9                         // PA2
+#define USART_RX_PIN 10                          // PA3
+#define APB1FCK 84000000                       // 串口2的时钟频率
 #define USART_SHARE_BUF_SIZE 256               // 串口共享缓冲区大小
 extern uint16_t g_usart_rx_sta;               // 接收状态标记
 extern uint8_t g_rx_buffer[RXBUFFERSIZE];     // HAL库USART接收Buffer
