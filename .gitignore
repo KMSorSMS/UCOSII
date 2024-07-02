@@ -1,4 +1,4 @@
-# .vscode/
+.vscode/
 build/
 .cache/
 compile_commands.json
@@ -6,4 +6,3 @@ compile_commands.json
 *.tmp
 *.py
 Makefile
-
