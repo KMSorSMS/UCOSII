@@ -16,6 +16,9 @@ ASM_SOURCES = startup_stm32f401xe.s
 ASM_SOURCES +=  \
 ports/os_cpu_a.S \
 SEGGER/SEGGER_RTT_ASM_ARMv7M.S \
+# 从openocd里获取interface路径，interface在openocd的安装的父目录的父目录的tcl目录下
+# OPENOCD_PATH = $(shell which openocd)
+# OPENOCD_TCL_PATH = $(shell dirname $(shell dirname $(OPENOCD_PATH)))/tcl
 
 # ports/os_cpu_a.S 
 
@@ -151,6 +154,9 @@ else ifeq ($(UBUNTU_VERSION),22.04)
 
 	rm ./compile_commands.json || true 
 	export https_proxy= && export http_proxy= && bear -- make -j4
+else ifeq ($(UBUNTU_VERSION),24.04)
+	rm ./compile_commands.json || true 
+	export https_proxy= && export http_proxy= && bear -- make -j4
 endif
 
 debug:
@@ -164,10 +170,10 @@ debug:
 format:
 	find . -iname *.h -o -iname *.c | xargs clang-format -i
 STdownload:
-	make bear
+	make
 	openocd -f interface/stlink.cfg -f target/stm32f4x.cfg -c init -c "halt" -c "flash write_image erase build/learn_startup.bin 0x8000000" -c "reset" -c "shutdown"
 Jdownload:
-	make bear
+	make
 	JLinkExe -device STM32F401RE -autoconnect 1 -if SWD -speed 4000 -CommanderScript JLinkScript.jlink
 pico:
 	picocom --omap crcrlf --imap lfcrlf -c -b 115200 /dev/ttyACM0

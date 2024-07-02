@@ -1,3 +1,4 @@
+#include "Global.h"
 #include "HMC.h"
 #include "MPU6050.h"
 #include "os_cpu.h"
@@ -7,11 +8,13 @@
 
 HmcData hmcData;
 MPU6050Data mpu6050Data;
+static U32 print_per_time = 100;
 
 // 有临界区时会导致串口接收数据任务异常
 // 优先级降低后systemView显示正常
 void GY86_task()
 {
+    U32 print_rate = 0;
     while (1)
     {
 //         // usart_send("**Start HMC5883L\n");
@@ -27,9 +30,15 @@ void GY86_task()
         Multiple_Read_HMC5883(&(hmcData.x), &(hmcData.y), &(hmcData.z));
         My_ACC_Read_MPU6050(&(mpu6050Data.acc_x), &(mpu6050Data.acc_y), &(mpu6050Data.acc_z));
         My_GYRO_Read_MPU6050(&(mpu6050Data.gyro_x), &(mpu6050Data.gyro_y), &(mpu6050Data.gyro_z));
-        // usart_send("hmc.x: %d,hmc.y: %d,hmc.x: %d\n",hmcData.x,hmcData.y,hmcData.z);
-        // usart_send("MPU.acc_x: %d,MPU.acc_y: %d,MPU.acc_z: %d\n",(int)mpu6050Data.acc_x,(int)mpu6050Data.acc_y,(int)mpu6050Data.acc_z);
-        usart_send("gyro_x: %d,gyro_y: %d,gyro_z: %d\n",(int)mpu6050Data.gyro_x,(int)mpu6050Data.gyro_y,(int)mpu6050Data.gyro_z);
+
+        if (print_rate %  print_per_time == 0)
+        {
+            print_rate = 0;
+            usart_send("hmc.x: %d,hmc.y: %d,hmc.x: %d\n",hmcData.x,hmcData.y,hmcData.z);
+            usart_send("MPU.acc_x: %d,MPU.acc_y: %d,MPU.acc_z: %d\n",(int)mpu6050Data.acc_x,(int)mpu6050Data.acc_y,(int)mpu6050Data.acc_z);
+            usart_send("gyro_x: %d,gyro_y: %d,gyro_z: %d\n",(int)mpu6050Data.gyro_x,(int)mpu6050Data.gyro_y,(int)mpu6050Data.gyro_z);
+        }
+        print_rate++;
         // usart_send("HMC5883L\n");
         // OS_ENTER_CRITICAL();
         // if (OSIntNesting > 0u)
@@ -37,6 +46,6 @@ void GY86_task()
             // OSIntNesting--;
         // }
         // OS_EXIT_CRITICAL();
-        OSTimeDly(1000 * 3); // 延时5s，因为一个tick是1毫秒
+        OSTimeDly(10 * 1); // 一个tick是1毫秒
     }
 }
