@@ -77,7 +77,7 @@ void iic_TIM_Init(uint16_t arr, uint16_t psc)
 {
     RCC->AHB1ENR |= (1 << 1); // 打开GPIOB时钟
 
-    RCC->APB1ENR |= (1 << 2); // 打开TIM3时钟
+    RCC->APB1ENR |= (1 << 2); // 打开TIM4时钟
 
     GPIOB->MODER |= (0x2 << 12);
     GPIOB->OSPEEDR |= (0x2 << 12);
