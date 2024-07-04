@@ -15,7 +15,7 @@ ports/os_cpu_c.c \
 ASM_SOURCES = startup_stm32f401xe.s
 ASM_SOURCES +=  \
 ports/os_cpu_a.S \
-SEGGER/SEGGER_RTT_ASM_ARMv7M.S \
+Trace/ThirdPartyLib/SEGGER/SEGGER_RTT_ASM_ARMv7M.S \
 # 从openocd里获取interface路径，interface在openocd的安装的父目录的父目录的tcl目录下
 # OPENOCD_PATH = $(shell which openocd)
 # OPENOCD_TCL_PATH = $(shell dirname $(shell dirname $(OPENOCD_PATH)))/tcl
