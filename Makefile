@@ -170,10 +170,10 @@ debug:
 format:
 	find . -iname *.h -o -iname *.c | xargs clang-format -i
 STdownload:
-	make
+	make bear
 	openocd -f interface/stlink.cfg -f target/stm32f4x.cfg -c init -c "halt" -c "flash write_image erase build/learn_startup.bin 0x8000000" -c "reset" -c "shutdown"
 Jdownload:
-	make
+	make bear
 	JLinkExe -device STM32F401RE -autoconnect 1 -if SWD -speed 4000 -CommanderScript JLinkScript.jlink
 pico:
 	picocom --omap crcrlf --imap lfcrlf -c -b 115200 /dev/ttyACM0
