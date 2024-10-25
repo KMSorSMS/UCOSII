@@ -97,7 +97,7 @@ void my_task_0_t_(void *args)
         // LED2_ON();
         // delay_used_by_iic(100*1000*3);
         // 任务0是关灯，关完后调用OS延时函数--OSTimeDly()
-        // usart_send("LED2_OFF\n");
+        usart_send("LED2_OFF\n");
         OSTimeDly(1000 * 4); // 延时4s，因为一个tick是1毫秒
     }
 }
@@ -108,7 +108,7 @@ void my_task_1_t_(void *args)
     {
         // 任务一采用点灯，点完后调用OS延时函数--OSTimeDly()
         LED2_ON()
-        // usart_send("LED2_ON\n");
+        usart_send("LED2_ON\n");
         OSTimeDly(1000 * 2); // 延时2s，因为一个tick是1毫秒
     }
 }
