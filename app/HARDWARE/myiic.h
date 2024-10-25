@@ -34,7 +34,7 @@ void iic_read_bytes(uint8_t* buffer,int size); /* 读取多个字节 */
 extern INT32U IIC_TIME;
 extern void iic_TIM_Init(uint16_t arr ,uint16_t psc);
 
-extern void Peripheral_SendByte(uint8_t devAddress,uint8_t data, uint8_t addr);
+extern void Peripheral_SendByte(uint8_t devAddress,uint8_t addr, uint8_t data);
 extern void Peripheral_ReadBytes(uint8_t devAddress,uint8_t address,uint8_t* buffer ,uint8_t size);
 extern void Peripheral_SendBytes(uint8_t devAddress, uint8_t addr,uint8_t*buffer, uint8_t size);
 

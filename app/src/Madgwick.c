@@ -17,11 +17,12 @@
 
 #include "Madgwick.h"
 #include <math.h>
+#include "usart.h"
 
 //---------------------------------------------------------------------------------------------------
 // Definitions
 
-#define sampleFreq	512.0f		// sample frequency in Hz
+#define sampleFreq	100.0f		// sample frequency in Hz
 #define betaDef		0.1f		// 2 * proportional gain
 
 //---------------------------------------------------------------------------------------------------
@@ -29,6 +30,9 @@
 
 volatile float beta = betaDef;								// 2 * proportional gain (Kp)
 volatile float q0 = 1.0f, q1 = 0.0f, q2 = 0.0f, q3 = 0.0f;	// quaternion of sensor frame relative to auxiliary frame
+// const static U32 print_per_time = 100;
+// U32 print_rate = 0;
+
 
 //---------------------------------------------------------------------------------------------------
 // Function declarations
@@ -50,6 +54,7 @@ void MadgwickAHRSupdate(float gx, float gy, float gz, float ax, float ay, float 
 
 	// Use IMU algorithm if magnetometer measurement invalid (avoids NaN in magnetometer normalisation)
 	if((mx == 0.0f) && (my == 0.0f) && (mz == 0.0f)) {
+		// usart_send("use IMU algorithm\n");
 		MadgwickAHRSupdateIMU(gx, gy, gz, ax, ay, az);
 		return;
 	}
@@ -151,6 +156,7 @@ void MadgwickAHRSupdateIMU(float gx, float gy, float gz, float ax, float ay, flo
 	qDot2 = 0.5f * (q0 * gx + q2 * gz - q3 * gy);
 	qDot3 = 0.5f * (q0 * gy - q1 * gz + q3 * gx);
 	qDot4 = 0.5f * (q0 * gz + q1 * gy - q2 * gx);
+	// const float left_nums = 100000;
 
 	// Compute feedback only if accelerometer measurement valid (avoids NaN in accelerometer normalisation)
 	if(!((ax == 0.0f) && (ay == 0.0f) && (az == 0.0f))) {
@@ -186,12 +192,20 @@ void MadgwickAHRSupdateIMU(float gx, float gy, float gz, float ax, float ay, flo
 		s1 *= recipNorm;
 		s2 *= recipNorm;
 		s3 *= recipNorm;
-
 		// Apply feedback step
+        // if (print_rate %  print_per_time == 0){
+		// 	usart_send("gyro:      qDot1: %7d,qDot2: %7d,qDot3: %7d,qDot4: %7d\n",(int)(qDot1*left_nums),(int)(qDot2*left_nums),(int)(qDot3*left_nums),(int)(qDot4*left_nums));
+		// 	usart_send("s0123:     qDot1: %7d,qDot2: %7d,qDot3: %7d,qDot4: %7d\n",(int)(- beta * s0 *left_nums),(int)(- beta * s1 *left_nums),(int)(- beta * s2 *left_nums),(int)(- beta * s3 *left_nums));
+		// }
 		qDot1 -= beta * s0;
 		qDot2 -= beta * s1;
 		qDot3 -= beta * s2;
 		qDot4 -= beta * s3;
+        // if (print_rate %  print_per_time == 0){
+        //     print_rate = 0;
+		// 	usart_send("copensate: qDot1: %7d,qDot2: %7d,qDot3: %7d,qDot4: %7d\n",(int)(qDot1*left_nums),(int)(qDot2*left_nums),(int)(qDot3*left_nums),(int)(qDot4*left_nums));
+		// }
+		// print_rate++;
 	}
 
 	// Integrate rate of change of quaternion to yield quaternion

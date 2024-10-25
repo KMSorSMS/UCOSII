@@ -3,6 +3,7 @@
 #include "os_cfg.h"
 
 static float Xtest,Ytest,Ztest,x,y,z;
+#define DEG_TO_RAD (3.14159265358979323846 / 180.0)
 
 static void Raw_Read_MPU6050(int16_t* x, int16_t* y, int16_t* z, int16_t readType);
 
@@ -79,9 +80,9 @@ void GYRO_Read_MPU6050(float* x,float* y,float* z){
 	tempY=(((int16_t)BUF[2])<<8)|((int16_t)BUF[3]);
 	tempZ=(((int16_t)BUF[4])<<8)|((int16_t)BUF[5]);
 	//映射成实际值(单位为度/秒)
-	*x=(float)tempX*GYRO_RANGE/65536;
-	*y=(float)tempY*GYRO_RANGE/65536;
-	*z=(float)tempZ*GYRO_RANGE/65536;
+	*x=(((float)tempX)/65536)*GYRO_RANGE;
+	*y=(((float)tempY)/65536)*GYRO_RANGE;
+	*z=(((float)tempZ)/65536)*GYRO_RANGE;
 }
 
 void My_ACC_Read_MPU6050(float* x, float* y, float* z) {
@@ -89,9 +90,12 @@ void My_ACC_Read_MPU6050(float* x, float* y, float* z) {
 	//Raw_Read_MPU6050(&tempX,&tempY,&tempZ,MPU6050_ACCEL_XOUT_H);
 	//映射成实际值(单位为mg)
 	Raw_Read_MPU6050(&tempX, &tempY, &tempZ, MPU6050_ACCEL_XOUT_H);
-	*x = (float)tempX * ACC_RANGE * 1000 / 65536;
-	*y = (float)tempY * ACC_RANGE * 1000 / 65536;
-	*z = (float)tempZ * ACC_RANGE * 1000 / 65536;
+	// *x = (float)tempX * ACC_RANGE * 1000 / 65536;
+	// *y = (float)tempY * ACC_RANGE * 1000 / 65536;
+	// *z = (float)tempZ * ACC_RANGE * 1000 / 65536;
+	*x = (float)tempX;
+	*y = (float)tempY;
+	*z = (float)tempZ;
 } 
 
 
@@ -99,9 +103,9 @@ void My_GYRO_Read_MPU6050(float* x, float* y, float* z) {
 	int16_t tempX, tempY, tempZ;
 	Raw_Read_MPU6050(&tempX, &tempY, &tempZ, MPU6050_GYRO_XOUT_H);
 	//映射成实际值(单位为度/秒)
-	*x = (float)tempX * GYRO_RANGE / 65536;
-	*y = (float)tempY * GYRO_RANGE / 65536;
-	*z = (float)tempZ * GYRO_RANGE / 65536;
+	*x =(((float)tempX)/65536)*GYRO_RANGE * DEG_TO_RAD;
+	*y =(((float)tempY)/65536)*GYRO_RANGE * DEG_TO_RAD;
+	*z =(((float)tempZ)/65536)*GYRO_RANGE * DEG_TO_RAD;
 }
 
 void Raw_Read_MPU6050(int16_t* x, int16_t* y, int16_t* z, int16_t readType) {
