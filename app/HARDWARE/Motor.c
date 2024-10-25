@@ -95,10 +95,10 @@ void MotorPWMSet(uint16_t M1, uint16_t M2, uint16_t M3, uint16_t M4, uint16_t M5
     if (print_rate % print_per_time == 0)
     {
         print_rate = 0;
-        usart_send("M1: %d\n", TIM3->CCR1);
-        usart_send("M2: %d\n", TIM3->CCR2);
-        usart_send("M3: %d\n", TIM3->CCR3);
-        usart_send("M4: %d\n", TIM3->CCR4);
+        // usart_send("M1: %d\n", TIM3->CCR1);
+        // usart_send("M2: %d\n", TIM3->CCR2);
+        // usart_send("M3: %d\n", TIM3->CCR3);
+        // usart_send("M4: %d\n", TIM3->CCR4);
     }
     print_rate++;
 }

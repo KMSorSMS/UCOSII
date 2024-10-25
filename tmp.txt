@@ -1,0 +1,186 @@
+picocom --omap crcrlf --imap lfcrlf -c -b 115200 /dev/ttyACM0
+picocom v3.1
+
+port is        : /dev/ttyACM0
+flowcontrol    : none
+baudrate is    : 115200
+parity is      : none
+databits are   : 8
+stopbits are   : 1
+escape is      : C-a
+local echo is  : yes
+noinit is      : no
+noreset is     : no
+hangup is      : no
+nolock is      : no
+send_cmd is    : sz -vv
+receive_cmd is : rz -vv -E
+imap is        : lfcrlf,
+omap is        : crcrlf,
+emap is        : crcrlf,delbs,
+logfile is     : none
+initstring     : none
+exit_after is  : not set
+exit is        : no
+
+Type [C-a] [C-h] to see available commands
+Terminal ready
+gyro:      qDot1:   80337,qDot2:   89273,qDot3:   30064,qDot4:  -62111
+s0123:     qDot1:    1315,qDot2:   -6042,qDot3:    7774,qDot4:    1090
+copensate: qDot1:   81652,qDot2:   83230,qDot3:   37839,qDot4:  -61020
+MPU.acc_x: -13708,MPU.acc_y: -186,MPU.acc_z: 9772
+gyro_x: -2,gyro_y: 0,gyro_z: 0
+q0: -60775,q1: 39485,q2: -48643,q3: -48449
+gyro:      qDot1:   99406,qDot2:  -27670,qDot3:   68549,qDot4:   50026
+s0123:     qDot1:   -3120,qDot2:   -9421,qDot3:    1214,qDot4:     154
+copensate: qDot1:   96286,qDot2:  -37091,qDot3:   69763,qDot4:   50180
+MPU.acc_x: -13592,MPU.acc_y: -112,MPU.acc_z: 9822
+gyro_x: -2,gyro_y: 0,gyro_z: 0
+q0: 42548,q1: 65650,q2: 11836,q3: -60875
+gyro:      qDot1:  -45804,qDot2: -142524,qDot3:   15363,qDot4:   65131
+s0123:     qDot1:   -1630,qDot2:     788,qDot3:   -9752,qDot4:   -1159
+copensate: qDot1:  -47434,qDot2: -141736,qDot3:    5610,qDot4:   63971
+MPU.acc_x: -13670,MPU.acc_y: -260,MPU.acc_z: 9652
+gyro_x: -3,gyro_y: 1,gyro_z: 0
+q0: 79057,q1: -12289,q2: 56440,q3: 19483
+gyro:      qDot1: -113739,qDot2:   -8771,qDot3:  -69370,qDot4:   -4807
+s0123:     qDot1:    2163,qDot2:    8663,qDot3:   -4226,qDot4:   -1433
+copensate: qDot1: -111576,qDot2:    -107,qDot3:  -73597,qDot4:   -6240
+MPU.acc_x: -13636,MPU.acc_y: -106,MPU.acc_z: 9770
+gyro_x: -2,gyro_y: 0,gyro_z: 0
+q0: -8897,q1: -67408,q2: 15591,q3: 71415
+gyro:      qDot1:  -11437,qDot2:   80817,qDot3:  -42594,qDot4:  -96907
+s0123:     qDot1:    2302,qDot2:    6648,qDot3:    6785,qDot4:    2064
+copensate: qDot1:   -9135,qDot2:   87465,qDot3:  -35809,qDot4:  -94842
+MPU.acc_x: -13658,MPU.acc_y: -110,MPU.acc_z: 9814
+gyro_x: -2,gyro_y: 0,gyro_z: 0
+q0: -81736,q1: -19662,q2: -51926,q3: 14225
+gyro:      qDot1:  103145,qDot2:   48653,qDot3:   55236,qDot4:  -39960
+s0123:     qDot1:    -403,qDot2:   -7224,qDot3:    6627,qDot4:    1895
+copensate: qDot1:  102741,qDot2:   41429,qDot3:   61863,qDot4:  -38065
+MPU.acc_x: -13612,MPU.acc_y: -94,MPU.acc_z: 9820
+gyro_x: -2,gyro_y: 0,gyro_z: 0
+q0: -29776,q1: 56221,q2: -38799,q3: -66433
+gyro:      qDot1:   63414,qDot2:  -56372,qDot3:   64002,qDot4:   80953
+s0123:     qDot1:   -3311,qDot2:   -9213,qDot3:   -1527,qDot4:   -1341
+copensate: qDot1:   60102,qDot2:  -65586,qDot3:   62475,qDot4:   79612
+MPU.acc_x: -13618,MPU.acc_y: -132,MPU.acc_z: 9762
+gyro_x: -2,gyro_y: 0,gyro_z: 0
+q0: 67193,q1: 46851,q2: 34748,q3: -45263
+gyro:      qDot1:  -73863,qDot2:  -77789,qDot3:  -25683,qDot4:   74327
+s0123:     qDot1:    -803,qDot2:    4056,qDot3:   -8936,qDot4:   -1701
+copensate: qDot1:  -74666,qDot2:  -73733,qDot3:  -34619,qDot4:   72626
+MPU.acc_x: -13610,MPU.acc_y: -100,MPU.acc_z: 9786
+gyro_x: -2,gyro_y: 0,gyro_z: 0
+q0: 60327,q1: -33516,q2: 55284,q3: 46337
+gyro:      qDot1:  -95283,qDot2:   18923,qDot3:  -80351,qDot4:  -44429
+s0123:     qDot1:    3217,qDot2:    9228,qDot3:   -2048,qDot4:    -446
+copensate: qDot1:  -92066,qDot2:   28152,qDot3:  -82400,qDot4:  -44875
+MPU.acc_x: -13596,MPU.acc_y: -88,MPU.acc_z: 9776
+gyro_x: -2,gyro_y: 0,gyro_z: 0
+q0: -38127,q1: -61654,q2: -9153,q3: 68026
+gyro:      qDot1:   29411,qDot2:   86180,qDot3:  -12628,qDot4:  -96122
+s0123:     qDot1:    1577,qDot2:    1085,qDot3:    9703,qDot4:    1464
+copensate: qDot1:   30989,qDot2:   87266,qDot3:   -2924,qDot4:  -94658
+MPU.acc_x: -13592,MPU.acc_y: -58,MPU.acc_z: 9804
+gyro_x: -2,gyro_y: 0,gyro_z: 0
+q0: -77964,q1: 3730,q2: -60555,q3: -14384
+gyro:      qDot1:  110899,qDot2:   21704,qDot3:   72744,qDot4:   -1012
+s0123:     qDot1:   -1943,qDot2:   -8315,qDot3:    4860,qDot4:    1763
+copensate: qDot1:  108955,qDot2:   13389,qDot3:   77604,qDot4:     750
+MPU.acc_x: -13608,MPU.acc_y: -132,MPU.acc_z: 9818
+gyro_x: -2,gyro_y: 0,gyro_z: 0
+q0: 616,q1: 63059,q2: -18323,q3: -75190
+gyro:      qDot1:   32794,qDot2:  -43587,qDot3:   18476,qDot4:  108814
+s0123:     qDot1:   -2386,qDot2:   -6897,qDot3:   -6623,qDot4:   -1596
+copensate: qDot1:   30407,qDot2:  -50484,qDot3:   11852,qDot4:  107218
+MPU.acc_x: -13542,MPU.acc_y: -86,MPU.acc_z: 9790
+gyro_x: -2,gyro_y: 0,gyro_z: 1
+q0: 78166,q1: 27201,q2: 52073,q3: -20117
+gyro:      qDot1:  -95924,qDot2:  -56253,qDot3:  -54123,qDot4:   48567
+s0123:     qDot1:     379,qDot2:    6178,qDot3:   -7538,qDot4:   -2162
+copensate: qDot1:  -95544,qDot2:  -50074,qDot3:  -61661,qDot4:   46405
+MPU.acc_x: -13616,MPU.acc_y: -104,MPU.acc_z: 9796
+gyro_x: -2,gyro_y: 0,gyro_z: 0
+q0: 36914,q1: -49762,q2: 42205,q3: 65924
+gyro:      qDot1:  -66727,qDot2:   47711,qDot3:  -77477,qDot4:  -76183
+s0123:     qDot1:    3011,qDot2:    9278,qDot3:    2055,qDot4:     562
+copensate: qDot1:  -63716,qDot2:   56990,qDot3:  -75422,qDot4:  -75621
+MPU.acc_x: -13596,MPU.acc_y: -88,MPU.acc_z: 9830
+gyro_x: -2,gyro_y: 0,gyro_z: 0
+q0: -60082,q1: -51528,q2: -32780,q3: 51251
+gyro:      qDot1:   65254,qDot2:   82435,qDot3:   18788,qDot4:  -80724
+s0123:     qDot1:     766,qDot2:   -2274,qDot3:    9473,qDot4:    2044
+copensate: qDot1:   66020,qDot2:   80161,qDot3:   28262,qDot4:  -78680
+MPU.acc_x: -13626,MPU.acc_y: -94,MPU.acc_z: 9786
+gyro_x: -2,gyro_y: 0,gyro_z: 0
+q0: -64920,q1: 25541,q2: -57724,q3: -42038
+gyro:      qDot1:  101319,qDot2:   -7762,qDot3:   78713,qDot4:   39252
+s0123:     qDot1:   -2701,qDot2:   -9397,qDot3:    1879,qDot4:     896
+copensate: qDot1:   98618,qDot2:  -17159,qDot3:   80592,qDot4:   40148
+MPU.acc_x: -13606,MPU.acc_y: -98,MPU.acc_z: 9798
+gyro_x: -2,gyro_y: 0,gyro_z: 0
+q0: 29539,q1: 63170,q2: 5997,q3: -71184
+gyro:      qDot1:  -18225,qDot2:  -83169,qDot3:   16853,qDot4:  101657
+s0123:     qDot1:   -1633,qDot2:   -3069,qDot3:   -9174,qDot4:   -1927
+copensate: qDot1:  -19858,qDot2:  -86238,qDot3:    7678,qDot4:   99730
+MPU.acc_x: -13594,MPU.acc_y: -104,MPU.acc_z: 9784
+gyro_x: -2,gyro_y: 0,gyro_z: 0
+q0: 78643,q1: 4317,q2: 60628,q3: 9332
+gyro:      qDot1: -106744,qDot2:  -31751,qDot3:  -77213,qDot4:    9860
+s0123:     qDot1:    1651,qDot2:    8008,qDot3:   -5400,qDot4:   -1943
+copensate: qDot1: -105093,qDot2:  -23743,qDot3:  -82613,qDot4:    7917
+MPU.acc_x: -13584,MPU.acc_y: -92,MPU.acc_z: 9786
+gyro_x: -2,gyro_y: 0,gyro_z: 0
+q0: 7121,q1: -60739,q2: 22406,q3: 75659
+gyro:      qDot1:  -34930,qDot2:   65059,qDot3:  -47861,qDot4: -101581
+s0123:     qDot1:    2433,qDot2:    7268,qDot3:    6306,qDot4:    1200
+copensate: qDot1:  -32497,qDot2:   72328,qDot3:  -41555,qDot4: -100381
+MPU.acc_x: -13596,MPU.acc_y: -98,MPU.acc_z: 9812
+gyro_x: -2,gyro_y: 0,gyro_z: 0
+q0: -74678,q1: -32556,q2: -50961,q3: 27063
+gyro:      qDot1:   91322,qDot2:   62895,qDot3:   49649,qDot4:  -55738
+s0123:     qDot1:    -381,qDot2:   -5059,qDot3:    8280,qDot4:    2369
+copensate: qDot1:   90941,qDot2:   57836,qDot3:   57930,qDot4:  -53369
+MPU.acc_x: -13608,MPU.acc_y: -114,MPU.acc_z: 9764
+gyro_x: -2,gyro_y: 0,gyro_z: 0
+q0: -42360,q1: 44506,q2: -46299,q3: -63619
+gyro:      qDot1:   73119,qDot2:  -35908,qDot3:   73298,qDot4:   71464
+s0123:     qDot1:   -2858,qDot2:   -9388,qDot3:   -1839,qDot4:    -126
+copensate: qDot1:   70261,qDot2:  -45297,qDot3:   71459,qDot4:   71338
+MPU.acc_x: -13582,MPU.acc_y: -108,MPU.acc_z: 9826
+gyro_x: -2,gyro_y: 0,gyro_z: 0
+q0: 54590,q1: 53768,q2: 29557,q3: -56759
+gyro:      qDot1:  -56446,qDot2:  -84129,qDot3:  -13282,qDot4:   86503
+s0123:     qDot1:    -844,qDot2:     916,qDot3:   -9658,qDot4:   -2200
+copensate: qDot1:  -57291,qDot2:  -83212,qDot3:  -22941,qDot4:   84303
+MPU.acc_x: -13592,MPU.acc_y: -18,MPU.acc_z: 9822
+gyro_x: -2,gyro_y: 0,gyro_z: 0
+q0: 68284,q1: -19005,q2: 59597,q3: 37288
+gyro:      qDot1:  -99628,qDot2:   -1232,qDot3:  -79218,qDot4:  -30215
+s0123:     qDot1:    2492,qDot2:    9282,qDot3:   -2464,qDot4:   -1177
+copensate: qDot1:  -97135,qDot2:    8050,qDot3:  -81682,qDot4:  -31393
+MPU.acc_x: -13594,MPU.acc_y: -112,MPU.acc_z: 9802
+gyro_x: -2,gyro_y: 0,gyro_z: 0
+q0: -22371,q1: -63141,q2: -1269,q3: 74008
+gyro:      qDot1:    8812,qDot2:   78789,qDot3:  -23223,qDot4: -106007
+s0123:     qDot1:    1780,qDot2:    3870,qDot3:    8865,qDot4:    1760
+copensate: qDot1:   10593,qDot2:   82660,qDot3:  -14358,qDot4: -104247
+MPU.acc_x: -13666,MPU.acc_y: -64,MPU.acc_z: 9868
+gyro_x: -2,gyro_y: 0,gyro_z: 0
+q0: -78666,q1: -10214,q2: -60555,q3: -2563
+gyro:      qDot1:  104652,qDot2:   39860,qDot3:   74615,qDot4:  -18790
+s0123:     qDot1:   -1451,qDot2:   -7510,qDot3:    6081,qDot4:    2108
+copensate: qDot1:  103200,qDot2:   32349,qDot3:   80697,qDot4:  -16681
+MPU.acc_x: -13656,MPU.acc_y: -134,MPU.acc_z: 9800
+gyro_x: -2,gyro_y: 0,gyro_z: 0
+q0: -14592,q1: 57995,q2: -26991,q3: -75241
+gyro:      qDot1:   40490,qDot2:  -61230,qDot3:   58439,qDot4:   95203
+s0123:     qDot1:   -2459,qDot2:   -7683,qDot3:   -5844,qDot4:    -842
+copensate: qDot1:   38030,qDot2:  -68914,qDot3:   52595,qDot4:   94360
+MPU.acc_x: -13610,MPU.acc_y: -56,MPU.acc_z: 9756
+gyro_x: -2,gyro_y: 0,gyro_z: 0
+q0: 71302,q1: 37092,q2: 48306,q3: -34248
+
+Terminating...
+Thanks for using picocom

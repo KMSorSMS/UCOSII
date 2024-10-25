@@ -2,5 +2,4 @@ Diagnostics:
   UnusedIncludes: None
   # IgnorePatterns: ["main file cannot be included recursively when building a preamble"]
 CompileFlags:
-  Add: [-Wno-format]
-  # Compiler: /opt/arm-gnu-toolchain-13.2.Rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-gcc
+  Add: [-Wno-format]  
