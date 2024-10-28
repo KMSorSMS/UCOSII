@@ -1,6 +1,7 @@
 
 #include "MPU6050.h"
 #include "os_cfg.h"
+#include "tools.h"
 
 static float Xtest,Ytest,Ztest,x,y,z;
 #define DEG_TO_RAD (3.14159265358979323846 / 180.0)
@@ -10,18 +11,20 @@ static void Raw_Read_MPU6050(int16_t* x, int16_t* y, int16_t* z, int16_t readTyp
 //初始化MPU6050，寄存器的宏定义在MPU6050.h中
 void MPU6050_Init(void){
 	// //获取PWR_MGMT_1的值
+    Peripheral_SendByte(MPU6050_ADDRESS,MPU6050_PWR_MGMT_1, 0x80);
+	//延时
+	Delay_Congestion(100);
     //唤醒MPU6050
     Peripheral_SendByte(MPU6050_ADDRESS,MPU6050_PWR_MGMT_1, 0x01);
-	/*量程初始化*/
     //陀螺仪传感器,±2000dps
     Peripheral_SendByte(MPU6050_ADDRESS,MPU6050_GYRO_CONFIG, 0x18);//设置陀螺仪满量程范围为±2000dps
     //加速度传感器,±2g
     Peripheral_SendByte(MPU6050_ADDRESS,MPU6050_ACCEL_CONFIG, 0x01);//设置加速度传感器满量程范围为±2g
 	//进行自测
-	MPU_Self_Test();
+	// MPU_Self_Test();
 	/*将自测位清零*/
-    Peripheral_SendByte(MPU6050_ADDRESS,MPU6050_GYRO_CONFIG, 0x18);
-    Peripheral_SendByte(MPU6050_ADDRESS,MPU6050_ACCEL_CONFIG, 0x01);
+    // Peripheral_SendByte(MPU6050_ADDRESS,MPU6050_GYRO_CONFIG, 0x18);
+    // Peripheral_SendByte(MPU6050_ADDRESS,MPU6050_ACCEL_CONFIG, 0x01);
     //陀螺仪采样率为1K/(1+0x07)=125Hz
     Peripheral_SendByte(MPU6050_ADDRESS,MPU6050_SMPLRT_DIV, 0x07);
     //低通滤波器的截止频率为1K,带宽为5Hz
@@ -30,6 +33,7 @@ void MPU6050_Init(void){
     Peripheral_SendByte(MPU6050_ADDRESS,MPU6050_INT_PIN_CFG, 0x02);
     //关闭IIC主模式
     Peripheral_SendByte(MPU6050_ADDRESS,MPU6050_USER_CTRL, 0x00);
+	
 }
 
 //使能时数据减去失能时数据才是自测应答位(self-test response)

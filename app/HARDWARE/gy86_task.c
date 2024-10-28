@@ -9,7 +9,12 @@
 #define data_len 100
 HmcData hmcData;
 MPU6050Data mpu6050Data;
-static U32 print_per_time = 100;
+// static U32 print_per_time = 1;
+void usart1_send_char(U8 c)
+{
+    while ((USART_UX->SR & 0X40) == 0);     /* 等待上一个字符发送完成 */ 
+    USART_UX->DR=c;  
+} 
 // 有临界区时会导致串口接收数据任务异常
 void send_upper(){
     char data[data_len] = {0};
@@ -42,12 +47,15 @@ void send_upper(){
     data[13] = sumcheck;
     data[14] = addcheck;
     // 发送数据
-    usart_send("%s",data);
+    for(U8 i=0; i< (data[3]+6) ; i++)
+    {
+        usart1_send_char(data[i]);
+    }
 }
 // 优先级降低后systemView显示正常
 void GY86_task()
 {
-    U32 print_rate = 0;
+    // U32 print_rate = 0;
     while (1)
     {
 //         // usart_send("**Start HMC5883L\n");
@@ -63,14 +71,14 @@ void GY86_task()
         Multiple_Read_HMC5883(&(hmcData.x), &(hmcData.y), &(hmcData.z));
         My_ACC_Read_MPU6050(&(mpu6050Data.acc_x), &(mpu6050Data.acc_y), &(mpu6050Data.acc_z));
         My_GYRO_Read_MPU6050(&(mpu6050Data.gyro_x), &(mpu6050Data.gyro_y), &(mpu6050Data.gyro_z));
-        MadgwickAHRSupdate(mpu6050Data.gyro_x, mpu6050Data.gyro_y, mpu6050Data.gyro_z, mpu6050Data.acc_x, mpu6050Data.acc_y, mpu6050Data.acc_z,0,0,0);
+        MadgwickAHRSupdate(mpu6050Data.gyro_x, mpu6050Data.gyro_y, mpu6050Data.gyro_z, mpu6050Data.acc_x, mpu6050Data.acc_y, mpu6050Data.acc_z,hmcData.y,-hmcData.x,hmcData.z);
         // 打印数据
-        if (print_rate %  print_per_time == 0)
-        {
-            print_rate = 0;
+        // if (print_rate %  print_per_time == 0)
+        // {
+            // print_rate = 0;
             send_upper();
-        }
-        print_rate++;
+        // }
+        // print_rate++;
 
 
         // MadgwickAHRSupdate(mpu6050Data.gyro_x, mpu6050Data.gyro_y, mpu6050Data.gyro_z, 0, 0,0,0,0,0);
@@ -94,6 +102,6 @@ void GY86_task()
             // OSIntNesting--;
         // }
         // OS_EXIT_CRITICAL();
-        OSTimeDly(10 * 1); // 一个tick是1毫秒
+        OSTimeDly(15 * 1); // 一个tick是1毫秒
     }
 }
