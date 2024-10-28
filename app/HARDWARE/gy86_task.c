@@ -1,10 +1,12 @@
 #include "Global.h"
 #include "HMC.h"
 #include "MPU6050.h"
+#include "Madgwick.h"
 #include "os_cpu.h"
 #include "ucos_ii.h"
 #include "gy86_task.h"
 #include "usart.h"
+#include "PID.h"
 
 #define data_len 100
 HmcData hmcData;
@@ -68,12 +70,14 @@ void GY86_task()
 //             OSIntNesting++;
 //         }
 //         OS_EXIT_CRITICAL();
+        float yaw=0,pitch=0,roll=0;
         Multiple_Read_HMC5883(&(hmcData.x), &(hmcData.y), &(hmcData.z));
         My_ACC_Read_MPU6050(&(mpu6050Data.acc_x), &(mpu6050Data.acc_y), &(mpu6050Data.acc_z));
         My_GYRO_Read_MPU6050(&(mpu6050Data.gyro_x), &(mpu6050Data.gyro_y), &(mpu6050Data.gyro_z));
         MadgwickAHRSupdate(mpu6050Data.gyro_x, mpu6050Data.gyro_y, mpu6050Data.gyro_z, mpu6050Data.acc_x, mpu6050Data.acc_y, mpu6050Data.acc_z,hmcData.y,-hmcData.x,hmcData.z);
+        cal_angel(&yaw,&roll,&pitch);
         // 打印数据
-        // if (print_rate %  print_per_time == 0)
+        // if (print_rate % print_per_time == 0)
         // {
             // print_rate = 0;
             send_upper();

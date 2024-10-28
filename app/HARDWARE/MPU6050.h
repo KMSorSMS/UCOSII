@@ -47,7 +47,7 @@ extern void startMPU6050(void);
 extern void My_ACC_Read_MPU6050(float* x, float* y, float* z);
 extern void My_GYRO_Read_MPU6050(float* x, float* y, float* z);
 extern void MadgwickAHRSupdate(float gx, float gy, float gz, float ax, float ay, float az, float mx, float my, float mz);
-extern float q0 , q1, q2 , q3 ;
+extern volatile float q0 , q1, q2 , q3 ;
 void MPU6050_Read();
 
 #endif
