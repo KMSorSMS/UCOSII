@@ -76,6 +76,10 @@ void GY86_task()
         My_GYRO_Read_MPU6050(&(mpu6050Data.gyro_x), &(mpu6050Data.gyro_y), &(mpu6050Data.gyro_z));
         MadgwickAHRSupdate(mpu6050Data.gyro_x, mpu6050Data.gyro_y, mpu6050Data.gyro_z, mpu6050Data.acc_x, mpu6050Data.acc_y, mpu6050Data.acc_z,hmcData.y,-hmcData.x,hmcData.z);
         cal_angel(&yaw,&roll,&pitch);
+        PID_control(yaw,);
+        PID_control(roll,);
+        PID_control(pitch,);
+        
         // 打印数据
         // if (print_rate % print_per_time == 0)
         // {
