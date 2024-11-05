@@ -1,7 +1,8 @@
-#include "os_time.c"
+// #include "os_time.c"
 #include "stm32f401xe.h"
 #include "MPU6050.h"
 #include "PID.h"
+#include <math.h>
 
 // 偏航角（z轴旋转）
 double former_x;
@@ -22,32 +23,9 @@ void cal_angel(double* x, double* y, double* z)
 }
 
 // target and init_val is angle or w
-// we use the inceasing PID(增量式PID), because if we use position PID, the sum_err maybe 
+// we use the inceasing PID(增量式PID), because if we use position PID, the sum_err maybe
 // out of bound
-void PID_control(double target,double init_val){
-  // the delta t
-  double dt=0.1;
-  // const val of PID
-  float Kp=0,Ki=0,Kd=0;
-  // the rate of the increasing(or decreasing) of init_val
-  double v=0;
-  // the delta v in increasing PID
-  double dv=0;
-  // init the err
-  double errk=target-init_val;
-  double errk_2=0,errk_1=0;
-  while(1){
-    // cal the v. We can use the val to control the motor
-    dv=Kp*(errk-errk_1)+Ki*errk+Kd*(errk-2*errk_1+errk_2);
-    // update the v
-    v+=dv;
-    // update the init_val, we should use cal_angel func when we debug the PID
-    init_val+=v*dt;
-    // update the err
-    errk_2=errk_1;
-    errk_1=errk;
-    errk=target-init_val;
-    // the frequency of the loop. We set it to 0.1s
-    OSTimeDly(100);
-  }
+float PID_control(float A, float B, float C, float e_k, float e_k_1, float e_k_2)
+{
+  return A * e_k - B * e_k_1 + C * e_k_2;
 }
