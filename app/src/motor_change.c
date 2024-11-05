@@ -4,8 +4,6 @@
 #include "PID.h"
 
 typedef struct axis_val{
-	double target_angle;
-	double target_speed;
 	double err_k;
 	double err_k_1;
 	double err_k_2;

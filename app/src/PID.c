@@ -3,13 +3,14 @@
 #include "MPU6050.h"
 #include "PID.h"
 #include <math.h>
+#include "Reciever.h"
 
 // 偏航角（z轴旋转）
-double former_x;
+double target_x;
 // 横滚角（y轴旋转）
-double former_y;
+double target_y;
 // 俯仰角（x轴旋转）
-double former_z;
+double target_z;
 void threeaxisrot(double r11, double r12, double r21, double r31, double r32, double* x, double* y, double* z)
 {
     *x = atan2(r31, r32);
@@ -29,3 +30,4 @@ float PID_control(float A, float B, float C, float e_k, float e_k_1, float e_k_2
 {
   return A * e_k - B * e_k_1 + C * e_k_2;
 }
+

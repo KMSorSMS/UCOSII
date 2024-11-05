@@ -3,8 +3,11 @@
 #ifndef __RECEIVER_H
 #define __RECEIVER_H
 
-
 #include "main.h"
+
+#define PRECISION 50
+#define DUTY_MIDVAL 1500
+
 void PWM_TIM_Init(uint16_t arr, uint16_t psc);
 void TIM2_IRQHandler(void);
 //	void PWM_TIM4_Init(uint16_t arr,uint16_t psc);

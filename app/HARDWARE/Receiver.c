@@ -17,7 +17,8 @@ uint16_t TIM2_CH1_Cap_Sta = 0;
 uint16_t TIM2_CH1_Start_Val = 0;
 uint16_t TIM2_CH1_End_Val = 0;
 uint32_t TIM2_CH1_Counter = 0;
-
+// we can use this var to make our remote control better
+uint16_t interrupt_times=0;
 
 void PWM_TIM_Init(uint16_t arr,uint16_t psc){
 	/**初始化GPIO*/
@@ -72,6 +73,7 @@ void TIM2_IRQHandler(void){
 	uint16_t arr = TIM2->ARR;
 	static uint8_t start_ = 0;
 	static uint8_t in_num =0;
+	uint8_t need_change_target=0;
 	if(TIM2->SR & (0x01<<0)){//更新事件中断处理,CNt溢出
 		//channel_1
 		if(TIM2_CH1_Cap_Sta & 0x40){//捕获到高电平了
@@ -100,6 +102,11 @@ void TIM2_IRQHandler(void){
 				start = TIM2_CH1_Counter;
 			}
 			else if(start_ == 1){
+				// check the change of receiver
+				if(TIM2_Channel1_DataBuf[in_num]-TIM2_CH1_Counter>=PRECISION||TIM2_Channel1_DataBuf[in_num]-TIM2_CH1_Counter<=0-PRECISION){
+					// means we change the remote controller, so we need to set the flag
+					need_change_target=1;
+				}
 				TIM2_Channel1_DataBuf[in_num++] =  TIM2_CH1_Counter;
 				// usart_send("PPM_chal%d: %d\n",in_num-1,(int)TIM2_Channel1_DataBuf[in_num]);
 				if(in_num >= 8){
@@ -116,11 +123,12 @@ void TIM2_IRQHandler(void){
 			TIM2_CH1_Start_Val = TIM2->CCR1;//记录开始得到CNT
 			TIM2->CCER |= (0x1<<1);
 		}
+		if(need_change_target){
+
+		}
 	}
 	TIM2->SR &= ~(0xffff);//清除中断标志位
 }
-
-
 
 void print_capture_pwm(uint16_t arr){
 	// usart_send("start PPM:%d\n",start);
@@ -139,11 +147,3 @@ void print_capture_pwm(uint16_t arr){
 uint16_t PPMtoPWM(uint16_t ppm){
 	return (uint16_t)ppm+500;
 }
-
-
-
-
-
-
-
-
