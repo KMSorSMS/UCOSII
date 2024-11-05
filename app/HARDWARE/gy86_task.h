@@ -12,6 +12,7 @@ typedef struct MPU6050Data{
     float gyro_y;
     float gyro_z;
 } MPU6050Data; // 定义存储加速度和陀螺仪数据的结构体的单元
+extern MPU6050Data mpu6050Data;
 
 typedef struct HmcData{
     int16_t x;

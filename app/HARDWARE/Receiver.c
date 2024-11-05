@@ -1,3 +1,4 @@
+#include "PID.h"
 #include "Reciever.h"
 #include <stdint.h>
 #include <stdio.h>
@@ -110,6 +111,9 @@ void TIM2_IRQHandler(void){
 				TIM2_Channel1_DataBuf[in_num++] =  TIM2_CH1_Counter;
 				// usart_send("PPM_chal%d: %d\n",in_num-1,(int)TIM2_Channel1_DataBuf[in_num]);
 				if(in_num >= 8){
+					if(need_change_target){
+						update_target();
+					}
 					start_ = 0;
 				}
 			}
@@ -123,11 +127,30 @@ void TIM2_IRQHandler(void){
 			TIM2_CH1_Start_Val = TIM2->CCR1;//记录开始得到CNT
 			TIM2->CCER |= (0x1<<1);
 		}
-		if(need_change_target){
-
-		}
 	}
 	TIM2->SR &= ~(0xffff);//清除中断标志位
+}
+
+// x roll
+// change the target val of PID according to pwm
+void update_target(){
+	target_x=ANGLE_MAX * dbScaleLinear(PPMtoPWM(TIM2_Channel1_DataBuf[X_AXIS])-DUTY_MIDVAL,(double)RANGE/2,APP_PR_DB);
+	target_y=ANGLE_MAX * dbScaleLinear(PPMtoPWM(TIM2_Channel1_DataBuf[Y_AXIS])-DUTY_MIDVAL,(double)RANGE/2,APP_PR_DB);
+	target_z=YAW_RATE_MAX * dbScaleLinear(PPMtoPWM(TIM2_Channel1_DataBuf[Z_AXIS])-DUTY_MIDVAL,(double)RANGE/2,APP_YAW_DB);
+}
+
+//cut deadband, move linearhead
+double dbScaleLinear(double x, double x_end, double deadband)
+{
+	if (x > deadband) {
+		return (x - deadband) / (x_end - deadband);
+
+	} else if (x < -deadband) {
+		return (x + deadband) / (x_end - deadband);
+
+	} else {
+		return 0.0f;
+	}
 }
 
 void print_capture_pwm(uint16_t arr){

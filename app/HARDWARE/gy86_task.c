@@ -13,6 +13,9 @@
 
 HmcData hmcData;
 MPU6050Data mpu6050Data;
+double gy86_x;
+double gy86_y;
+double gy86_z;
 // static U32 print_per_time = 1;
 void usart1_send_char(U8 c)
 {
@@ -73,12 +76,10 @@ void GY86_task()
         //             OSIntNesting++;
         //         }
         //         OS_EXIT_CRITICAL();
-        double yaw,roll,pitch;
         Multiple_Read_HMC5883(&(hmcData.x), &(hmcData.y), &(hmcData.z));
         My_ACC_Read_MPU6050(&(mpu6050Data.acc_x), &(mpu6050Data.acc_y), &(mpu6050Data.acc_z));
         My_GYRO_Read_MPU6050(&(mpu6050Data.gyro_x), &(mpu6050Data.gyro_y), &(mpu6050Data.gyro_z));
         MadgwickAHRSupdate(mpu6050Data.gyro_x, mpu6050Data.gyro_y, mpu6050Data.gyro_z, mpu6050Data.acc_x, mpu6050Data.acc_y, mpu6050Data.acc_z,hmcData.y,-hmcData.x,hmcData.z);
-        cal_angel(&yaw,&roll,&pitch);
         // PID_control(yaw,);
         // PID_control(roll,);
         // PID_control(pitch,);
@@ -91,7 +92,7 @@ void GY86_task()
         // }
         // print_rate++;
 
-        // cal_angel(&former_x, &former_y, &former_z);
+        cal_angel(&gy86_x, &gy86_y, &gy86_z);
         // usart_send("former_x: %d,former_y: %d,former_z: %d\n", (int)(former_x * 100), (int)(former_y * 100), (int)(former_z * 100));
         // usart_send("former_x: %d,former_y: %d,former_z: %d\n", (int)((former_x * RAD_TO_DEG) * 10), (int)((former_y * RAD_TO_DEG) * 10),
         //            (int)((former_z * RAD_TO_DEG) * 10));

@@ -17,3 +17,4 @@ void LED2_Init(void)
     // 最后设置GPIO的输出值，对应GPIO的ODR寄存器，这里我们设置为高电平
     GPIOA->ODR |= 0x00000020; // 设置为1，即高电平
 }
+
