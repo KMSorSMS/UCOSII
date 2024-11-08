@@ -9,6 +9,10 @@
 #define DUTY_MIDVAL 1500
 #define RANGE 1000
 
+// RUSH CH3
+// YAW CH4
+// PITCH CH2
+// ROLL CH1
 #define RUSH 0
 #define X_AXIS 1
 #define Y_AXIS 2
