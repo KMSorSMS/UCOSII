@@ -31,9 +31,9 @@ void angle_pid(void *args){
 		CtrlAttiAng();
 		OSTimeDly(20); // 因为一个tick是1毫秒
 	}
-
 }
 
+// 右下为M0，左下为M1，右上M2，左上为M3
 void rate_pid(void *args){
 	while(1){
 		CtrlAttiRate();
@@ -43,9 +43,9 @@ void rate_pid(void *args){
 		usart_send("ch1: %d,ch2: %d,ch3: %d,ch4: %d\n",TIM2_Channel1_DataBuf[0]+500,TIM2_Channel1_DataBuf[1]+500,TIM2_Channel1_DataBuf[2]+500,TIM2_Channel1_DataBuf[3]+500);
 		//将输出值融合到四个电机
 		Motor[2] = (int16_t)(Thro - Pitch - Roll - Yaw );    //M3  
-		Motor[0] = (int16_t)(Thro + Pitch + Roll - Yaw );    //M1
+		Motor[0] = (int16_t)(Thro + Pitch - Roll + Yaw );    //M1
 		Motor[3] = (int16_t)(Thro - Pitch + Roll + Yaw );    //M4 
-		Motor[1] = (int16_t)(Thro + Pitch - Roll + Yaw );    //M2
+		Motor[1] = (int16_t)(Thro + Pitch + Roll - Yaw );    //M2
 		MotorPWMSet(Motor[0],Motor[1],Motor[2],Motor[3],0,0);
 		OSTimeDly(10); // 因为一个tick是1毫秒
 	}

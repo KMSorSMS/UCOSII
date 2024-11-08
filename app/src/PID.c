@@ -86,9 +86,6 @@ void CtrlAttiAng(void)
 		PID_Postion_Cal(&pitch_angle_PID,angTarget[PITCH],gy86_y,DT);
 }
 
-
-
-
 //函数名：CtrlAttiRate(void)
 //描述：对飞行器姿态控制（pitch，roll，yaw）控制中，串级PID中的角速度环控制
 void CtrlAttiRate(void)

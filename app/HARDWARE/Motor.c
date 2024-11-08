@@ -5,6 +5,8 @@
 TIM3挂载在APB1上，在我们f401 AHB为84M下，APB1为42Mhz，但是TIM3的时钟为84Mhz
 */
 
+// 右下为M1，左下为M2，右上M3，左上为M4
+
 // 初始化GPIO口，TIM3，PWM输出，我们使用GPIOC6~GPIOC9对应M1~M4
 void MotorPWMInit()
 {
