@@ -14,6 +14,7 @@
 #include "motor_change.h"
 #include "os_trace.h"
 #include "usart.h"
+#include "Madgwick.h"
 // 写一个时钟初始化的函数，配置为HSE，PLLM为4，PLLN为84，PLLP分频为2，PLLQ分频为4，还有AHB的地方分频为1 ，得到主频为84Mhz
 void RCC_Configuration(void)
 {
@@ -73,6 +74,7 @@ int main()
     // 创建串口发送互斥信号量(需要注意的是信号量的创建只能在OSInit之后，因为需要使用OSInit中的事件队列)
     uasrt_tx_sem=OSSemCreate(1);
     uasrt_rx_sem=OSSemCreate(0);
+    madgwick_sem=OSSemCreate(0);
     INT8U err=0;
     CommTxBuf = OSMemCreate(CommTxPart, 100, 32, &err);
     // OS_TRACE_START();
@@ -85,6 +87,7 @@ int main()
     //串口接收数据任务（发送不创建任务，而是直接使用线程安全的print）
     (void)OSTaskCreateExt(usart_receive, (void *)0, &uasrt_rx_task[USART_RX_TASK_SIZE - 1u], 10,4, uasrt_rx_task, sizeof(uasrt_rx_task), NULL, 0, "USART_RX");
     (void)OSTaskCreateExt(angle_pid,(void*)0,&motor_change_task_stk[MOTOR_TASK_STK_SIZE-1u],9,5,motor_change_task_stk,sizeof(motor_change_task_stk),NULL,0,"motor_change");
+    (void)OSTaskCreateExt(madgwick_task,(void*)0,&madgwick_stk[MADGWICK_TASK_SIZE-1u],7,5,madgwick_stk,sizeof(madgwick_stk),NULL,0,"madgwick");
     // OS启动
     OSStart();
     return 0;

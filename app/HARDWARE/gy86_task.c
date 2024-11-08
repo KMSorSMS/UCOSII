@@ -2,6 +2,7 @@
 #include "HMC.h"
 #include "MPU6050.h"
 #include "Madgwick.h"
+#include "OS_stk.h"
 #include "os_cpu.h"
 #include "ucos_ii.h"
 #include "gy86_task.h"
@@ -79,7 +80,7 @@ void GY86_task()
         Multiple_Read_HMC5883(&(hmcData.x), &(hmcData.y), &(hmcData.z));
         My_ACC_Read_MPU6050(&(mpu6050Data.acc_x), &(mpu6050Data.acc_y), &(mpu6050Data.acc_z));
         My_GYRO_Read_MPU6050(&(mpu6050Data.gyro_x), &(mpu6050Data.gyro_y), &(mpu6050Data.gyro_z));
-        MadgwickAHRSupdate(mpu6050Data.gyro_x, mpu6050Data.gyro_y, mpu6050Data.gyro_z, mpu6050Data.acc_x, mpu6050Data.acc_y, mpu6050Data.acc_z,hmcData.y,-hmcData.x,hmcData.z);
+        OSSemPost(madgwick_sem);
         // PID_control(yaw,);
         // PID_control(roll,);
         // PID_control(pitch,);

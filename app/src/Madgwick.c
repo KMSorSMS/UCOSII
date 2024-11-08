@@ -17,7 +17,9 @@
 
 #include "Madgwick.h"
 #include <math.h>
+#include "OS_stk.h"
 #include "usart.h"
+#include "gy86_task.h"
 
 //---------------------------------------------------------------------------------------------------
 // Definitions
@@ -237,5 +239,16 @@ float invSqrt(float x) {
 }
 
 //====================================================================================================
-// END OF CODE
+// THE TASK OF MADGWICK
 //====================================================================================================
+
+void madgwick_task(void *args)
+{
+	INT8U err=0;
+    while (1)
+    {
+		OSSemPend(madgwick_sem,0, &err);
+        MadgwickAHRSupdate(mpu6050Data.gyro_x, mpu6050Data.gyro_y, mpu6050Data.gyro_z, mpu6050Data.acc_x, mpu6050Data.acc_y, mpu6050Data.acc_z,hmcData.y,-hmcData.x,hmcData.z);
+    }
+}
+
