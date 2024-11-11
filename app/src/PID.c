@@ -30,7 +30,7 @@ double target_y;
 double target_z;
 void threeaxisrot(double r11, double r12, double r21, double r31, double r32, double* x, double* y, double* z)
 {
-    *x = atan2(r31, r32);
+    *x = -atan2(r31, r32);
     *y = -asin(r21);
     *z = -atan2(r11, r12);
 }
@@ -112,9 +112,9 @@ void Init_PID(){
 
     pitch_angle_PID.iLimit = 300;	//or 1000
 
-    pitch_rate_PID.P  = 0.7;
-    pitch_rate_PID.I  = 0.5; 		//0.5
-    pitch_rate_PID.D  = 0.03;
+    pitch_rate_PID.P  = 65;
+    pitch_rate_PID.I  = 5; 		//0.5
+    pitch_rate_PID.D  = 0.1;
 
     pitch_rate_PID.iLimit = 300;
 ////////////////////////////////////////////
@@ -123,9 +123,9 @@ void Init_PID(){
     roll_angle_PID.D = 0;
     roll_angle_PID.iLimit = 300;	//or 1000
 
-    roll_rate_PID.P  = 0.7;
-    roll_rate_PID.I  = 0.5;; 	//0.5
-    roll_rate_PID.D  = 0.03;
+    roll_rate_PID.P  = 65;
+    roll_rate_PID.I  = 5; 	//0.5
+    roll_rate_PID.D  = 0.1;
     roll_rate_PID.iLimit = 300;
 ///////////////////////////////////////////
     yaw_angle_PID.P = 1;

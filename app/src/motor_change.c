@@ -41,7 +41,7 @@ void rate_pid(void *args){
 		Thro = cast_to_range(PPMtoPWM(TIM2_Channel1_DataBuf[THROTTLE_CH]),1000,2000);
 		// 打印遥控器的值
 		//将输出值融合到四个电机
-		if(Thro < 1100){
+		if(Thro < 1050){
 			Pitch = 0, Roll = 0, Yaw = 0;
 		}
 		Motor[2] = cast_to_range((int16_t)(Thro - Pitch - Roll - Yaw ), 1000, 2000);    //M3  

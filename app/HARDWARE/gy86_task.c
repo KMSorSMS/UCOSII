@@ -17,7 +17,7 @@ MPU6050Data mpu6050Data;
 double gy86_x;
 double gy86_y;
 double gy86_z;
-// static U32 print_per_time = 1;
+static U32 print_per_time = 100;
 void usart1_send_char(U8 c)
 {
     while ((USART_UX->SR & 0X40) == 0); /* 等待上一个字符发送完成 */
@@ -64,7 +64,7 @@ void send_upper()
 // 优先级降低后systemView显示正常
 void GY86_task()
 {
-    // U32 print_rate = 0;
+    U32 print_rate = 0;
     while (1)
     {
         //         // usart_send("**Start HMC5883L\n");
@@ -88,12 +88,18 @@ void GY86_task()
         // 打印数据
         // if (print_rate % print_per_time == 0)
         // {
-        // print_rate = 0;
-        // send_upper();
+        //     print_rate = 0;
+        //     send_upper();
         // }
         // print_rate++;
 
         cal_angel(&gy86_x, &gy86_y, &gy86_z);
+        if (print_rate % print_per_time == 0)
+        {
+            print_rate = 0;
+            usart_send("gy86_x: %d,gy86_y: %d,gy86_z: %d\n", (int)(gy86_x * RAD_TO_DEG * 10), (int)(gy86_y * RAD_TO_DEG * 10), (int)(gy86_z * RAD_TO_DEG * 10));
+        }
+        print_rate++;
         // usart_send("former_x: %d,former_y: %d,former_z: %d\n", (int)(former_x * 100), (int)(former_y * 100), (int)(former_z * 100));
         // usart_send("former_x: %d,former_y: %d,former_z: %d\n", (int)((former_x * RAD_TO_DEG) * 10), (int)((former_y * RAD_TO_DEG) * 10),
         //            (int)((former_z * RAD_TO_DEG) * 10));

@@ -1,5 +1,6 @@
 #include "usart.h"
 #include "NVIC.h"
+#include "PID.h"
 
 
 
@@ -97,7 +98,7 @@ void UART_RxCpltCallback() {
         //所以需要在picocom中设置将0d映射为0x0d和0x0a
         if (g_usart_rx_sta & 0x4000)                /* 接收到了0x0d（即回车键） */
         {
-            if (g_rx_buffer[0] != 0x0a)             /* 接收到的不是0x0a（即不是换行键） */
+            if (g_rx_buffer[0] != 0x62)             /* 接收到的不是0x0a（即不是换行键） */
             {
                 g_usart_rx_sta = 0;                 /* 接收错误,重新开始 */
             }
@@ -111,7 +112,7 @@ void UART_RxCpltCallback() {
         }
         else                                        /* 还没收到0X0d（即回车键） */
         {
-            if (g_rx_buffer[0] == 0x0d)
+            if (g_rx_buffer[0] == 0x61)
                 g_usart_rx_sta |= 0x4000;
             else
             {
@@ -225,6 +226,34 @@ void usart_receive(void* args){
         usart_send("usart_receive:接收到数据\n");
 	    usart_send("usart_receive:数据长度为：%d\n", g_usart_rx_sta & 0x3fff);
         usart_send("usart_receive:数据内容为：%s\n", g_usart_rx_buf);
+        int index = 0,number_index=1;
+        int decimal_point_seen = 0;
+        float result[3] = {0.0f,0.0f,0.0f},fraction=0.1f;
+        while(g_usart_rx_buf[index]){
+            if(g_usart_rx_buf[index] >= '0' && g_usart_rx_buf[index] <= '9'){
+                if(decimal_point_seen){
+                    result[number_index-1] = result[number_index-1] + (g_usart_rx_buf[index] - '0') * fraction;
+                    fraction *= 0.1f;
+                } else {
+                    result[number_index-1] = result[number_index-1] * 10 + (g_usart_rx_buf[index] - '0');
+                }
+            } else if (g_usart_rx_buf[index] == '.'){
+                decimal_point_seen = 1;
+            } else if (g_usart_rx_buf[index] == ' '){
+                number_index++;
+                decimal_point_seen = 0;
+                fraction = 0.1f;
+            }
+            index++;
+        }
+        usart_send("the p float number is %d,the i float number is %d,the d float number is %d\n",(int)(result[0]*100),(int)(result[1]*100),(int)(result[2]*100));
+        roll_rate_PID.P = result[0];
+        pitch_rate_PID.P = result[0];
+        roll_rate_PID.I = result[1];
+        pitch_rate_PID.I = result[1];
+        roll_rate_PID.D = result[2];
+        pitch_rate_PID.D = result[2];
+        
         //由于中断不能获取信号量，所以这里需要使用共享内存的方式告诉ISR，数据已经处理完了，并且还能清除数据的长度信息
         //也正是这个标记的存在，使得uasrt_rx_sem信号量数量最多只有一个
         g_usart_rx_sta = 0;			//清除接收标记
