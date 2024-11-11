@@ -15,6 +15,15 @@
 #include "os_trace.h"
 #include "usart.h"
 #include "Madgwick.h"
+OS_STK my_task_0[MY_TASK_SIZE_0];
+OS_STK my_task_1[MY_TASK_SIZE_1];
+OS_STK my_task_2[MY_TASK_SIZE_2];
+OS_STK madgwick_stk[MADGWICK_TASK_SIZE];
+OS_STK uasrt_rx_task[USART_RX_TASK_SIZE];
+OS_STK motor_change_task_stk[MOTOR_TASK_STK_SIZE];
+OS_EVENT *uasrt_tx_sem;
+OS_EVENT *uasrt_rx_sem;
+OS_EVENT *madgwick_sem;
 // 写一个时钟初始化的函数，配置为HSE，PLLM为4，PLLN为84，PLLP分频为2，PLLQ分频为4，还有AHB的地方分频为1 ，得到主频为84Mhz
 void RCC_Configuration(void)
 {
