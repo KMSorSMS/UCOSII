@@ -46,6 +46,8 @@ void rate_pid(void *args){
 		Motor[0] = (int16_t)(Thro + Pitch - Roll + Yaw );    //M1
 		Motor[3] = (int16_t)(Thro - Pitch + Roll + Yaw );    //M4 
 		Motor[1] = (int16_t)(Thro + Pitch + Roll - Yaw );    //M2
+		usart_send("roll : %d,pitch : %d,yaw : %d,throttle : %d\n",(int)Roll,(int)Pitch,(int)Yaw,(int)Thro);
+		usart_send("motor0: %d,motor1: %d,motor2: %d,motor3: %d\n",Motor[0],Motor[1],Motor[2],Motor[3]);
 		MotorPWMSet(Motor[0],Motor[1],Motor[2],Motor[3],0,0);
 		OSTimeDly(10); // 因为一个tick是1毫秒
 	}

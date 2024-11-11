@@ -137,6 +137,7 @@ void update_target(){
 	target_x=ANGLE_MAX * dbScaleLinear(PPMtoPWM(TIM2_Channel1_DataBuf[X_AXIS])-DUTY_MIDVAL,(double)RANGE/2,APP_PR_DB);
 	target_y=ANGLE_MAX * dbScaleLinear(PPMtoPWM(TIM2_Channel1_DataBuf[Y_AXIS])-DUTY_MIDVAL,(double)RANGE/2,APP_PR_DB);
 	target_z=YAW_RATE_MAX * dbScaleLinear(PPMtoPWM(TIM2_Channel1_DataBuf[Z_AXIS])-DUTY_MIDVAL,(double)RANGE/2,APP_YAW_DB);
+	usart_send("target_x:%d target_y:%d target_z:%d\n",(int)target_x,(int)target_y,(int)target_z);
 }
 
 //cut deadband, move linearhead
@@ -153,19 +154,19 @@ double dbScaleLinear(double x, double x_end, double deadband)
 	}
 }
 
-void print_capture_pwm(uint16_t arr){
-	// usart_send("start PPM:%d\n",start);
-	// for(int i = 0;i<8;i++){
-	// 	usart_send("TIM2_CH%d cap: %d \n",i,(int)TIM2_Channel1_DataBuf[i]);
-	// }
-	uint16_t M1 = PPMtoPWM(TIM2_Channel1_DataBuf[0]);
-	uint16_t M2 = PPMtoPWM(TIM2_Channel1_DataBuf[1]);
-	uint16_t M3 = PPMtoPWM(TIM2_Channel1_DataBuf[2]);
-	uint16_t M4 = PPMtoPWM(TIM2_Channel1_DataBuf[3]);
-	uint16_t M5 = PPMtoPWM(TIM2_Channel1_DataBuf[4]);
-	uint16_t M6 = PPMtoPWM(TIM2_Channel1_DataBuf[5]);
-	MotorPWMSet(M1,M2,M3,M4,M5,M6);
-}
+// void print_capture_pwm(uint16_t arr){
+// 	// usart_send("start PPM:%d\n",start);
+// 	// for(int i = 0;i<8;i++){
+// 	// 	usart_send("TIM2_CH%d cap: %d \n",i,(int)TIM2_Channel1_DataBuf[i]);
+// 	// }
+// 	uint16_t M1 = PPMtoPWM(TIM2_Channel1_DataBuf[0]);
+// 	uint16_t M2 = PPMtoPWM(TIM2_Channel1_DataBuf[1]);
+// 	uint16_t M3 = PPMtoPWM(TIM2_Channel1_DataBuf[2]);
+// 	uint16_t M4 = PPMtoPWM(TIM2_Channel1_DataBuf[3]);
+// 	uint16_t M5 = PPMtoPWM(TIM2_Channel1_DataBuf[4]);
+// 	uint16_t M6 = PPMtoPWM(TIM2_Channel1_DataBuf[5]);
+// 	MotorPWMSet(M1,M2,M3,M4,M5,M6);
+// }
 
 uint16_t PPMtoPWM(uint16_t ppm){
 	return (uint16_t)ppm+500;

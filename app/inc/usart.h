@@ -10,12 +10,12 @@
 #define RXBUFFERSIZE 1
 
 // ************************************************************************
-#define USART_UX_IRQHandler USART2_IRQHandler // 串口2中断服务函数
-#define USART_UX_IRQn USART2_IRQn             // 串口2中断通道,相当于中断号
-#define USART_UX USART2                       //需要初始化的是串口2
-#define USART_TX_PIN 2                         // 串口2：PA2  串口1：PC9 
-#define USART_RX_PIN 3                          // 串口2：PA3  串口1：PC10
-#define APB1FCK 42000000                       // 串口2：42000000 串口1：84000000
+#define USART_UX_IRQHandler USART1_IRQHandler // 串口2中断服务函数
+#define USART_UX_IRQn USART1_IRQn             // 串口2中断通道,相当于中断号
+#define USART_UX USART1                       //需要初始化的是串口2
+#define USART_TX_PIN 9                         // 串口2：PA2  串口1：PC9 
+#define USART_RX_PIN 10                          // 串口2：PA3  串口1：PC10
+#define APB1FCK 84000000                       // 串口2：42000000 串口1：84000000
 // ************************************************************************
 #define USART_SHARE_BUF_SIZE 256               // 串口共享缓冲区大小
 extern uint16_t g_usart_rx_sta;               // 接收状态标记

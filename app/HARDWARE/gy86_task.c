@@ -89,7 +89,7 @@ void GY86_task()
         // if (print_rate % print_per_time == 0)
         // {
         // print_rate = 0;
-        send_upper();
+        // send_upper();
         // }
         // print_rate++;
 
