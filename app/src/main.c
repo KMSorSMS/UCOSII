@@ -70,7 +70,7 @@ int main()
     LED2_Init();
     //usart初始化
     USART_Init(115200);
-    // usart_send("usart_send:Hello World\n");
+    usart_send("usart_send:Hello World\n");
     PWM_TIM_Init(20000-1,84-1);
     iic_TIM_Init(10-1,84-1);
     MotorPWMInit();

@@ -13,10 +13,10 @@
 // YAW CH4
 // PITCH CH2
 // ROLL CH1
-#define RUSH 3
-#define X_AXIS 1
-#define Y_AXIS 2
-#define Z_AXIS 4
+#define THROTTLE_CH 2
+#define X_AXIS 0
+#define Y_AXIS 1
+#define Z_AXIS 3
 
 #define APP_YAW_DB	 70 //dead band 
 #define APP_PR_DB		 50
