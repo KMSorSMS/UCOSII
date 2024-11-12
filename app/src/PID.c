@@ -5,7 +5,7 @@
 #include <math.h>
 #include "Reciever.h"
 #include "gy86_task.h"
-#define DT 250.0f
+#define DT 1000.0f
 float Thro=0,Roll=0,Pitch=0,Yaw=0;
 // 我们认为x是roll，y是pitch
 enum {ROLL,PITCH,YAW,THROTTLE};

@@ -125,6 +125,6 @@ void GY86_task()
         // OSIntNesting--;
         // }
         // OS_EXIT_CRITICAL();
-        OSTimeDly(15 * 1); // 一个tick是1毫秒
+        OSTimeDly(5 * 1); // 一个tick是1毫秒
     }
 }

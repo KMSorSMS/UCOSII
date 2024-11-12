@@ -28,7 +28,7 @@ void angle_pid(void *args){
 
 	while(1){
 		CtrlAttiAng();
-		OSTimeDly(20); // 因为一个tick是1毫秒
+		OSTimeDly(10); // 因为一个tick是1毫秒
 	}
 }
 
@@ -57,7 +57,7 @@ void rate_pid(void *args){
 			print_rate = 0;
 		}
 		MotorPWMSet(Motor[0],Motor[1],Motor[2],Motor[3],0,0);
-		OSTimeDly(10); // 因为一个tick是1毫秒
+		OSTimeDly(5); // 因为一个tick是1毫秒
 	}
 }
 
