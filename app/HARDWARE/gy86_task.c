@@ -20,6 +20,9 @@ double gy86_x;
 double gy86_y;
 double gy86_z;
 static U32 print_per_time = 100;
+
+extern float cast_to_range(float val, float begin, float end);
+
 void usart1_send_char(U8 c)
 {
     while ((USART_UX->SR & 0X40) == 0); /* 等待上一个字符发送完成 */
@@ -63,22 +66,7 @@ void send_upper()
         usart1_send_char(data[i]);
     }
 }
-float cast_to_range(float val, float begin, float end)
-{
-    // return ((val-1000) * (end - begin))/ 1000 + begin;
-    if (val < begin)
-    {
-        return begin;
-    }
-    else if (val > end)
-    {
-        return end;
-    }
-    else
-    {
-        return val;
-    }
-}
+
 // 优先级降低后systemView显示正常
 void GY86_task()
 {
@@ -93,14 +81,17 @@ void GY86_task()
         }
         print_rate += 1;
         fre += 1;
-        Multiple_Read_HMC5883(&(hmcData.x), &(hmcData.y), &(hmcData.z));
-        My_ACC_Read_MPU6050(&(mpu6050Data.acc_x), &(mpu6050Data.acc_y), &(mpu6050Data.acc_z));
-        My_GYRO_Read_MPU6050(&(mpu6050Data.gyro_x), &(mpu6050Data.gyro_y), &(mpu6050Data.gyro_z));
-        MadgwickAHRSupdate(mpu6050Data.gyro_x, mpu6050Data.gyro_y, mpu6050Data.gyro_z, mpu6050Data.acc_x, mpu6050Data.acc_y, mpu6050Data.acc_z,
-                           hmcData.y, -hmcData.x, hmcData.z);
+        if (fre % 10 == 0)
+        {
+            Multiple_Read_HMC5883(&(hmcData.x), &(hmcData.y), &(hmcData.z));
+            My_ACC_Read_MPU6050(&(mpu6050Data.acc_x), &(mpu6050Data.acc_y), &(mpu6050Data.acc_z));
+            My_GYRO_Read_MPU6050(&(mpu6050Data.gyro_x), &(mpu6050Data.gyro_y), &(mpu6050Data.gyro_z));
+            MadgwickAHRSupdate(mpu6050Data.gyro_x, mpu6050Data.gyro_y, mpu6050Data.gyro_z, mpu6050Data.acc_x, mpu6050Data.acc_y, mpu6050Data.acc_z,
+                               hmcData.y, -hmcData.x, hmcData.z);
 
-        send_upper();
-        cal_angel(&gy86_x, &gy86_y, &gy86_z);
+            send_upper();
+            cal_angel(&gy86_x, &gy86_y, &gy86_z);
+        }
         if (print_rate % print_per_time == 0)
         {
             usart_send("gy86_x: %d,gy86_y: %d,gy86_z: %d\n", (int)(gy86_x * RAD_TO_DEG * 10), (int)(gy86_y * RAD_TO_DEG * 10),
