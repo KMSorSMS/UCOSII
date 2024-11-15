@@ -64,7 +64,7 @@ static void PID_Postion_Cal(PID_Typedef * PID,float target,float measure,int32_t
 
 	PID->PreError=PID->Error;
 	//仅用于角度环和角速度环的
-  if(fabs(PID->Output) < Thro )		              //比油门还大时不积分
+  if(fabs(PID->Output) < Thro-1000 )		              //比油门还大时不积分
 		{
 			termI=(PID->Integ) + (PID->Error) * dt;     //积分环节
 			if(termI > - PID->iLimit && termI < PID->iLimit && PID->Output > - PID->iLimit && PID->Output < PID->iLimit)       //在-300~300时才进行积分环节
@@ -112,9 +112,9 @@ void Init_PID(){
 
     pitch_angle_PID.iLimit = 300;	//or 1000
 
-    pitch_rate_PID.P  = 65;
-    pitch_rate_PID.I  = 5; 		//0.5
-    pitch_rate_PID.D  = 0.1;
+    pitch_rate_PID.P  = 45.3;
+    pitch_rate_PID.I  = 67; 		//0.5
+    pitch_rate_PID.D  = 0.0;
 
     pitch_rate_PID.iLimit = 300;
 ////////////////////////////////////////////
@@ -123,9 +123,9 @@ void Init_PID(){
     roll_angle_PID.D = 0;
     roll_angle_PID.iLimit = 300;	//or 1000
 
-    roll_rate_PID.P  = 65;
-    roll_rate_PID.I  = 5; 	//0.5
-    roll_rate_PID.D  = 0.1;
+    roll_rate_PID.P  = 45.3;
+    roll_rate_PID.I  = 67; 	//0.5
+    roll_rate_PID.D  = 0.0;
     roll_rate_PID.iLimit = 300;
 ///////////////////////////////////////////
     yaw_angle_PID.P = 1;

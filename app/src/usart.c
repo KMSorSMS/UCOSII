@@ -254,6 +254,9 @@ void usart_receive(void* args){
         roll_rate_PID.D = result[2];
         pitch_rate_PID.D = result[2];
         
+        roll_rate_PID.Integ = 0;
+        pitch_rate_PID.Integ = 0;
+        
         //由于中断不能获取信号量，所以这里需要使用共享内存的方式告诉ISR，数据已经处理完了，并且还能清除数据的长度信息
         //也正是这个标记的存在，使得uasrt_rx_sem信号量数量最多只有一个
         g_usart_rx_sta = 0;			//清除接收标记

@@ -89,7 +89,7 @@ void GY86_task()
         // if (print_rate % print_per_time == 0)
         // {
         //     print_rate = 0;
-        //     send_upper();
+        send_upper();
         // }
         // print_rate++;
 
@@ -125,6 +125,6 @@ void GY86_task()
         // OSIntNesting--;
         // }
         // OS_EXIT_CRITICAL();
-        OSTimeDly(5 * 1); // 一个tick是1毫秒
+        OSTimeDly(10 * 1); // 一个tick是1毫秒
     }
 }
