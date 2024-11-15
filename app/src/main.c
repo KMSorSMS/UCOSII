@@ -91,12 +91,12 @@ int main()
     // pnext用于指向任务扩展部分，暂时没有用到
     // opt是可选项，根据被置位的位来进行一些额外的操作，暂时没有用到
     (void)OSTaskCreateExt(my_task_0_t_, (void *)0, &my_task_0[MY_TASK_SIZE_0 - 1u], 12,1,my_task_0,sizeof(my_task_0),NULL,0,"LED_OFF");
-    (void)OSTaskCreateExt(rate_pid, (void *)0, &my_task_1[MY_TASK_SIZE_1 - 1u], 9,2,my_task_1,sizeof(my_task_1),NULL,0,"LED_ON");
+    // (void)OSTaskCreateExt(rate_pid, (void *)0, &my_task_1[MY_TASK_SIZE_1 - 1u], 9,2,my_task_1,sizeof(my_task_1),NULL,0,"LED_ON");
     (void)OSTaskCreateExt(GY86_task, 0, &my_task_2[MY_TASK_SIZE_2-1u], 8,3,my_task_2,sizeof(my_task_2),NULL,0,"GY86");
     //串口接收数据任务（发送不创建任务，而是直接使用线程安全的print）
     (void)OSTaskCreateExt(usart_receive, (void *)0, &uasrt_rx_task[USART_RX_TASK_SIZE - 1u], 11,4, uasrt_rx_task, sizeof(uasrt_rx_task), NULL, 0, "USART_RX");
-    (void)OSTaskCreateExt(angle_pid,(void*)0,&motor_change_task_stk[MOTOR_TASK_STK_SIZE-1u],10,5,motor_change_task_stk,sizeof(motor_change_task_stk),NULL,0,"motor_change");
-    (void)OSTaskCreateExt(madgwick_task,(void*)0,&madgwick_stk[MADGWICK_TASK_SIZE-1u],7,5,madgwick_stk,sizeof(madgwick_stk),NULL,0,"madgwick");
+    // (void)OSTaskCreateExt(angle_pid,(void*)0,&motor_change_task_stk[MOTOR_TASK_STK_SIZE-1u],10,5,motor_change_task_stk,sizeof(motor_change_task_stk),NULL,0,"motor_change");
+    // (void)OSTaskCreateExt(madgwick_task,(void*)0,&madgwick_stk[MADGWICK_TASK_SIZE-1u],7,5,madgwick_stk,sizeof(madgwick_stk),NULL,0,"madgwick");
     // OS启动
     OSStart();
     return 0;
