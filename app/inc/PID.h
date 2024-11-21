@@ -6,6 +6,8 @@ extern double target_x;
 extern double target_y;
 // 俯仰角（x轴旋转）
 extern double target_z;
+// 油门
+extern double target_thro;
 
 //gy86测量值
 extern double gy86_x;

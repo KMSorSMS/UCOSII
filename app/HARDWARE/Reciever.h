@@ -14,6 +14,10 @@
 // PITCH CH2
 // ROLL CH1
 #define THROTTLE_CH 2
+#define YAW_CH 3
+#define PITCH_CH 1
+#define ROLL_CH 0
+
 #define X_AXIS 0
 #define Y_AXIS 1
 #define Z_AXIS 3

@@ -22,12 +22,14 @@ PID_Typedef roll_rate_PID;    //roll角速率环的PID
 PID_Typedef yaw_angle_PID;    //yaw角度环的PID 
 PID_Typedef yaw_rate_PID;     //yaw角速率环的PID
 
-// 偏航角（z轴旋转）
+// 偏航角（z轴旋转）弧度制
 double target_x;
-// 横滚角（y轴旋转）
+// 横滚角（y轴旋转）弧度制
 double target_y;
-// 俯仰角（x轴旋转）
+// 俯仰角（x轴旋转）弧度制
 double target_z;
+// 油门
+double target_thro;
 void threeaxisrot(double r11, double r12, double r21, double r31, double r32, double* x, double* y, double* z)
 {
     *x = -atan2(r31, r32);
@@ -92,10 +94,10 @@ void CtrlAttiRate(void)
 {
  	float yawRateTarget=0;
 	
-	yawRateTarget=-(float)target_z;  //yawRateTarget是目标角速度，是deg/s,target_z是目标角速度
+	yawRateTarget=-(float)target_z;  //yawRateTarget是目标角速度，是RAD/s,target_z是目标角速度
 	
 	
-	//原参数对应于 DMP的直接输出gyro , 是deg.  且原DMP之后的处理运算是错误的
+	//原参数对应于 DMP的直接输出gyro , 是RAD.
 	PID_Postion_Cal(&pitch_rate_PID,pitch_angle_PID.Output,mpu6050Data.gyro_y,DT);	
 	PID_Postion_Cal(&roll_rate_PID,roll_angle_PID.Output,mpu6050Data.gyro_x,DT);//gyroxGloble
 	PID_Postion_Cal(&yaw_rate_PID,yawRateTarget,mpu6050Data.gyro_z,DT);          //DMP_DATA.GYROz
@@ -106,25 +108,25 @@ void CtrlAttiRate(void)
 }
 
 void Init_PID(){
-    pitch_angle_PID.P = 3.5;
+    pitch_angle_PID.P = 4.0;
     pitch_angle_PID.I = 0;//1.0;		//0
     pitch_angle_PID.D = 0;
 
     pitch_angle_PID.iLimit = 300;	//or 1000
 
-    pitch_rate_PID.P  = 45.3;
-    pitch_rate_PID.I  = 67; 		//0.5
+    pitch_rate_PID.P  = 55;
+    pitch_rate_PID.I  = 0; 		//0.5
     pitch_rate_PID.D  = 0.0;
 
     pitch_rate_PID.iLimit = 300;
 ////////////////////////////////////////////
-    roll_angle_PID.P = 3.5;
+    roll_angle_PID.P = 4.0;
     roll_angle_PID.I = 0;//1.0;
     roll_angle_PID.D = 0;
     roll_angle_PID.iLimit = 300;	//or 1000
 
-    roll_rate_PID.P  = 45.3;
-    roll_rate_PID.I  = 67; 	//0.5
+    roll_rate_PID.P  = 55;
+    roll_rate_PID.I  = 0; 	//0.5
     roll_rate_PID.D  = 0.0;
     roll_rate_PID.iLimit = 300;
 ///////////////////////////////////////////

@@ -7,7 +7,7 @@
 #include "stm32f401xe.h"
 #include "usart.h"
 #include "NVIC.h"
-
+#define DEG2RAD 3.1415926 / 180.0
 
 /**
 	use TIM2_CH1 as PPM capture channel
@@ -134,9 +134,10 @@ void TIM2_IRQHandler(void){
 // x roll
 // change the target val of PID according to pwm
 void update_target(){
-	target_x=ANGLE_MAX * dbScaleLinear(PPMtoPWM(TIM2_Channel1_DataBuf[X_AXIS])-DUTY_MIDVAL,(double)RANGE/2,APP_PR_DB);
-	target_y=ANGLE_MAX * dbScaleLinear(PPMtoPWM(TIM2_Channel1_DataBuf[Y_AXIS])-DUTY_MIDVAL,(double)RANGE/2,APP_PR_DB);
-	target_z=YAW_RATE_MAX * dbScaleLinear(PPMtoPWM(TIM2_Channel1_DataBuf[Z_AXIS])-DUTY_MIDVAL,(double)RANGE/2,APP_YAW_DB);
+	target_x=ANGLE_MAX * dbScaleLinear(PPMtoPWM(TIM2_Channel1_DataBuf[X_AXIS])-DUTY_MIDVAL,(double)RANGE/2,APP_PR_DB) * DEG2RAD;
+	target_y=ANGLE_MAX * dbScaleLinear(PPMtoPWM(TIM2_Channel1_DataBuf[Y_AXIS])-DUTY_MIDVAL,(double)RANGE/2,APP_PR_DB) * DEG2RAD;
+	target_z=YAW_RATE_MAX * dbScaleLinear(PPMtoPWM(TIM2_Channel1_DataBuf[Z_AXIS])-DUTY_MIDVAL,(double)RANGE/2,APP_YAW_DB) * DEG2RAD;
+	target_thro=PPMtoPWM(TIM2_Channel1_DataBuf[THROTTLE_CH]);
 	// usart_send("target_x:%d target_y:%d target_z:%d\n",(int)target_x,(int)target_y,(int)target_z);
 }
 

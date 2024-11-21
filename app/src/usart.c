@@ -228,7 +228,7 @@ void usart_receive(void* args){
         usart_send("usart_receive:数据内容为：%s\n", g_usart_rx_buf);
         int index = 0,number_index=1;
         int decimal_point_seen = 0;
-        float result[3] = {0.0f,0.0f,0.0f},fraction=0.1f;
+        float result[4] = {0.0f,0.0f,0.0f,0.0f},fraction=0.1f;
         while(g_usart_rx_buf[index]){
             if(g_usart_rx_buf[index] >= '0' && g_usart_rx_buf[index] <= '9'){
                 if(decimal_point_seen){
@@ -253,6 +253,9 @@ void usart_receive(void* args){
         pitch_rate_PID.I = result[1];
         roll_rate_PID.D = result[2];
         pitch_rate_PID.D = result[2];
+        usart_send("the input is: %d %d %d %d\n",(int)(result[0]*100),(int)(result[1]*100),(int)(result[2]*100),(int)(result[3]*100));
+        roll_angle_PID.P = result[3];
+        pitch_angle_PID.P = result[3];
         
         roll_rate_PID.Integ = 0;
         pitch_rate_PID.Integ = 0;
