@@ -211,23 +211,23 @@ void GY86_task()
             // 打印遥控器的值
             // 将输出值融合到四个电机
 
-            // if (Thro < 1050)
-            // {
-            //     Pitch = 0, Roll = 0, Yaw = 0;
-            // }
-            // else
+            if (Thro < 1050)
+            {
+                Pitch = 0, Roll = 0, Yaw = 0;
+            }
+            else
             {
                 Pitch = cast_to_range(Pitch, -(Thro - 1000) * partial, (Thro - 1000) * partial);
                 Roll = cast_to_range(Roll, -(Thro - 1000) * partial, (Thro - 1000) * partial);
                 Yaw = cast_to_range(Yaw, -(Thro - 1000) * partial, (Thro - 1000) * partial);
-                // Pitch = 0;
-                // Yaw = 0;
+                Pitch = 0;
+                Yaw = 0;
             }
 
-            Motor[2] = (int16_t)cast_to_range((Thro - Pitch - Roll - Yaw), 1000, 2000); // M3
-            Motor[0] = (int16_t)cast_to_range((Thro + Pitch - Roll + Yaw), 1000, 2000); // M1
-            Motor[3] = (int16_t)cast_to_range((Thro - Pitch + Roll + Yaw), 1000, 2000); // M4
-            Motor[1] = (int16_t)cast_to_range((Thro + Pitch + Roll - Yaw), 1000, 2000); // M2
+            Motor[2] = (int16_t)cast_to_range((Thro - Pitch + Roll - Yaw), 1000, 2000); // M3
+            Motor[0] = (int16_t)cast_to_range((Thro + Pitch + Roll + Yaw), 1000, 2000); // M1
+            Motor[3] = (int16_t)cast_to_range((Thro - Pitch - Roll + Yaw), 1000, 2000); // M4
+            Motor[1] = (int16_t)cast_to_range((Thro + Pitch - Roll - Yaw), 1000, 2000); // M2
             if (gy86_x > 1.5708 || gy86_y > 1.5708 || gy86_x < -1.5708 || gy86_y < -1.5708)
             {
                 Motor[0] = 1000;

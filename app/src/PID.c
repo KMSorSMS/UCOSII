@@ -32,7 +32,7 @@ double target_z;
 double target_thro;
 void threeaxisrot(double r11, double r12, double r21, double r31, double r32, double* x, double* y, double* z)
 {
-    *x = -atan2(r31, r32);
+    *x = atan2(r31, r32);
     *y = -asin(r21);
     *z = -atan2(r11, r12);
 }
@@ -108,26 +108,26 @@ void CtrlAttiRate(void)
 }
 
 void Init_PID(){
-    pitch_angle_PID.P = 4.0;
+    pitch_angle_PID.P = 8.0;
     pitch_angle_PID.I = 0;//1.0;		//0
     pitch_angle_PID.D = 0;
 
     pitch_angle_PID.iLimit = 300;	//or 1000
 
-    pitch_rate_PID.P  = 55;
-    pitch_rate_PID.I  = 0; 		//0.5
-    pitch_rate_PID.D  = 0.0;
+    pitch_rate_PID.P  = 20.0;
+    pitch_rate_PID.I  = 2.5; 		//0.5
+    pitch_rate_PID.D  = 0.8;
 
     pitch_rate_PID.iLimit = 300;
 ////////////////////////////////////////////
-    roll_angle_PID.P = 4.0;
+    roll_angle_PID.P = 8.0;
     roll_angle_PID.I = 0;//1.0;
     roll_angle_PID.D = 0;
     roll_angle_PID.iLimit = 300;	//or 1000
 
-    roll_rate_PID.P  = 55;
-    roll_rate_PID.I  = 0; 	//0.5
-    roll_rate_PID.D  = 0.0;
+    roll_rate_PID.P  = 20.0;
+    roll_rate_PID.I  = 2.5; 	//0.5
+    roll_rate_PID.D  = 0.8;
     roll_rate_PID.iLimit = 300;
 ///////////////////////////////////////////
     yaw_angle_PID.P = 1;
