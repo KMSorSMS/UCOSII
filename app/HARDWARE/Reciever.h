@@ -25,7 +25,7 @@
 #define APP_YAW_DB	 70 //dead band 
 #define APP_PR_DB		 50
 
-#define ANGLE_MAX 45
+#define ANGLE_MAX 15.0f
 
 #define YAW_RATE_MAX 60
 
