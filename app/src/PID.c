@@ -134,7 +134,7 @@ void Init_PID(){
     yaw_angle_PID.I = 0.2;
     yaw_angle_PID.D = 0;
 
-    yaw_rate_PID.P  = 20;
+    yaw_rate_PID.P  = 15;
     yaw_rate_PID.I  = 0;
     yaw_rate_PID.D  = 0;
 }
