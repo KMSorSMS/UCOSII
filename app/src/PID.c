@@ -62,16 +62,17 @@ static void PID_Postion_Cal(PID_Typedef * PID,float target,float measure,int32_t
 
 	PID->Deriv= (PID->Error-PID->PreError)/dt;
 
+    // Integ在未起飞之前都是0，所以这里不用对这个式子进行修改
 	PID->Output=(PID->P * PID->Error) + (PID->I * PID->Integ) + (PID->D * PID->Deriv);    //PID:比例环节+积分环节+微分环节
 
 	PID->PreError=PID->Error;
 	//仅用于角度环和角速度环的
-  if(fabs(PID->Output) < Thro-1000 )		              //比油门还大时不积分
-		{
-			termI=(PID->Integ) + (PID->Error) * dt;     //积分环节
-			if(termI > - PID->iLimit && termI < PID->iLimit && PID->Output > - PID->iLimit && PID->Output < PID->iLimit)       //在-300~300时才进行积分环节
-					PID->Integ=termI;
-		}
+    if(fabs(PID->Output) < Thro-1000&&takeoff_stat)		              //比油门还大时不积分（未起飞时也不积分）
+    {
+        termI=(PID->Integ) + (PID->Error) * dt;     //积分环节
+        if(termI > - PID->iLimit && termI < PID->iLimit && PID->Output > - PID->iLimit && PID->Output < PID->iLimit)       //在-300~300时才进行积分环节
+                PID->Integ=termI;
+    }
 }
 
 
@@ -79,13 +80,13 @@ static void PID_Postion_Cal(PID_Typedef * PID,float target,float measure,int32_t
 //描述：对飞行器姿态控制（pitch，roll，yaw）控制中，串级PID中的角度环控制
 void CtrlAttiAng(void)
 {
-		float angTarget[3]={0};
-		
+	float angTarget[3]={0};
+    
     angTarget[ROLL]=(float)(target_x);
     angTarget[PITCH]=(float)(target_y); 
 
-		PID_Postion_Cal(&roll_angle_PID,angTarget[ROLL],gy86_x,DT);	 
-		PID_Postion_Cal(&pitch_angle_PID,angTarget[PITCH],gy86_y,DT);
+	PID_Postion_Cal(&roll_angle_PID,angTarget[ROLL],gy86_x,DT);	 
+	PID_Postion_Cal(&pitch_angle_PID,angTarget[PITCH],gy86_y,DT);
 }
 
 //函数名：CtrlAttiRate(void)
@@ -93,10 +94,9 @@ void CtrlAttiAng(void)
 void CtrlAttiRate(void)
 {
  	float yawRateTarget=0;
-	
+
 	yawRateTarget=-(float)target_z;  //yawRateTarget是目标角速度，是RAD/s,target_z是目标角速度
-	
-	
+
 	//原参数对应于 DMP的直接输出gyro , 是RAD.
 	PID_Postion_Cal(&pitch_rate_PID,pitch_angle_PID.Output,mpu6050Data.gyro_y,DT);	
 	PID_Postion_Cal(&roll_rate_PID,roll_angle_PID.Output,mpu6050Data.gyro_x,DT);//gyroxGloble
@@ -126,7 +126,7 @@ void Init_PID(){
     roll_angle_PID.iLimit = 300;	//or 1000
 
     roll_rate_PID.P  = 18.5;
-    roll_rate_PID.I  = 3; 	//0.5
+    roll_rate_PID.I  = 3; 	//3
     roll_rate_PID.D  = 0.15;
     roll_rate_PID.iLimit = 300;
 ///////////////////////////////////////////

@@ -5,7 +5,7 @@
 #include "main.h"
 
 typedef struct MPU6050Data{
-	float acc_x; 
+	float acc_x;
     float acc_y;
     float acc_z;
 	float gyro_x;
@@ -23,5 +23,8 @@ typedef struct HmcData{
 extern HmcData hmcData;
 extern MPU6050Data mpu6050Data; 
 extern void GY86_task();
+
+// the take off state 
+extern U8 takeoff_stat;
 
 #endif

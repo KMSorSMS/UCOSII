@@ -25,7 +25,6 @@ float cast_to_range(float val,float begin,float end);
 // }
 
 void angle_pid(void *args){
-
 	while(1){
 		CtrlAttiAng();
 		OSTimeDly(20); // 因为一个tick是1毫秒

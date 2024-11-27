@@ -13,6 +13,9 @@
 
 #define DATA_LEN 100
 #define RAD_TO_DEG (180.0 / 3.14159265358979323846)
+#define TAKEOFF_THOR 1500
+// init the take off state
+U8 takeoff_stat=0;
 
 HmcData hmcData;
 MPU6050Data mpu6050Data;
@@ -165,7 +168,6 @@ void send_upper(int16_t Motor[4])
     // data[10] = D_rate & 0xFF;
     // data[11] = (D_rate >> 8) & 0xFF;
     // send_controller(data);
-
 }
 
 // 优先级降低后systemView显示正常
@@ -207,16 +209,18 @@ void GY86_task()
         if (fre % 5 == 0)
         {
             Thro = cast_to_range(target_thro, 1000.0, 2000.0);
+            // 更新飞行状态
+            if(Thro>=TAKEOFF_THOR){
+                takeoff_stat=1;
+            }
             CtrlAttiRate();
             // 打印遥控器的值
             // 将输出值融合到四个电机
-
             if (Thro < 1050)
             {
                 Pitch = 0, Roll = 0, Yaw = 0;
             }
-            else
-            {
+            else{
                 Pitch = cast_to_range(Pitch, -(Thro - 1000) * partial, (Thro - 1000) * partial);
                 Roll = cast_to_range(Roll, -(Thro - 1000) * partial, (Thro - 1000) * partial);
                 Yaw = cast_to_range(Yaw, -(Thro - 1000) * partial, (Thro - 1000) * partial);
