@@ -254,9 +254,9 @@ void usart_receive(void* args){
         roll_rate_PID.D = result[2];
         pitch_rate_PID.D = result[2];
         usart_send("the input is: %d %d %d %d\n",(int)(result[0]*100),(int)(result[1]*100),(int)(result[2]*100),(int)(result[3]*100));
-        roll_angle_PID.P = result[3];
-        pitch_angle_PID.P = result[3];
-        
+        // roll_angle_PID.P = result[3];
+        // pitch_angle_PID.P = result[3];
+        yaw_rate_PID.P = result[3];
         roll_rate_PID.Integ = 0;
         pitch_rate_PID.Integ = 0;
         

@@ -51,10 +51,10 @@ void rate_pid(void *args){
 			Yaw = 0;
 		}
 
-		Motor[2] = (int16_t)cast_to_range((Thro - Pitch - Roll - Yaw ), 1000, 1800);    //M3  
-		Motor[0] = (int16_t)cast_to_range((Thro + Pitch - Roll + Yaw ), 1000, 1800);    //M1
-		Motor[3] = (int16_t)cast_to_range((Thro - Pitch + Roll + Yaw ), 1000, 1800);    //M4 
-		Motor[1] = (int16_t)cast_to_range((Thro + Pitch + Roll - Yaw ), 1000, 1800);    //M2
+		Motor[2] = (int16_t)cast_to_range((Thro - Pitch - Roll + Yaw ), 1000, 1800);    //M3  
+		Motor[0] = (int16_t)cast_to_range((Thro + Pitch - Roll - Yaw ), 1000, 1800);    //M1
+		Motor[3] = (int16_t)cast_to_range((Thro - Pitch + Roll - Yaw ), 1000, 1800);    //M4 
+		Motor[1] = (int16_t)cast_to_range((Thro + Pitch + Roll + Yaw ), 1000, 1800);    //M2
 		if(gy86_x > 1.2217 || gy86_y > 1.2217 || gy86_x < -1.2217 || gy86_y < -1.2217){
 			Motor[0] = 1000;
 			Motor[1] = 1000;
