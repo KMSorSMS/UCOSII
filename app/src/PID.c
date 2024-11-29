@@ -62,6 +62,11 @@ static void PID_Postion_Cal(PID_Typedef * PID,float target,float measure,int32_t
 
 	PID->Deriv= (PID->Error-PID->PreError)/dt;
 
+    // 没有起飞时将Integ清零
+    if(!takeoff_stat){
+        PID->Integ=0;
+    }
+
     // Integ在未起飞之前都是0，所以这里不用对这个式子进行修改
 	PID->Output=(PID->P * PID->Error) + (PID->I * PID->Integ) + (PID->D * PID->Deriv);    //PID:比例环节+积分环节+微分环节
 
@@ -115,8 +120,8 @@ void Init_PID(){
     pitch_angle_PID.iLimit = 300;	//or 1000
 
     pitch_rate_PID.P  = 18.5;
-    pitch_rate_PID.I  = 3; 		//0.5
-    pitch_rate_PID.D  = 0.15;
+    pitch_rate_PID.I  = 0.5; 		//0.5
+    pitch_rate_PID.D  = 0.132;
 
     pitch_rate_PID.iLimit = 300;
 ////////////////////////////////////////////
@@ -126,15 +131,15 @@ void Init_PID(){
     roll_angle_PID.iLimit = 300;	//or 1000
 
     roll_rate_PID.P  = 18.5;
-    roll_rate_PID.I  = 3; 	//3
-    roll_rate_PID.D  = 0.15;
+    roll_rate_PID.I  = 0.5; 	//3
+    roll_rate_PID.D  = 0.132;
     roll_rate_PID.iLimit = 300;
 ///////////////////////////////////////////
-    yaw_angle_PID.P = 1;
-    yaw_angle_PID.I = 0.2;
+    yaw_angle_PID.P = 0;
+    yaw_angle_PID.I = 0;
     yaw_angle_PID.D = 0;
 
-    yaw_rate_PID.P  = 15;
+    yaw_rate_PID.P  = 100;
     yaw_rate_PID.I  = 0;
     yaw_rate_PID.D  = 0;
 }

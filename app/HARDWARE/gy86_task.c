@@ -212,6 +212,8 @@ void GY86_task()
             // 更新飞行状态
             if(Thro>=TAKEOFF_THOR){
                 takeoff_stat=1;
+            }else{
+                takeoff_stat=0;
             }
             CtrlAttiRate();
             // 打印遥控器的值
@@ -228,10 +230,10 @@ void GY86_task()
                 // Yaw = 0;
             }
 
-            Motor[2] = (int16_t)cast_to_range((Thro + Pitch + Roll - Yaw), 1000, 2000); // M3
-            Motor[0] = (int16_t)cast_to_range((Thro - Pitch + Roll + Yaw), 1000, 2000); // M1
-            Motor[3] = (int16_t)cast_to_range((Thro + Pitch - Roll + Yaw), 1000, 2000); // M4
-            Motor[1] = (int16_t)cast_to_range((Thro - Pitch - Roll - Yaw), 1000, 2000); // M2
+            Motor[2] = (int16_t)cast_to_range((Thro + Pitch + Roll + Yaw), 1000, 2000); // M3
+            Motor[0] = (int16_t)cast_to_range((Thro - Pitch + Roll - Yaw), 1000, 2000); // M1
+            Motor[3] = (int16_t)cast_to_range((Thro + Pitch - Roll - Yaw), 1000, 2000); // M4
+            Motor[1] = (int16_t)cast_to_range((Thro - Pitch - Roll + Yaw), 1000, 2000); // M2
             if (gy86_x > 1.5708 || gy86_y > 1.5708 || gy86_x < -1.5708 || gy86_y < -1.5708)
             {
                 Motor[0] = 1000;
