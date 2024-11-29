@@ -119,9 +119,9 @@ void Init_PID(){
 
     pitch_angle_PID.iLimit = 300;	//or 1000
 
-    pitch_rate_PID.P  = 16.5;
+    pitch_rate_PID.P  = 17.5;
     pitch_rate_PID.I  = 0.5; 		//0.5
-    pitch_rate_PID.D  = 0.132;
+    pitch_rate_PID.D  = 0.162;
 
     pitch_rate_PID.iLimit = 300;
 ////////////////////////////////////////////
@@ -130,9 +130,9 @@ void Init_PID(){
     roll_angle_PID.D = 0;
     roll_angle_PID.iLimit = 300;	//or 1000
 
-    roll_rate_PID.P  = 16.5;
+    roll_rate_PID.P  = 17.5;
     roll_rate_PID.I  = 0.5; 	//3
-    roll_rate_PID.D  = 0.132;
+    roll_rate_PID.D  = 0.162;
     roll_rate_PID.iLimit = 300;
 ///////////////////////////////////////////
     yaw_angle_PID.P = 0;
